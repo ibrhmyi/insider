@@ -1,0 +1,25 @@
+{
+ "seed_quantile": 0.99,
+ "seed_lookback_h": 24,
+ "ripple_window_min": 30,
+ "news_buffer_min": 30,
+ "carry_cutoff": 0.98,
+ "anchor_step_min": 5,
+ "anchor_min_prior_hour_trades": 1,
+ "max_anchors": 3000,
+ "anchor_mode": "trade",
+ "k_matches": 10,
+ "min_prior_trades": 20,
+ "feature_set": "brief+burst+expiry",
+ "time_caliper_h": 2,
+ "match_features": [
+  "price",
+  "log_cnt_1h",
+  "log_cnt_5m",
+  "log_h_to_ref"
+ ],
+ "alert_threshold_excess_wallets": 12.909999999999979,
+ "alert_threshold_basis": "95th percentile of control excess_wallets at q=0.99 (n=50 control seeds)",
+ "frozen_utc": "2026-11-09T16:31:34Z",
+ "measures_py_sha256": "b47a1a4b0a5a1e7061fa085438061ee496e75000e760c6904b84954028547682"
+}

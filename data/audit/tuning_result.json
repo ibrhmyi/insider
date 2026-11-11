@@ -1,0 +1,38 @@
+{
+ "chosen": {
+  "seed_quantile": 0.99,
+  "seed_lookback_h": 24,
+  "ripple_window_min": 30,
+  "news_buffer_min": 30,
+  "carry_cutoff": 0.98,
+  "anchor_step_min": 5,
+  "anchor_min_prior_hour_trades": 1,
+  "max_anchors": 3000,
+  "anchor_mode": "trade",
+  "k_matches": 10,
+  "min_prior_trades": 20,
+  "feature_set": "brief+burst+expiry",
+  "time_caliper_h": 2,
+  "match_features": [
+   "price",
+   "log_cnt_1h",
+   "log_cnt_5m",
+   "log_h_to_ref"
+  ],
+  "alert_threshold_excess_wallets": 12.909999999999979,
+  "alert_threshold_basis": "95th percentile of control excess_wallets at q=0.99 (n=50 control seeds)"
+ },
+ "best_row": {
+  "anchor_mode": "trade",
+  "k_matches": 10,
+  "min_prior_trades": 20,
+  "feature_set": "brief+burst+expiry",
+  "time_caliper_h": 2,
+  "placebo_n": 268,
+  "placebo_mean_excess_wallets": 2.449,
+  "placebo_sd": 8.347,
+  "placebo_median": 0.1,
+  "placebo_mean_log_ratio": 0.025,
+  "abs_mean": 2.449
+ }
+}

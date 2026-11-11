@@ -1,0 +1,9 @@
+anchor_mode,k_matches,min_prior_trades,feature_set,time_caliper_h,placebo_n,placebo_mean_excess_wallets,placebo_sd,placebo_median,placebo_mean_log_ratio
+trade,10,20,brief+burst+expiry,0,300,9.952,23.92,0.3,0.193
+trade,10,20,brief+burst+expiry,12,300,9.6,22.586,0.3,0.182
+trade,10,20,brief+burst+expiry,6,300,9.635,22.563,0.3,0.179
+trade,10,20,brief+burst+expiry,2,268,2.449,8.347,0.1,0.025
+trade,20,20,brief+burst+expiry,0,300,9.822,23.449,0.475,0.175
+trade,20,20,brief+burst+expiry,12,300,9.564,22.438,0.5,0.171
+trade,20,20,brief+burst+expiry,6,300,9.61,22.408,0.55,0.179
+trade,20,20,brief+burst+expiry,2,268,2.518,8.335,0.079,0.027

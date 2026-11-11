@@ -1,0 +1,10 @@
+quantile,market_key,n_trades,n_seeds,n_news_excluded,n_used,n_anchors,mean_obs_wallets,mean_exp_wallets,mean_excess_wallets
+0.95,ctrl_btc110k_jun17,1592,69,0,69,662,3.55,1.97,1.59
+0.95,ctrl_btc94k_jan5,4376,162,48,111,267,23.86,4.52,1.46
+0.95,ctrl_btcupdown_oct14,2682,36,33,0,14,,,
+0.99,ctrl_btc110k_jun17,1592,27,0,27,1042,2.85,2.86,-0.01
+0.99,ctrl_btc94k_jan5,4376,41,14,26,954,22.12,8.2,3.46
+0.99,ctrl_btcupdown_oct14,2682,7,6,0,14,,,
+0.995,ctrl_btc110k_jun17,1592,21,0,21,1196,3.05,2.96,0.09
+0.995,ctrl_btc94k_jan5,4376,24,11,12,1570,16.67,11.3,5.37
+0.995,ctrl_btcupdown_oct14,2682,0,0,0,14,,,
