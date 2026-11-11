@@ -45,3 +45,14 @@ Not used: Dome API (shut down April 2026); on-chain/Dune (no API key in this ses
 - Placebo bias of the baseline on controls: **+2.45** wallets on average.
 - Maduro blind validation: 1 pre-news alert (96 h before news, toward NO); none in the final 24 h; the last pre-news hours were not scorable.
 - Full logs: `log/process_log.md`; results: `data/results/comparison_summary.md`, `data/results/maduro_blind_validation.md`.
+
+## v1 (2026-11-11): wallet-market suspicion screen + follow-on test
+Rules frozen first: `rules/frozen_v1.md` (git commit `f39e644`). Labels from public reporting: `data/labels/documented_wallets.csv`.
+| Step | Script | Output |
+|---|---|---|
+| Fills (maker+taker) and wallet profiles | `src/v1_01_fetch.py trades` / `wallets` | `data/clean/v1_fills_*.csv`, `v1_wallet_stats.csv`, `v1_wallet_windows.csv` |
+| Match labels (frozen rule) | `src/v1_02_match_labels.py` | `data/labels/documented_wallets_matched.csv` |
+| Layer 1 screen, permutation null, validation, price impact | `src/v1_03_layer1.py` | `data/results/v1_wallet_scores.csv`, `v1_validation.csv`, `v1_layer1.json` |
+| Layer 2 follow-on (A vs B) | `src/v1_04_layer2.py` | `data/results/v1_layer2*.{csv,json}` |
+| Figures 4-7 | `src/v1_05_figures.py` | `figures/fig4..fig7*.png` |
+| Summary | `src/v1_06_summary.py` | `data/results/v1_summary.md` |

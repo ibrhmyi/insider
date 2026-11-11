@@ -1,0 +1,848 @@
+{
+ "whale_cut_usd": 22488082.248152643,
+ "n_whales": 84,
+ "n_bots": 282,
+ "n_A_seeds_total": 352,
+ "excluded_counts": [
+  {
+   "kind": "A",
+   "H": 30,
+   "n": 38
+  },
+  {
+   "kind": "A",
+   "H": 120,
+   "n": 95
+  },
+  {
+   "kind": "B",
+   "H": 30,
+   "n": 143
+  },
+  {
+   "kind": "B",
+   "H": 120,
+   "n": 257
+  }
+ ],
+ "tests": [
+  {
+   "H": 30,
+   "outcome": "wallets",
+   "scope": "pooled",
+   "n_A_seeds": 273,
+   "n_A_wallets": 211,
+   "mean_A": 26.813186813186814,
+   "mean_B": 28.692703368871978,
+   "mean_diff": -1.8795165556851645,
+   "ci95": [
+    -3.5558125901006714,
+    -0.12473426636346086
+   ],
+   "p_signflip": 0.0332966703329667,
+   "wallet_clustered_mean_diff": -1.3122318860039122,
+   "wallet_clustered_p": 0.19738026197380262
+  },
+  {
+   "H": 30,
+   "outcome": "wallets",
+   "scope": "iran",
+   "n_A_seeds": 117,
+   "n_A_wallets": 88,
+   "mean_A": 10.239316239316238,
+   "mean_B": 20.731049114078807,
+   "mean_diff": -10.491732874762564,
+   "ci95": [
+    -12.21855127653373,
+    -8.80905050256012
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -10.574017370512337,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 30,
+   "outcome": "wallets",
+   "scope": "maduro",
+   "n_A_seeds": 47,
+   "n_A_wallets": 31,
+   "mean_A": 3.5531914893617023,
+   "mean_B": 9.053459838034305,
+   "mean_diff": -5.500268348672604,
+   "ci95": [
+    -7.214876723453852,
+    -3.8282507253384943
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -4.477364839461613,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 30,
+   "outcome": "wallets",
+   "scope": "nobel",
+   "n_A_seeds": 109,
+   "n_A_wallets": 92,
+   "mean_A": 54.63302752293578,
+   "mean_B": 45.7069968896075,
+   "mean_diff": 8.92603063332828,
+   "ci95": [
+    6.180870357689742,
+    11.798093925293625
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": 8.61337946393011,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 30,
+   "outcome": "usd",
+   "scope": "pooled",
+   "n_A_seeds": 273,
+   "n_A_wallets": 211,
+   "mean_A": 12811.756095474238,
+   "mean_B": 16651.213192401516,
+   "mean_diff": -3839.457096927277,
+   "ci95": [
+    -5129.257407003801,
+    -2588.2644256911067
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -3401.2038504973266,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 30,
+   "outcome": "usd",
+   "scope": "iran",
+   "n_A_seeds": 117,
+   "n_A_wallets": 88,
+   "mean_A": 8835.502908153669,
+   "mean_B": 13396.209333152032,
+   "mean_diff": -4560.706424998361,
+   "ci95": [
+    -6690.932406227646,
+    -2533.2250400215767
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -4103.7464996844765,
+   "wallet_clustered_p": 0.0026997300269973002
+  },
+  {
+   "H": 30,
+   "outcome": "usd",
+   "scope": "maduro",
+   "n_A_seeds": 47,
+   "n_A_wallets": 31,
+   "mean_A": 1144.0212520929656,
+   "mean_B": 3178.665095846782,
+   "mean_diff": -2034.6438437538166,
+   "ci95": [
+    -3466.9639835404437,
+    -754.2747247735042
+   ],
+   "p_signflip": 0.0027997200279972004,
+   "wallet_clustered_mean_diff": -1276.7224694327938,
+   "wallet_clustered_p": 0.0705929407059294
+  },
+  {
+   "H": 30,
+   "outcome": "usd",
+   "scope": "nobel",
+   "n_A_seeds": 109,
+   "n_A_wallets": 92,
+   "mean_A": 22110.886008826776,
+   "mean_B": 25954.38027561493,
+   "mean_diff": -3843.4942667881555,
+   "ci95": [
+    -5929.521359291626,
+    -1651.3954471361276
+   ],
+   "p_signflip": 0.0008999100089991,
+   "wallet_clustered_mean_diff": -3445.0643905465804,
+   "wallet_clustered_p": 0.0035996400359964
+  },
+  {
+   "H": 30,
+   "outcome": "price_move",
+   "scope": "pooled",
+   "n_A_seeds": 273,
+   "n_A_wallets": 211,
+   "mean_A": 0.0006317276582417565,
+   "mean_B": -0.0033786723958567338,
+   "mean_diff": 0.00401040005409849,
+   "ci95": [
+    -0.0025761501593149546,
+    0.010930428263597103
+   ],
+   "p_signflip": 0.23967603239676033,
+   "wallet_clustered_mean_diff": 0.0020665409719438934,
+   "wallet_clustered_p": 0.5932406759324068
+  },
+  {
+   "H": 30,
+   "outcome": "price_move",
+   "scope": "iran",
+   "n_A_seeds": 117,
+   "n_A_wallets": 88,
+   "mean_A": -0.0040479011760683765,
+   "mean_B": 0.00409628325037902,
+   "mean_diff": -0.008144184426447395,
+   "ci95": [
+    -0.014150489051311454,
+    -0.001804378094655936
+   ],
+   "p_signflip": 0.008899110088991101,
+   "wallet_clustered_mean_diff": -0.010571349165940982,
+   "wallet_clustered_p": 0.0025997400259974
+  },
+  {
+   "H": 30,
+   "outcome": "price_move",
+   "scope": "maduro",
+   "n_A_seeds": 47,
+   "n_A_wallets": 31,
+   "mean_A": -0.003617010444680852,
+   "mean_B": 0.003997956945885308,
+   "mean_diff": -0.0076149673905661595,
+   "ci95": [
+    -0.011150873948929713,
+    -0.0037994564205151562
+   ],
+   "p_signflip": 0.00029997000299970003,
+   "wallet_clustered_mean_diff": -0.00643488958411602,
+   "wallet_clustered_p": 0.006199380061993801
+  },
+  {
+   "H": 30,
+   "outcome": "price_move",
+   "scope": "nobel",
+   "n_A_seeds": 109,
+   "n_A_wallets": 92,
+   "mean_A": 0.007486840176146786,
+   "mean_B": -0.014582997071741682,
+   "mean_diff": 0.022069837247888465,
+   "ci95": [
+    0.007652018918424072,
+    0.0373468942797874
+   ],
+   "p_signflip": 0.0032996700329967,
+   "wallet_clustered_mean_diff": 0.01701957009554961,
+   "wallet_clustered_p": 0.0254974502549745
+  },
+  {
+   "H": 30,
+   "outcome": "whales",
+   "scope": "pooled",
+   "n_A_seeds": 273,
+   "n_A_wallets": 211,
+   "mean_A": 1.9120879120879122,
+   "mean_B": 1.9185548179609615,
+   "mean_diff": -0.00646690587304912,
+   "ci95": [
+    -0.19363592287563383,
+    0.1796978833362313
+   ],
+   "p_signflip": 0.9454054594540546,
+   "wallet_clustered_mean_diff": -0.0234988035438472,
+   "wallet_clustered_p": 0.8285171482851715
+  },
+  {
+   "H": 30,
+   "outcome": "whales",
+   "scope": "iran",
+   "n_A_seeds": 117,
+   "n_A_wallets": 88,
+   "mean_A": 0.3162393162393162,
+   "mean_B": 0.8806219109525452,
+   "mean_diff": -0.5643825947132289,
+   "ci95": [
+    -0.7170707756967878,
+    -0.40234483505822943
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -0.5593277401011402,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 30,
+   "outcome": "whales",
+   "scope": "maduro",
+   "n_A_seeds": 47,
+   "n_A_wallets": 31,
+   "mean_A": 0.19148936170212766,
+   "mean_B": 0.17680617255085337,
+   "mean_diff": 0.014683189151274261,
+   "ci95": [
+    -0.10964071389603305,
+    0.14668634556932428
+   ],
+   "p_signflip": 0.823917608239176,
+   "wallet_clustered_mean_diff": -0.0615492930009059,
+   "wallet_clustered_p": 0.31996800319968005
+  },
+  {
+   "H": 30,
+   "outcome": "whales",
+   "scope": "nobel",
+   "n_A_seeds": 109,
+   "n_A_wallets": 92,
+   "mean_A": 4.36697247706422,
+   "mean_B": 3.7836955193761876,
+   "mean_diff": 0.583276957688032,
+   "ci95": [
+    0.1697495404534518,
+    0.9745268279911888
+   ],
+   "p_signflip": 0.0052994700529947,
+   "wallet_clustered_mean_diff": 0.5018545833062682,
+   "wallet_clustered_p": 0.0212978702129787
+  },
+  {
+   "H": 30,
+   "outcome": "bots",
+   "scope": "pooled",
+   "n_A_seeds": 273,
+   "n_A_wallets": 211,
+   "mean_A": 2.9084249084249083,
+   "mean_B": 2.9187022836240355,
+   "mean_diff": -0.010277375199127178,
+   "ci95": [
+    -0.24246632149408828,
+    0.22369672663913695
+   ],
+   "p_signflip": 0.9306069393060694,
+   "wallet_clustered_mean_diff": -0.002044216814400324,
+   "wallet_clustered_p": 0.989001099890011
+  },
+  {
+   "H": 30,
+   "outcome": "bots",
+   "scope": "iran",
+   "n_A_seeds": 117,
+   "n_A_wallets": 88,
+   "mean_A": 1.4273504273504274,
+   "mean_B": 1.9037159446741094,
+   "mean_diff": -0.47636551732368193,
+   "ci95": [
+    -0.7267191600010426,
+    -0.21805450438125912
+   ],
+   "p_signflip": 0.0004999500049995,
+   "wallet_clustered_mean_diff": -0.5024592492326992,
+   "wallet_clustered_p": 0.0014998500149985001
+  },
+  {
+   "H": 30,
+   "outcome": "bots",
+   "scope": "maduro",
+   "n_A_seeds": 47,
+   "n_A_wallets": 31,
+   "mean_A": 0.574468085106383,
+   "mean_B": 1.3478563989202288,
+   "mean_diff": -0.7733883138138458,
+   "ci95": [
+    -1.0999336966225264,
+    -0.47896669819542165
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -0.7289041424525295,
+   "wallet_clustered_p": 0.00019998000199980003
+  },
+  {
+   "H": 30,
+   "outcome": "bots",
+   "scope": "nobel",
+   "n_A_seeds": 109,
+   "n_A_wallets": 92,
+   "mean_A": 5.504587155963303,
+   "mean_B": 4.685520249112295,
+   "mean_diff": 0.8190669068510076,
+   "ci95": [
+    0.35401158664666343,
+    1.2895588133385492
+   ],
+   "p_signflip": 0.0005999400059994001,
+   "wallet_clustered_mean_diff": 0.721533832615951,
+   "wallet_clustered_p": 0.006299370062993701
+  },
+  {
+   "H": 30,
+   "outcome": "others",
+   "scope": "pooled",
+   "n_A_seeds": 273,
+   "n_A_wallets": 211,
+   "mean_A": 21.992673992673993,
+   "mean_B": 23.85544626728698,
+   "mean_diff": -1.8627722746129889,
+   "ci95": [
+    -3.4173549833959926,
+    -0.24279535245838652
+   ],
+   "p_signflip": 0.0206979302069793,
+   "wallet_clustered_mean_diff": -1.2866888656456652,
+   "wallet_clustered_p": 0.1663833616638336
+  },
+  {
+   "H": 30,
+   "outcome": "others",
+   "scope": "iran",
+   "n_A_seeds": 117,
+   "n_A_wallets": 88,
+   "mean_A": 8.495726495726496,
+   "mean_B": 17.94671125845215,
+   "mean_diff": -9.450984762725655,
+   "ci95": [
+    -11.008202639815325,
+    -7.818314775237012
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -9.512230381178497,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 30,
+   "outcome": "others",
+   "scope": "maduro",
+   "n_A_seeds": 47,
+   "n_A_wallets": 31,
+   "mean_A": 2.7872340425531914,
+   "mean_B": 7.528797266563222,
+   "mean_diff": -4.741563224010032,
+   "ci95": [
+    -6.333152809070363,
+    -3.2349504352030944
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -3.6869114040081787,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 30,
+   "outcome": "others",
+   "scope": "nobel",
+   "n_A_seeds": 109,
+   "n_A_wallets": 92,
+   "mean_A": 44.76146788990825,
+   "mean_B": 37.23778112111901,
+   "mean_diff": 7.523686768789242,
+   "ci95": [
+    5.126578056153031,
+    9.973829103075749
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": 7.389991048007892,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "wallets",
+   "scope": "pooled",
+   "n_A_seeds": 224,
+   "n_A_wallets": 177,
+   "mean_A": 79.79464285714286,
+   "mean_B": 89.52699644065446,
+   "mean_diff": -9.732353583511598,
+   "ci95": [
+    -14.40054370011963,
+    -5.335366717386838
+   ],
+   "p_signflip": 0.00019998000199980003,
+   "wallet_clustered_mean_diff": -8.24864693262998,
+   "wallet_clustered_p": 0.0022997700229977
+  },
+  {
+   "H": 120,
+   "outcome": "wallets",
+   "scope": "iran",
+   "n_A_seeds": 104,
+   "n_A_wallets": 77,
+   "mean_A": 37.23076923076923,
+   "mean_B": 68.67362280285074,
+   "mean_diff": -31.44285357208151,
+   "ci95": [
+    -37.091449177864625,
+    -25.829271406187765
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -31.048817155420473,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "wallets",
+   "scope": "maduro",
+   "n_A_seeds": 40,
+   "n_A_wallets": 31,
+   "mean_A": 11.5,
+   "mean_B": 21.331160714285716,
+   "mean_diff": -9.831160714285714,
+   "ci95": [
+    -13.327029017857143,
+    -6.567542410714288
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -9.140706605222736,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "wallets",
+   "scope": "nobel",
+   "n_A_seeds": 80,
+   "n_A_wallets": 69,
+   "mean_A": 169.275,
+   "mean_B": 150.73430003298364,
+   "mean_diff": 18.540699967016355,
+   "ci95": [
+    11.730083256161008,
+    25.022040616925906
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": 17.59580171961993,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "usd",
+   "scope": "pooled",
+   "n_A_seeds": 224,
+   "n_A_wallets": 177,
+   "mean_A": 48525.79942586769,
+   "mean_B": 63640.459694714074,
+   "mean_diff": -15114.660268846375,
+   "ci95": [
+    -18312.806400314144,
+    -11975.522219259003
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -13354.515601891142,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "usd",
+   "scope": "iran",
+   "n_A_seeds": 104,
+   "n_A_wallets": 77,
+   "mean_A": 36530.96666048117,
+   "mean_B": 50735.29802783769,
+   "mean_diff": -14204.331367356526,
+   "ci95": [
+    -19910.2432793972,
+    -8520.308284917997
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -10920.419629981341,
+   "wallet_clustered_p": 0.0005999400059994001
+  },
+  {
+   "H": 120,
+   "outcome": "usd",
+   "scope": "maduro",
+   "n_A_seeds": 40,
+   "n_A_wallets": 31,
+   "mean_A": 3723.9693975397995,
+   "mean_B": 8801.97058253103,
+   "mean_diff": -5078.00118499123,
+   "ci95": [
+    -8462.743152805324,
+    -2157.7442880910407
+   ],
+   "p_signflip": 0.0008999100089991,
+   "wallet_clustered_mean_diff": -4065.8332234241257,
+   "wallet_clustered_p": 0.005599440055994401
+  },
+  {
+   "H": 120,
+   "outcome": "usd",
+   "scope": "nobel",
+   "n_A_seeds": 80,
+   "n_A_wallets": 69,
+   "mean_A": 86519.99703503412,
+   "mean_B": 107836.41441774485,
+   "mean_diff": -21316.417382710755,
+   "ci95": [
+    -25704.944016782752,
+    -17106.31523899733
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -20244.001740580014,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "price_move",
+   "scope": "pooled",
+   "n_A_seeds": 224,
+   "n_A_wallets": 177,
+   "mean_A": -0.0007724500410714265,
+   "mean_B": 0.0009689457492072744,
+   "mean_diff": -0.001741395790278701,
+   "ci95": [
+    -0.009534565351666862,
+    0.006345424798883103
+   ],
+   "p_signflip": 0.6765323467653235,
+   "wallet_clustered_mean_diff": 0.0015989923913730397,
+   "wallet_clustered_p": 0.6987301269873013
+  },
+  {
+   "H": 120,
+   "outcome": "price_move",
+   "scope": "iran",
+   "n_A_seeds": 104,
+   "n_A_wallets": 77,
+   "mean_A": 0.007744466838461541,
+   "mean_B": 0.009292031957547294,
+   "mean_diff": -0.0015475651190857516,
+   "ci95": [
+    -0.01330721791303944,
+    0.009963329436322312
+   ],
+   "p_signflip": 0.7994200579942006,
+   "wallet_clustered_mean_diff": 0.001564863533001707,
+   "wallet_clustered_p": 0.8203179682031797
+  },
+  {
+   "H": 120,
+   "outcome": "price_move",
+   "scope": "maduro",
+   "n_A_seeds": 40,
+   "n_A_wallets": 31,
+   "mean_A": -0.0029999945975,
+   "mean_B": 0.001843685253630952,
+   "mean_diff": -0.004843679851130952,
+   "ci95": [
+    -0.008828503716606984,
+    -0.0007812411323364624
+   ],
+   "p_signflip": 0.026297370262973702,
+   "wallet_clustered_mean_diff": -0.005308730368723756,
+   "wallet_clustered_p": 0.0047995200479952005
+  },
+  {
+   "H": 120,
+   "outcome": "price_move",
+   "scope": "nobel",
+   "n_A_seeds": 80,
+   "n_A_wallets": 69,
+   "mean_A": -0.010730669706249998,
+   "mean_B": -0.010288436073846587,
+   "mean_diff": -0.00044223363240340904,
+   "ci95": [
+    -0.017391706350355297,
+    0.01575349910262266
+   ],
+   "p_signflip": 0.9622037796220378,
+   "wallet_clustered_mean_diff": 0.004740547864671492,
+   "wallet_clustered_p": 0.5374462553744626
+  },
+  {
+   "H": 120,
+   "outcome": "whales",
+   "scope": "pooled",
+   "n_A_seeds": 224,
+   "n_A_wallets": 177,
+   "mean_A": 3.875,
+   "mean_B": 4.601113970432906,
+   "mean_diff": -0.7261139704329066,
+   "ci95": [
+    -1.0584314183148966,
+    -0.41095372348018405
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -0.6799697616162428,
+   "wallet_clustered_p": 0.00039996000399960006
+  },
+  {
+   "H": 120,
+   "outcome": "whales",
+   "scope": "iran",
+   "n_A_seeds": 104,
+   "n_A_wallets": 77,
+   "mean_A": 1.0192307692307692,
+   "mean_B": 2.8290786199722855,
+   "mean_diff": -1.8098478507415159,
+   "ci95": [
+    -2.127375471750472,
+    -1.4752466441458243
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -1.7304761295808848,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "whales",
+   "scope": "maduro",
+   "n_A_seeds": 40,
+   "n_A_wallets": 31,
+   "mean_A": 0.175,
+   "mean_B": 0.3435416666666667,
+   "mean_diff": -0.16854166666666665,
+   "ci95": [
+    -0.30917187500000004,
+    -0.02603348214285727
+   ],
+   "p_signflip": 0.0273972602739726,
+   "wallet_clustered_mean_diff": -0.1736687147977471,
+   "wallet_clustered_p": 0.0184981501849815
+  },
+  {
+   "H": 120,
+   "outcome": "whales",
+   "scope": "nobel",
+   "n_A_seeds": 80,
+   "n_A_wallets": 69,
+   "mean_A": 9.4375,
+   "mean_B": 9.033546077914835,
+   "mean_diff": 0.40395392208516573,
+   "ci95": [
+    -0.32353236134383695,
+    1.0853369680523
+   ],
+   "p_signflip": 0.27347265273472654,
+   "wallet_clustered_mean_diff": 0.26486585986062794,
+   "wallet_clustered_p": 0.5206479352064793
+  },
+  {
+   "H": 120,
+   "outcome": "bots",
+   "scope": "pooled",
+   "n_A_seeds": 224,
+   "n_A_wallets": 177,
+   "mean_A": 7.526785714285714,
+   "mean_B": 7.5637099944843955,
+   "mean_diff": -0.036924280198681735,
+   "ci95": [
+    -0.47046171255683644,
+    0.40076696325670225
+   ],
+   "p_signflip": 0.8665133486651335,
+   "wallet_clustered_mean_diff": 0.05903670756502247,
+   "wallet_clustered_p": 0.8144185581441856
+  },
+  {
+   "H": 120,
+   "outcome": "bots",
+   "scope": "iran",
+   "n_A_seeds": 104,
+   "n_A_wallets": 77,
+   "mean_A": 3.875,
+   "mean_B": 4.907663644173825,
+   "mean_diff": -1.032663644173825,
+   "ci95": [
+    -1.4826964703141883,
+    -0.5783130388104232
+   ],
+   "p_signflip": 0.00019998000199980003,
+   "wallet_clustered_mean_diff": -0.8905427445224047,
+   "wallet_clustered_p": 0.0004999500049995
+  },
+  {
+   "H": 120,
+   "outcome": "bots",
+   "scope": "maduro",
+   "n_A_seeds": 40,
+   "n_A_wallets": 31,
+   "mean_A": 2.3,
+   "mean_B": 2.75547619047619,
+   "mean_diff": -0.45547619047619053,
+   "ci95": [
+    -0.9937790178571428,
+    0.07212499999999983
+   ],
+   "p_signflip": 0.09629037096290372,
+   "wallet_clustered_mean_diff": -0.2996671786994367,
+   "wallet_clustered_p": 0.1374862513748625
+  },
+  {
+   "H": 120,
+   "outcome": "bots",
+   "scope": "nobel",
+   "n_A_seeds": 80,
+   "n_A_wallets": 69,
+   "mean_A": 14.8875,
+   "mean_B": 13.420687151892242,
+   "mean_diff": 1.4668128481077591,
+   "ci95": [
+    0.48218422872948674,
+    2.3884736066531076
+   ],
+   "p_signflip": 0.0027997200279972004,
+   "wallet_clustered_mean_diff": 1.279869146477053,
+   "wallet_clustered_p": 0.014498550144985502
+  },
+  {
+   "H": 120,
+   "outcome": "others",
+   "scope": "pooled",
+   "n_A_seeds": 224,
+   "n_A_wallets": 177,
+   "mean_A": 68.39285714285714,
+   "mean_B": 77.36217247573714,
+   "mean_diff": -8.969315332880006,
+   "ci95": [
+    -13.250816958254921,
+    -4.880289442829759
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -7.62771387857876,
+   "wallet_clustered_p": 0.0016998300169983002
+  },
+  {
+   "H": 120,
+   "outcome": "others",
+   "scope": "iran",
+   "n_A_seeds": 104,
+   "n_A_wallets": 77,
+   "mean_A": 32.33653846153846,
+   "mean_B": 60.936880538704635,
+   "mean_diff": -28.600342077166168,
+   "ci95": [
+    -33.95045319401407,
+    -23.220802739791004
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -28.427798281317187,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "others",
+   "scope": "maduro",
+   "n_A_seeds": 40,
+   "n_A_wallets": 31,
+   "mean_A": 9.025,
+   "mean_B": 18.232142857142854,
+   "mean_diff": -9.207142857142857,
+   "ci95": [
+    -12.432673363095237,
+    -6.156515625000002
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": -8.66737071172555,
+   "wallet_clustered_p": 9.999000099990002e-05
+  },
+  {
+   "H": 120,
+   "outcome": "others",
+   "scope": "nobel",
+   "n_A_seeds": 80,
+   "n_A_wallets": 69,
+   "mean_A": 144.95,
+   "mean_B": 128.28006680317657,
+   "mean_diff": 16.669933196823433,
+   "ci95": [
+    10.93580804716579,
+    22.00269577526076
+   ],
+   "p_signflip": 9.999000099990002e-05,
+   "wallet_clustered_mean_diff": 16.051066713282243,
+   "wallet_clustered_p": 9.999000099990002e-05
+  }
+ ],
+ "A_seeds_without_B_H30": 79,
+ "A_seeds_without_B_H120": 71
+}

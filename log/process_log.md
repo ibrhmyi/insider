@@ -108,3 +108,22 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Could not verify against the papers:** the Bock & Guenthoer PDF host (vernimmen.com) is not reachable from this session; no public source for the
   ACDC figures was found by web search. Gomez-Cram et al. was found (working paper, LSE/LBS/Yale, 2026; reported 7-12x larger price impact for suspected insider accounts).
 - Thresholds were written to `rules/frozen_v1.md` and committed to git **before** any v1 feature was computed and before validation.
+
+### 2026-11-11 - v1 order of operations (for audit)
+1. `rules/frozen_v1.md` written and committed (`f39e644`, FROZEN_UTC 2026-11-11T00:31:36Z) before any v1 feature existed.
+2. `data/labels/documented_wallets.csv` built from public reporting and matched to wallets by the frozen handle/prefix rule; committed (`add4bcd`) before scoring.
+3. Data fetched, then Layer 1, Layer 2, figures, summary. No threshold was changed after step 1.
+
+### 2026-11-11 - v1 problems, decisions, data gaps
+- **Re-download (necessary):** v0 kept taker fills only; wallet-level features need every fill incl. limit orders. Fetched `/v2/trades?taker_only=false` for the 3 markets (cached in `data/raw/trades_allsides/`). Taker counts match v0 exactly (2,291 / 9,367 / 6,143); maker rows 4,355 / 16,617 / 9,441.
+- **Duplicate ambiguity:** with maker rows the composite key removed 199 / 420 / 14 rows. The API has no log index, so some may be genuine identical fills. Kept the brief's rule; possible undercount <= 2.9%.
+- **Wallet profiles:** 8,309 wallets via `/v2/user-stats` (0 errors); 7,139 pre-news-buyer wallet-markets via `/v2/user-volume` windows (0 errors). `join_date` null for 235 wallets; first-activity fallback fetched for 132 pre-news buyers.
+- **Web access:** this session can run web searches but cannot open external pages (news sites, arXiv, vernimmen.com, Polygonscan all fail DNS). Consequences: thresholds not verified against Bock & Guenthoer / ACDC; documented wallets built from search-result summaries of public reporting (sources listed per row); no on-chain funding analysis.
+- **Documented wallets:** 8 labels -> 7 distinct wallets. The CFTC complaint's handle "Burdensome-Mix" and Lookonchain's prefix 0x31a5 independently resolve to the same wallet.
+- **Bug:** pandas refused NaN in a boolean column for F8 (dormancy unknown). Fixed by storing F8 as float (1/0/NaN).
+- **Permutation consistency fix (before running):** observed F1 uses a wallet's first fill of any side; the null initially redrew only buys. Fixed so sells keep their real times, as the frozen text implies.
+- **Finding - F6 uninformative in Iran:** Iran traded ~49 h before T_news, so F6 (<= 72 h) fires for 100% of buyers; the Iran permutation null cannot test timing. F5 fires for 71-73% of buyers in Iran/Maduro. Recorded as a v1 limitation (not changed, rules frozen).
+- **Finding - F7 confounded:** all three markets resolved toward the long-time longshot. Among longshot buyers, high-score wallets win *less* often than others, so F7 does not support precision. Dormancy (F8) among larger winners is the informative proxy.
+- **Price impact:** no historical mid-price; last-fill YES price used. Fills whose 5/60-min window crosses T_news dropped.
+- **Layer 2 limitation:** B seeds matched on size/time window but not local activity. Added a wallet-clustered sign-flip as a robustness check (not in the frozen text; reported alongside, not instead).
+- **Not done:** on-chain funding (no access), 2-3 additional markets (time), event-cluster F2 (single-market only).

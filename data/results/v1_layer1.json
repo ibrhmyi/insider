@@ -1,0 +1,186 @@
+{
+ "flags": {
+  "F1_days": 7,
+  "F2_share": 0.8,
+  "F2_markets": 2,
+  "F3_price": 0.35,
+  "F4_usd": 2500,
+  "F5_conv": 0.8,
+  "F6_hours": 72,
+  "HIGH": 4
+ },
+ "permutation": [
+  {
+   "market_key": "iran",
+   "n_wallets": 977,
+   "observed_high": 95,
+   "null_mean": 95.466,
+   "null_p95": 97.0,
+   "null_min": 91,
+   "null_max": 98,
+   "p_value": 0.8141858141858141,
+   "pre_news_buy_fills": 4308,
+   "pre_news_buy_fills_last6h": 1275
+  },
+  {
+   "market_key": "maduro",
+   "n_wallets": 2608,
+   "observed_high": 39,
+   "null_mean": 42.964,
+   "null_p95": 51.0,
+   "null_min": 27,
+   "null_max": 61,
+   "p_value": 0.8291708291708292,
+   "pre_news_buy_fills": 9362,
+   "pre_news_buy_fills_last6h": 640
+  },
+  {
+   "market_key": "nobel",
+   "n_wallets": 3554,
+   "observed_high": 137,
+   "null_mean": 88.214,
+   "null_p95": 99.0,
+   "null_min": 68,
+   "null_max": 110,
+   "p_value": 0.000999000999000999,
+   "pre_news_buy_fills": 9252,
+   "pre_news_buy_fills_last6h": 3236
+  }
+ ],
+ "sensitivity": [
+  {
+   "F4_threshold": 1000,
+   "iran": 108,
+   "maduro": 42,
+   "nobel": 147
+  },
+  {
+   "F4_threshold": 2500,
+   "iran": 95,
+   "maduro": 39,
+   "nobel": 137
+  },
+  {
+   "F4_threshold": 10000,
+   "iran": 88,
+   "maduro": 33,
+   "nobel": 129
+  }
+ ],
+ "precision": [
+  {
+   "size_band": "<1k",
+   "is_high": false,
+   "n": 6337,
+   "win_rate": 0.273,
+   "dormant_rate": 0.389,
+   "n_dormant_known": 6337
+  },
+  {
+   "size_band": "<1k",
+   "is_high": true,
+   "n": 213,
+   "win_rate": 0.516,
+   "dormant_rate": 0.39,
+   "n_dormant_known": 213
+  },
+  {
+   "size_band": "1k-2.5k",
+   "is_high": false,
+   "n": 261,
+   "win_rate": 0.253,
+   "dormant_rate": 0.142,
+   "n_dormant_known": 261
+  },
+  {
+   "size_band": "1k-2.5k",
+   "is_high": true,
+   "n": 5,
+   "win_rate": 0.4,
+   "dormant_rate": 0.4,
+   "n_dormant_known": 5
+  },
+  {
+   "size_band": "2.5k-10k",
+   "is_high": false,
+   "n": 173,
+   "win_rate": 0.295,
+   "dormant_rate": 0.064,
+   "n_dormant_known": 173
+  },
+  {
+   "size_band": "2.5k-10k",
+   "is_high": true,
+   "n": 31,
+   "win_rate": 0.484,
+   "dormant_rate": 0.419,
+   "n_dormant_known": 31
+  },
+  {
+   "size_band": ">=10k",
+   "is_high": false,
+   "n": 97,
+   "win_rate": 0.165,
+   "dormant_rate": 0.124,
+   "n_dormant_known": 97
+  },
+  {
+   "size_band": ">=10k",
+   "is_high": true,
+   "n": 22,
+   "win_rate": 0.682,
+   "dormant_rate": 0.545,
+   "n_dormant_known": 22
+  }
+ ],
+ "impact": {
+  "impact_5m_per_1k": {
+   "high_n": 251,
+   "high_median": 6.505003252269333e-05,
+   "other_n": 5138,
+   "other_median": 0.0,
+   "p_mwu": 0.30021733321729327,
+   "other_ge2500_n": 215,
+   "other_ge2500_median": 0.0016791381264196254,
+   "p_mwu_vs_ge2500": 0.8616579731836452
+  },
+  "impact_60m_per_1k": {
+   "high_n": 220,
+   "high_median": 0.0023145769328525734,
+   "other_n": 4974,
+   "other_median": 0.0,
+   "p_mwu": 0.008832193222351757,
+   "other_ge2500_n": 208,
+   "other_ge2500_median": 0.0012793194761198628,
+   "p_mwu_vs_ge2500": 0.17048761450337602
+  }
+ },
+ "score_dist": {
+  "iran": {
+   "1": 75,
+   "2": 503,
+   "3": 304,
+   "4": 82,
+   "5": 12,
+   "6": 1
+  },
+  "maduro": {
+   "0": 256,
+   "1": 1247,
+   "2": 850,
+   "3": 216,
+   "4": 28,
+   "5": 9,
+   "6": 2
+  },
+  "nobel": {
+   "0": 1797,
+   "1": 557,
+   "2": 595,
+   "3": 468,
+   "4": 93,
+   "5": 42,
+   "6": 2
+  }
+ }
+}

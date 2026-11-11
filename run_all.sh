@@ -9,3 +9,11 @@ python3 02_extract_trades.py iran ctrl_btc110k_jun17 ctrl_btc94k_jan5 ctrl_btcup
 python3 03_tune_controls.py                         # controls only -> data/audit/tuning_*.  (rules/frozen_v0.* are NOT overwritten)
 python3 04_run_frozen.py                            # aborts if src/measures.py differs from the frozen hash
 python3 05_figures.py
+# --- v1 ---
+python3 v1_01_fetch.py trades
+python3 v1_01_fetch.py wallets
+python3 v1_02_match_labels.py
+python3 v1_03_layer1.py
+python3 v1_04_layer2.py
+python3 v1_05_figures.py
+python3 v1_06_summary.py
