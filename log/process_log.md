@@ -127,3 +127,8 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Price impact:** no historical mid-price; last-fill YES price used. Fills whose 5/60-min window crosses T_news dropped.
 - **Layer 2 limitation:** B seeds matched on size/time window but not local activity. Added a wallet-clustered sign-flip as a robustness check (not in the frozen text; reported alongside, not instead).
 - **Not done:** on-chain funding (no access), 2-3 additional markets (time), event-cluster F2 (single-market only).
+
+### 2026-11-14 - Handoff
+- Wrote `HANDOFF.md` for agents taking over (rules, what was done, weaknesses, prioritized open tasks, API facts, repo map).
+- Raw API cache (`data/raw/`, ~71 MB, rejected SOL control pages included) is now committed so the pipeline re-runs without re-downloading.
+- **Push blocked:** the session's GitHub token is invalid and no repository is attached. The repo is committed locally on `main`, waiting for a GitHub repository to push to.

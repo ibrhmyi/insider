@@ -1,0 +1,22 @@
+HTTP/1.1 200 Connection Established
+
+HTTP/2 200 
+date: Mon, 09 Nov 2026 16:10:54 GMT
+content-type: application/json
+x-trace-id: 87648a69042f49f9889bb71aec08d93d
+set-cookie: __cf_bm=Dhl_sYSRfViRLmtzmsTPxr7kpye8kGun0Q_cL_YhYb8-1794240654.3757343-1.0.1.1-AS96WDKbkD12C8S70WvjzUDrrBCUMWQm_LZ2CasTbkwhGhcknguW9Ha6BDKJ467By6eJJy4riEIaD4OH6FxO9W0WlGwrecRCe3cOVADTrTZEm1hJCndfRUGQMl6cTOq4; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=polymarket.com; Expires=Mon, 09 Nov 2026 16:40:54 GMT
+access-control-allow-origin: *
+access-control-expose-headers: retry-after,x-trace-id
+x-envoy-upstream-service-time: 367
+server: cloudflare
+vary: accept-encoding,origin
+via: 1.1 b7dd001578b73a6989e710df24ccc0ce.cloudfront.net (CloudFront)
+cache-control: public, max-age=300
+x-cache: Miss from cloudfront
+x-amz-cf-pop: IAD55-P10
+x-amz-cf-id: BRjH5tjJOVqhs3iN9fD6G0bONpRGKtQxD2UTS8w_gPPojQipPG-iBQ==
+cf-cache-status: DYNAMIC
+strict-transport-security: max-age=7776000; includeSubDomains
+speculation-rules: "/cdn-cgi/speculation"
+cf-ray: a57e1719de9d9d25-IAD
+

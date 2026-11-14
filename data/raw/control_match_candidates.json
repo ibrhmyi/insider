@@ -1,0 +1,245 @@
+{
+ "554012": [
+  {
+   "score": 2.0486099409553127,
+   "id": "551260",
+   "q": "Bitcoin above $110,000 on June 17?",
+   "vol": 979889.023363,
+   "pmin": 0.0,
+   "pmax": 0.525,
+   "pmed": 0.09,
+   "n": 15,
+   "days": 4.36068287037037,
+   "cond": "0xb65f93ec7a24727c41e0700e73cc67c26c722cd9752a958d5eb7fe5e1bf2be2b"
+  },
+  {
+   "score": 2.6845250369097315,
+   "id": "551261",
+   "q": "Ethereum above $2,800 on June 17?",
+   "vol": 587671.281408,
+   "pmin": 0.0,
+   "pmax": 0.52,
+   "pmed": 0.065,
+   "n": 15,
+   "days": 4.3571180555555555,
+   "cond": "0x3f0dded0e8594ab3fb2099b15f6e1a7151f7fdec3e7e81871c98a87e42b93218"
+  },
+  {
+   "score": 3.332330320250821,
+   "id": "552348",
+   "q": "Ethereum above $2,500 on June 20?",
+   "vol": 1376429.187907,
+   "pmin": 0.0,
+   "pmax": 0.925,
+   "pmed": 0.585,
+   "n": 15,
+   "days": 1.3459722222222221,
+   "cond": "0xa7053c5f1a8926bfed6fcecb6bb513dd30403b44dee5d3d50ce4d2a08e50a4ea"
+  },
+  {
+   "score": 3.5557819209981196,
+   "id": "552347",
+   "q": "Bitcoin above $103,000 on June 20?",
+   "vol": 5540072.679521,
+   "pmin": 0.635,
+   "pmax": 1.0,
+   "pmed": 0.75,
+   "n": 15,
+   "days": 1.36,
+   "cond": "0x76fc6a5bac5261743e300a7cb7c971a13eafacd4c7f4afca38b77523d2fe2c95"
+  },
+  {
+   "score": 3.8246761773061215,
+   "id": "553346",
+   "q": "Bitcoin above $103,000 on June 24?",
+   "vol": 1293556.738794,
+   "pmin": 0.22,
+   "pmax": 1.0,
+   "pmed": 0.645,
+   "n": 15,
+   "days": 2.648460648148148,
+   "cond": "0x15d51789d6f1c77c4c588ecd4b317d33595ba4e1022e8b9dc536e7e0c86ef8fb"
+  },
+  {
+   "score": 3.833686175469478,
+   "id": "553347",
+   "q": "Ethereum above $2,400 on June 24?",
+   "vol": 1132093.36969,
+   "pmin": 0.0835,
+   "pmax": 1.0,
+   "pmed": 0.62,
+   "n": 15,
+   "days": 2.655289351851852,
+   "cond": "0xd473bc14c4e869b059f5325e7f015445c0a094b66f78a391b84198f4adfdeb2f"
+  }
+ ],
+ "554012_target": {
+  "vol": 3733050.391322,
+  "pmin": 0.105,
+  "pmax": 0.165,
+  "pmed": 0.145,
+  "n": 4
+ },
+ "560868": [
+  {
+   "score": 0.08861747887441247,
+   "id": "620852",
+   "q": "Will the price of Solana be above $280 on October 10?",
+   "vol": 2367012.924012,
+   "pmin": 0.0,
+   "pmax": 0.036,
+   "pmed": 0.016,
+   "n": 15,
+   "days": 0.24805555555555556,
+   "cond": "0x488494df640f0323aa8211f9771927f89969b795c8fa3f4422c28553414e7e3b"
+  },
+  {
+   "score": 0.534390646017686,
+   "id": "621677",
+   "q": "Will the price of Ethereum be above $4,900 on October 11?",
+   "vol": 1680409.195274,
+   "pmin": 0.0,
+   "pmax": 0.25,
+   "pmed": 0.042,
+   "n": 15,
+   "days": 1.2561111111111112,
+   "cond": "0x3c88d841e73504b8245b64cd99031a2b7802edcc2fc713a47aa438e072e6392c"
+  },
+  {
+   "score": 0.6556930882180261,
+   "id": "621695",
+   "q": "Will the price of Bitcoin be above $130,000 on October 11?",
+   "vol": 1419101.95008,
+   "pmin": 0.0,
+   "pmax": 0.145,
+   "pmed": 0.0325,
+   "n": 15,
+   "days": 1.2540046296296297,
+   "cond": "0xc2a7f54050d2a79d50473efc73689955bb1787ffd474985ea9774e604da4a411"
+  },
+  {
+   "score": 0.6764205781274735,
+   "id": "623433",
+   "q": "Will the price of Ethereum be above $5,200 on October 13?",
+   "vol": 1607626.001657,
+   "pmin": 0.0,
+   "pmax": 0.095,
+   "pmed": 0.0145,
+   "n": 15,
+   "days": 3.2586226851851854,
+   "cond": "0x714863c22e8c1bb9d3e55925839a5325c3ab64f5c44f3c96b0873fd27cff3471"
+  },
+  {
+   "score": 0.6860295288042308,
+   "id": "621697",
+   "q": "Will the price of Bitcoin be above $132,000 on October 11?",
+   "vol": 1280511.440089,
+   "pmin": 0.0,
+   "pmax": 0.0795,
+   "pmed": 0.018,
+   "n": 15,
+   "days": 1.2547222222222223,
+   "cond": "0x2a5561a71112d10653b0877e15cbbf48bbec7748028d87f5d2123bf7b50c981c"
+  },
+  {
+   "score": 0.7260979336971091,
+   "id": "619953",
+   "q": "Will the price of Solana be above $280 on October 9?",
+   "vol": 1201609.8755,
+   "pmin": 0.0,
+   "pmax": 0.0385,
+   "pmed": 0.0125,
+   "n": 15,
+   "days": 0.7444328703703704,
+   "cond": "0xabf1fb19f5847f41cc3e1bcd2dec1339b7da6b4320d00f93c3b32e3fa896baa8"
+  }
+ ],
+ "560868_target": {
+  "vol": 2243005.858143,
+  "pmin": 0.005,
+  "pmax": 0.728,
+  "pmed": 0.018,
+  "n": 187
+ },
+ "916440": [
+  {
+   "score": 2.7983237514297397,
+   "id": "1058617",
+   "q": "Will the price of Bitcoin be above $94,000 on January 5?",
+   "vol": 1165856.871209,
+   "pmin": 0.0,
+   "pmax": 0.1945,
+   "pmed": 0.0795,
+   "n": 15,
+   "days": 2.2939583333333333,
+   "cond": "0xe4a7020ebf8d1b55246fff86b10351a4bbced6e394ba4a4ffd8438f1771e58fc"
+  },
+  {
+   "score": 3.189452230186133,
+   "id": "1058616",
+   "q": "Will the price of Bitcoin be above $92,000 on January 5?",
+   "vol": 729455.529919,
+   "pmin": 0.095,
+   "pmax": 1.0,
+   "pmed": 0.195,
+   "n": 15,
+   "days": 2.2911111111111113,
+   "cond": "0x1b1655450bfcc8d14c0add80504b59d4e0b80bf2569e7654b9dc903817ec5e02"
+  },
+  {
+   "score": 3.2359958193928624,
+   "id": "1029013",
+   "q": "Will the price of Bitcoin be above $92,000 on January 2?",
+   "vol": 637149.815588,
+   "pmin": 0.0,
+   "pmax": 0.475,
+   "pmed": 0.08,
+   "n": 15,
+   "days": 0.6536111111111111,
+   "cond": "0x4039e8ba3d58f755567b9bc1a56871a2cc677d561404b9e30fc069d8c9532bb4"
+  },
+  {
+   "score": 3.2844077703555836,
+   "id": "1039471",
+   "q": "Will the price of Bitcoin be above $90,000 on January 3?",
+   "vol": 943776.295125,
+   "pmin": 0.165,
+   "pmax": 1.0,
+   "pmed": 0.305,
+   "n": 15,
+   "days": 0.31657407407407406,
+   "cond": "0x01f4bd0da051f482215aee1daa184851d9cb89f1c4f35b8fadc7fcdc0706cbd8"
+  },
+  {
+   "score": 3.317813950749459,
+   "id": "1029012",
+   "q": "Will the price of Bitcoin be above $90,000 on January 2?",
+   "vol": 875859.07472,
+   "pmin": 0.105,
+   "pmax": 1.0,
+   "pmed": 0.29,
+   "n": 15,
+   "days": 0.6537962962962963,
+   "cond": "0x14106945c627b6a1078deb8592cb320a4c4f91de824bad0644c8252928eb4ed5"
+  },
+  {
+   "score": 3.3299120570312413,
+   "id": "1066796",
+   "q": "Will the price of Bitcoin be above $94,000 on January 6?",
+   "vol": 603291.85197,
+   "pmin": 0.0,
+   "pmax": 0.495,
+   "pmed": 0.125,
+   "n": 15,
+   "days": 3.296736111111111,
+   "cond": "0x76911f654bb5bb27411874b9359e58eb14c06faca69a7a03faa21dd454a41021"
+  }
+ ],
+ "916440_target": {
+  "vol": 10966928.525521,
+  "pmin": 0.055,
+  "pmax": 0.245,
+  "pmed": 0.145,
+  "n": 44
+ }
+}

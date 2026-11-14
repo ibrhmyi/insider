@@ -1,0 +1,65 @@
+{
+ "620852": {
+  "gid": "620852",
+  "q": "Will the price of Solana be above $280 on October 10?",
+  "vol": 2367012.924012,
+  "taker_rows": 399,
+  "first_trade_h_after_open": 132.9,
+  "all_sides_ratio": 1.984,
+  "contested_share": 0.0
+ },
+ "621677": {
+  "gid": "621677",
+  "q": "Will the price of Ethereum be above $4,900 on October 11?",
+  "vol": 1680409.195274,
+  "taker_rows": 319,
+  "first_trade_h_after_open": 4.6,
+  "all_sides_ratio": 1.914,
+  "contested_share": 0.003
+ },
+ "621695": {
+  "gid": "621695",
+  "q": "Will the price of Bitcoin be above $130,000 on October 11?",
+  "vol": 1419101.95008,
+  "taker_rows": 289,
+  "first_trade_h_after_open": 17.0,
+  "all_sides_ratio": 1.96,
+  "contested_share": 0.0
+ },
+ "623433": {
+  "gid": "623433",
+  "q": "Will the price of Ethereum be above $5,200 on October 13?",
+  "vol": 1607626.001657,
+  "taker_rows": 499,
+  "first_trade_h_after_open": 27.4,
+  "all_sides_ratio": 1.978,
+  "contested_share": 0.0
+ },
+ "621697": {
+  "gid": "621697",
+  "q": "Will the price of Bitcoin be above $132,000 on October 11?",
+  "vol": 1280511.440089,
+  "taker_rows": 431,
+  "first_trade_h_after_open": 5.8,
+  "all_sides_ratio": 1.963,
+  "contested_share": 0.0
+ },
+ "551260": {
+  "gid": "551260",
+  "q": "Bitcoin above $110,000 on June 17?",
+  "vol": 979889.023363,
+  "taker_rows": 1592,
+  "first_trade_h_after_open": 1.3,
+  "all_sides_ratio": 1.068,
+  "contested_share": 0.956
+ },
+ "1058617": {
+  "gid": "1058617",
+  "q": "Will the price of Bitcoin be above $94,000 on January 5?",
+  "vol": 1165856.871209,
+  "taker_rows": 4376,
+  "first_trade_h_after_open": 2.0,
+  "all_sides_ratio": 0.994,
+  "contested_share": 0.689
+ }
+}

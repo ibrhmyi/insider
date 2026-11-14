@@ -1,0 +1,13 @@
+== iran: US military action against Iran by Sunday?
+   rows raw 2291, dupes 0, clean 2291, 2025-06-19T23:06:46Z -> 2025-06-22T02:43:24Z, post-res 1, notional/gamma 0.373
+== ctrl_btc110k_jun17: Bitcoin above $110,000 on June 17?
+   rows raw 1592, dupes 0, clean 1592, 2025-06-10T18:37:30Z -> 2025-06-17T17:06:41Z, post-res 0, notional/gamma 0.643
+== ctrl_btc94k_jan5: Will the price of Bitcoin be above $94,000 on January 5?
+   rows raw 4376, dupes 0, clean 4376, 2025-12-29T19:02:05Z -> 2026-01-05T19:17:01Z, post-res 0, notional/gamma 0.349
+== ctrl_btcupdown_oct14: Bitcoin Up or Down - October 14, 5PM ET
+   rows raw 2682, dupes 0, clean 2682, 2025-10-14T12:12:13Z -> 2025-10-14T23:08:49Z, post-res 0, notional/gamma 0.503
+== maduro: Maduro out by January 31, 2026?
+   rows raw 9367, dupes 0, clean 9367, 2025-12-12T01:20:24Z -> 2026-01-03T12:13:39Z, post-res 0, notional/gamma 0.414
+== nobel: Will María Corina Machado win the Nobel Peace Prize in 2025?
+   rows raw 6143, dupes 0, clean 6143, 2025-07-08T18:41:57Z -> 2025-10-10T12:05:56Z, post-res 16, notional/gamma 0.491
+HTTP non-200 events: 0

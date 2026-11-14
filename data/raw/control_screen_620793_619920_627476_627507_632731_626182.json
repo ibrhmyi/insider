@@ -1,0 +1,56 @@
+{
+ "620793": {
+  "gid": "620793",
+  "q": "Will the price of Bitcoin be above $112,000 on October 10?",
+  "vol": 1924330.179731,
+  "taker_rows": 906,
+  "first_trade_h_after_open": 2.4,
+  "all_sides_ratio": 1.839,
+  "contested_share": 0.001
+ },
+ "619920": {
+  "gid": "619920",
+  "q": "Will the price of Bitcoin be above $112,000 on October 9?",
+  "vol": 1246861.840527,
+  "taker_rows": 638,
+  "first_trade_h_after_open": 3.4,
+  "all_sides_ratio": 1.897,
+  "contested_share": 0.003
+ },
+ "627476": {
+  "gid": "627476",
+  "q": "Will the price of Ethereum be above $4,500 on October 15?",
+  "vol": 1129572.343669,
+  "taker_rows": 300,
+  "first_trade_h_after_open": 51.9,
+  "all_sides_ratio": 1.96,
+  "contested_share": 0.003
+ },
+ "627507": {
+  "gid": "627507",
+  "q": "Will the price of Bitcoin be above $124,000 on October 15?",
+  "vol": 806003.017104,
+  "taker_rows": 431,
+  "first_trade_h_after_open": 46.9,
+  "all_sides_ratio": 1.955,
+  "contested_share": 0.0
+ },
+ "632731": {
+  "gid": "632731",
+  "q": "Bitcoin Up or Down - October 14, 5PM ET",
+  "vol": 920452.035034,
+  "taker_rows": 2682,
+  "first_trade_h_after_open": 39.2,
+  "all_sides_ratio": 1.003,
+  "contested_share": 0.992
+ },
+ "626182": {
+  "gid": "626182",
+  "q": "Will the price of Ethereum be above $5,000 on October 14?",
+  "vol": 850425.644383,
+  "taker_rows": 300,
+  "first_trade_h_after_open": 3.7,
+  "all_sides_ratio": 1.939,
+  "contested_share": 0.0
+ }
+}
