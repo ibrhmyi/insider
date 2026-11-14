@@ -38,7 +38,7 @@ export type WalletRow = {
   post: {f7_won: boolean; f8_dormant: boolean | null; f8_trades_30d: number | null};
 };
 
-export type Seed = {t: number; H: number; usd: number; dir: number; h_before: number; n_B: number; A_wallets: number; B_wallets: number; A_whales: number; B_whales: number; A_bots: number; B_bots: number; A_price: number; B_price: number};
+export type Seed = {t: number; H: number; usd: number; dir: number; h_before: number; n_B: number; A_wallets: number; B_wallets: number | null; A_whales: number; B_whales: number; A_bots: number; B_bots: number; A_price: number; B_price: number};
 export type Alerts = Record<string, Seed[]>;
 
 export type Validation = {
