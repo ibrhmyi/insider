@@ -1,0 +1,290 @@
+[
+ {
+  "label_id": "MAD-CFTC-1",
+  "market": "maduro",
+  "identifier": "Burdensome-Mix",
+  "identifier_type": "handle",
+  "confidence": "charged",
+  "wallet_id": "0x31a5",
+  "addr": "0x31a56e9e690c621ed21de08cb559e9524cdb8ed9",
+  "score": 6,
+  "flags": [
+   "F1",
+   "F2",
+   "F3",
+   "F4",
+   "F5",
+   "F6"
+  ],
+  "rank": 1,
+  "n": 2608,
+  "first_high_h": 30.0,
+  "usd": 32538.34,
+  "claim": "CFTC complaint (SDNY, 23 Apr 2026) alleges a US Army master sergeant used classified information to buy >436,000 Yes shares of 'Maduro Out by January 31, 2026?' under this Polymarket handle; >$404k profit alleged",
+  "amount": ">436k Yes shares; >$404k profit",
+  "publisher": "CFTC complaint via Baker Botts / bitcoin.com / FOW summaries",
+  "source": "https://www.bakerbotts.com/thought-leadership/publications/2026/april/cftc-brings-first-of-its-kind-insider-trading-action",
+  "date": "2026-04-23",
+  "notes": "Charged, not adjudicated; civil case reportedly stayed while DOJ prosecution proceeds. Secondary summary of the complaint (primary document not reachable from this session).",
+  "sens": {
+   "1000": 6,
+   "2500": 6,
+   "10000": 6
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": false
+  }
+ },
+ {
+  "label_id": "MAD-LOOK-1",
+  "market": "maduro",
+  "identifier": "0x31a5",
+  "identifier_type": "address_prefix",
+  "confidence": "alleged",
+  "wallet_id": "0x31a5",
+  "addr": "0x31a56e9e690c621ed21de08cb559e9524cdb8ed9",
+  "score": 6,
+  "flags": [
+   "F1",
+   "F2",
+   "F3",
+   "F4",
+   "F5",
+   "F6"
+  ],
+  "rank": 1,
+  "n": 2608,
+  "first_high_h": 30.0,
+  "usd": 32538.34,
+  "claim": "Lookonchain: one of three wallets 'created and pre-funded days in advance' that bet on Maduro out of office hours before the arrest",
+  "amount": "invested ~$34k (one source ~$32k); profit ~$409.9k",
+  "publisher": "Lookonchain (X) via BeInCrypto / KuCoin / RootData",
+  "source": "https://x.com/lookonchain/status/2007639475497881625",
+  "date": "2026-01-04",
+  "notes": "Only a 4-hex prefix is public; market(s) not specified per wallet (may include sibling Maduro markets).",
+  "sens": {
+   "1000": 6,
+   "2500": 6,
+   "10000": 6
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": false
+  }
+ },
+ {
+  "label_id": "MAD-LOOK-2",
+  "market": "maduro",
+  "identifier": "0xa72d",
+  "identifier_type": "address_prefix",
+  "confidence": "alleged",
+  "wallet_id": "0xa72d",
+  "addr": "0xa72db1749e9ac2379d49a3c12708325ed17febd4",
+  "score": 5,
+  "flags": [
+   "F2",
+   "F3",
+   "F4",
+   "F5",
+   "F6"
+  ],
+  "rank": 5,
+  "n": 2608,
+  "first_high_h": 8.3,
+  "usd": 5782.66,
+  "claim": "Lookonchain: second of the three wallets (same claim)",
+  "amount": "invested ~$5.8k; profit ~$75k",
+  "publisher": "Lookonchain (X) via BeInCrypto / KuCoin",
+  "source": "https://x.com/lookonchain/status/2007639475497881625",
+  "date": "2026-01-04",
+  "notes": "Only a prefix is public.",
+  "sens": {
+   "1000": 5,
+   "2500": 5,
+   "10000": 4
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": true
+  }
+ },
+ {
+  "label_id": "MAD-LOOK-3",
+  "market": "maduro",
+  "identifier": "SBet365",
+  "identifier_type": "handle",
+  "confidence": "alleged",
+  "wallet_id": "0x6baf",
+  "addr": "0x6baf05d193692bb208d616709e27442c910a94c5",
+  "score": 5,
+  "flags": [
+   "F1",
+   "F3",
+   "F4",
+   "F5",
+   "F6"
+  ],
+  "rank": 3,
+  "n": 2608,
+  "first_high_h": 2.3,
+  "usd": 10000.0,
+  "claim": "Lookonchain: third of the three wallets (same claim)",
+  "amount": "invested ~$25k; profit ~$145.6k",
+  "publisher": "Lookonchain (X) via BeInCrypto / KuCoin",
+  "source": "https://x.com/lookonchain/status/2007639475497881625",
+  "date": "2026-01-04",
+  "notes": "One outlet misspells as SB3t365.",
+  "sens": {
+   "1000": 5,
+   "2500": 5,
+   "10000": 5
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": false
+  }
+ },
+ {
+  "label_id": "NOB-BLM-1",
+  "market": "nobel",
+  "identifier": "dirtycup",
+  "identifier_type": "handle",
+  "confidence": "alleged",
+  "wallet_id": "0x234c",
+  "addr": "0x234cc49e43dff8b3207bbd3a8a2579f339cb9867",
+  "score": 5,
+  "flags": [
+   "F1",
+   "F2",
+   "F4",
+   "F5",
+   "F6"
+  ],
+  "rank": 3,
+  "n": 3554,
+  "first_high_h": 5.5,
+  "usd": 68373.81,
+  "claim": "Bloomberg: account opened weeks earlier bet ~$70k on Machado hours before the announcement; Nobel Institute opened a probe",
+  "amount": "~$70k bet; ~$30k profit",
+  "publisher": "Bloomberg via Cointelegraph / CoinDesk / Blockworks",
+  "source": "https://www.bloomberg.com/news/articles/2025-10-10/unusual-bets-on-nobel-peace-prize-winner-prompt-probe-into-leaks",
+  "date": "2025-10-10",
+  "notes": "Bloomberg also mentions two further accounts (~$90k combined profit) without names in the coverage found.",
+  "sens": {
+   "1000": 5,
+   "2500": 5,
+   "10000": 5
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": true
+  }
+ },
+ {
+  "label_id": "NOB-WSJ-1",
+  "market": "nobel",
+  "identifier": "6741",
+  "identifier_type": "handle",
+  "confidence": "alleged",
+  "wallet_id": "0xa430",
+  "addr": "0xa430506774f9efaf39903ee7e0db1351f66891ca",
+  "score": 4,
+  "flags": [
+   "F1",
+   "F3",
+   "F4",
+   "F6"
+  ],
+  "rank": 45,
+  "n": 3554,
+  "first_high_h": 10.3,
+  "usd": 43338.58,
+  "claim": "WSJ (as reported by secondary coverage): account '6741' accurately predicted Machado's win; insider allegations",
+  "amount": "not reported",
+  "publisher": "WSJ via secondary coverage",
+  "source": "https://www.tradingview.com/news/cointelegraph:280987598094b:0-nobel-peace-prize-bets-on-polymarket-under-scrutiny-report/",
+  "date": "2025-10",
+  "notes": "Not reconciled with 'dirtycup' in the coverage found; weakest label.",
+  "sens": {
+   "1000": 4,
+   "2500": 4,
+   "10000": 4
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": true
+  }
+ },
+ {
+  "label_id": "IRN-ACDC-1",
+  "market": "iran",
+  "identifier": "Skoobidoobnj",
+  "identifier_type": "handle",
+  "confidence": "alleged",
+  "wallet_id": "0xfe6e",
+  "addr": "0xfe6eee00d36717359578ddb4d6e091d56bc9074e",
+  "score": 4,
+  "flags": [
+   "F3",
+   "F4",
+   "F5",
+   "F6"
+  ],
+  "rank": 15,
+  "n": 977,
+  "first_high_h": 28.3,
+  "usd": 6000.0,
+  "claim": "ACDC 'Profiting from War': placed bets worth nearly $9k on a US airstrike against Iran before midnight (June 2025)",
+  "amount": "~$9k",
+  "publisher": "Anti-Corruption Data Collective",
+  "source": "https://acdatacollective.org/work/profiting-from-war-mysterious-bets-on-polymarket/",
+  "date": "2026",
+  "notes": "ACDC notes luck is a possible explanation.",
+  "sens": {
+   "1000": 4,
+   "2500": 4,
+   "10000": 3
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": true
+  }
+ },
+ {
+  "label_id": "IRN-ACDC-2",
+  "market": "iran",
+  "identifier": "0xoracle",
+  "identifier_type": "handle",
+  "confidence": "alleged",
+  "wallet_id": "0x88e6",
+  "addr": "0x88e6bd838cbcb50ced302bd0257cc3635289a3e0",
+  "score": 5,
+  "flags": [
+   "F2",
+   "F3",
+   "F4",
+   "F5",
+   "F6"
+  ],
+  "rank": 3,
+  "n": 977,
+  "first_high_h": 1.2,
+  "usd": 3180.16,
+  "claim": "ACDC: account apparently created specifically for these bets; first bet it ever placed (June 2025 Iran strikes)",
+  "amount": "not reported",
+  "publisher": "Anti-Corruption Data Collective",
+  "source": "https://acdatacollective.org/work/profiting-from-war-mysterious-bets-on-polymarket/",
+  "date": "2026",
+  "notes": "Market not specified per account (may be a sibling Iran market).",
+  "sens": {
+   "1000": 5,
+   "2500": 5,
+   "10000": 4
+  },
+  "post": {
+   "f7_won": true,
+   "f8_dormant": false
+  }
+ }
+]

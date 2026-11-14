@@ -17,3 +17,5 @@ python3 v1_03_layer1.py
 python3 v1_04_layer2.py
 python3 v1_05_figures.py
 python3 v1_06_summary.py
+# --- web app data (reads frozen outputs only; no re-analysis) ---
+python3 export_web.py                               # web/public/data/*.json, web/tests/fixtures/flags_20.json

@@ -1,0 +1,80 @@
+{
+ "quantile": 0.99,
+ "per_market": [
+  {
+   "market": "iran",
+   "label": "insider-possible",
+   "n_compared": 27,
+   "n_pre_news": 27,
+   "n_unmatched": 0,
+   "mean_excess": 0.27,
+   "n_alerts": 1
+  },
+  {
+   "market": "maduro",
+   "label": "insider-possible",
+   "n_compared": 73,
+   "n_pre_news": 78,
+   "n_unmatched": 5,
+   "mean_excess": 1.04,
+   "n_alerts": 1
+  },
+  {
+   "market": "nobel",
+   "label": "insider-possible",
+   "n_compared": 47,
+   "n_pre_news": 85,
+   "n_unmatched": 38,
+   "mean_excess": 4.43,
+   "n_alerts": 7
+  },
+  {
+   "market": "ctrl_btc110k_jun17",
+   "label": "insider-impossible",
+   "n_compared": 27,
+   "n_pre_news": 27,
+   "n_unmatched": 0,
+   "mean_excess": -0.01,
+   "n_alerts": 0
+  },
+  {
+   "market": "ctrl_btc94k_jan5",
+   "label": "insider-impossible",
+   "n_compared": 23,
+   "n_pre_news": 26,
+   "n_unmatched": 3,
+   "mean_excess": 3.46,
+   "n_alerts": 3
+  },
+  {
+   "market": "ctrl_btcupdown_oct14",
+   "label": "insider-impossible",
+   "n_compared": 0,
+   "n_pre_news": 0,
+   "n_unmatched": 0,
+   "mean_excess": null,
+   "n_alerts": 0
+  }
+ ],
+ "pooled": {
+  "insider-possible": {
+   "n_seeds": 147,
+   "n_markets": 3,
+   "mean_excess": 1.98
+  },
+  "insider-impossible": {
+   "n_seeds": 50,
+   "n_markets": 2,
+   "mean_excess": 1.58
+  }
+ },
+ "p_value": 0.722,
+ "placebo_bias": 2.45,
+ "maduro_blind": {
+  "alerts_pre_news": 1,
+  "hours_before_news": 96,
+  "direction": "toward NO",
+  "note": "One pre-news alert, 96 h early and in the wrong direction; the final pre-news hours were not scorable."
+ },
+ "source": "data/results/comparison_summary.md, data/results/maduro_blind_validation.md"
+}

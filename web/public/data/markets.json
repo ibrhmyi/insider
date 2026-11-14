@@ -1,0 +1,614 @@
+{
+ "flags": {
+  "F1_days": 7,
+  "F2_share": 0.8,
+  "F2_markets": 2,
+  "F3_price": 0.35,
+  "F4_usd": 2500,
+  "F5_conv": 0.8,
+  "F6_hours": 72,
+  "HIGH": 4
+ },
+ "headline": {
+  "rank": 1,
+  "n_in_market": 2608,
+  "market": "maduro",
+  "hours_before": 30,
+  "documented_flagged": 7,
+  "documented_total": 7,
+  "n_high_total": 271,
+  "n_high_under_1k": 213,
+  "n_wallet_markets": 7139
+ },
+ "markets": [
+  {
+   "id": "iran",
+   "short": "Iran strike",
+   "question": "US military action against Iran by Sunday?",
+   "slug": "us-military-action-against-iran-by-sunday-225",
+   "condition_id": "0x4ec4d0c92654ccfed5b161c3ca1b4e3664608581b9d21d80939ce792a3a3b94f",
+   "open_utc": "2025-06-19T22:45:31Z",
+   "resolution": "Yes",
+   "resolution_utc": "2025-06-22T02:41:50Z",
+   "volume_usd": 3733050.0,
+   "why_insider_possible": "Resolves on a US military strike decision; known in advance to the US chain of command.",
+   "t_news": 1750549560,
+   "t_news_utc": "2025-06-21T23:46:00Z",
+   "t_news_basis": "Trump Truth Social post announcing strikes on Fordow/Natanz/Esfahan (reported 7:46-7:50pm EDT)",
+   "t_news_source": "https://www.pbs.org/newshour/world/trump-says-u-s-has-struck-3-iranian-nuclear-sites-joining-israeli-military-campaign | time: https://www.thejournal.ie/donald-trump-announcement-bomb-iran-6740123-Jun2025/ ; https://wbgsv0a.gigazine.net/gsc_news/en/20250624-donald-trump-truth-social-down",
+   "news_events": [
+    {
+     "utc": "2025-06-21T23:46:00Z",
+     "epoch": 1750549560,
+     "description": "Trump Truth Social post announcing strikes on Fordow/Natanz/Esfahan (reported 7:46-7:50pm EDT)",
+     "source": "https://www.pbs.org/newshour/world/trump-says-u-s-has-struck-3-iranian-nuclear-sites-joining-israeli-military-campaign | time: https://www.thejournal.ie/donald-trump-announcement-bomb-iran-6740123-Jun2025/ ; https://wbgsv0a.gigazine.net/gsc_news/en/20250624-donald-trump-truth-social-down"
+    }
+   ],
+   "n_wallets": 977,
+   "n_high": 95,
+   "n_documented": 2,
+   "permutation": {
+    "observed": 95,
+    "null_mean": 95.5,
+    "null_p95": 97.0,
+    "null_min": 91,
+    "null_max": 98,
+    "p_value": 0.814,
+    "n_perm": 1000,
+    "hist": [
+     [
+      91,
+      3
+     ],
+     [
+      92,
+      6
+     ],
+     [
+      93,
+      43
+     ],
+     [
+      94,
+      134
+     ],
+     [
+      95,
+      296
+     ],
+     [
+      96,
+      346
+     ],
+     [
+      97,
+      146
+     ],
+     [
+      98,
+      26
+     ]
+    ]
+   },
+   "firing_rates": {
+    "F1": 0.264,
+    "F2": 0.035,
+    "F3": 0.331,
+    "F4": 0.1,
+    "F5": 0.713,
+    "F6": 1.0
+   },
+   "score_dist": {
+    "1": 75,
+    "2": 503,
+    "3": 304,
+    "4": 82,
+    "5": 12,
+    "6": 1
+   },
+   "pre_news_buy_fills": 4308
+  },
+  {
+   "id": "maduro",
+   "short": "Maduro out",
+   "question": "Maduro out by January 31, 2026?",
+   "slug": "maduro-out-by-january-31-2026-318",
+   "condition_id": "0x580adc1327de9bf7c179ef5aaffa3377bb5cb252b7d6390b027172d43fd6f993",
+   "open_utc": "2025-12-12T00:27:56Z",
+   "resolution": "Yes",
+   "resolution_utc": "2026-01-03T12:14:07Z",
+   "volume_usd": 10966929.0,
+   "why_insider_possible": "Resolves on Maduro leaving power; the Jan-3-2026 US operation was known in advance to US planners.",
+   "t_news": 1767420000,
+   "t_news_utc": "2026-01-03T06:00:00Z",
+   "t_news_basis": "First public reports of explosions over Caracas (~2:00am VET); approximate",
+   "t_news_source": "https://chequeado.com/el-explicador/que-sabemos-de-los-bombardeos-en-venezuela-y-la-captura-de-nicolas-maduro-anunciada-por-donald-trump/",
+   "news_events": [
+    {
+     "utc": "2026-01-03T06:00:00Z",
+     "epoch": 1767420000,
+     "description": "First public reports of explosions over Caracas (~2:00am VET); approximate",
+     "source": "https://chequeado.com/el-explicador/que-sabemos-de-los-bombardeos-en-venezuela-y-la-captura-de-nicolas-maduro-anunciada-por-donald-trump/"
+    },
+    {
+     "utc": "2026-01-03T09:21:00Z",
+     "epoch": 1767432060,
+     "description": "Trump Truth Social post: Maduro captured and flown out (4:21am ET)",
+     "source": "https://talkingpointsmemo.com/news/trump-says-us-has-captured-venezuelas-president-maduro"
+    }
+   ],
+   "n_wallets": 2608,
+   "n_high": 39,
+   "n_documented": 3,
+   "permutation": {
+    "observed": 39,
+    "null_mean": 43.0,
+    "null_p95": 51.0,
+    "null_min": 27,
+    "null_max": 61,
+    "p_value": 0.829,
+    "n_perm": 1000,
+    "hist": [
+     [
+      27,
+      1
+     ],
+     [
+      31,
+      4
+     ],
+     [
+      32,
+      6
+     ],
+     [
+      33,
+      5
+     ],
+     [
+      34,
+      12
+     ],
+     [
+      35,
+      19
+     ],
+     [
+      36,
+      27
+     ],
+     [
+      37,
+      42
+     ],
+     [
+      38,
+      55
+     ],
+     [
+      39,
+      75
+     ],
+     [
+      40,
+      65
+     ],
+     [
+      41,
+      77
+     ],
+     [
+      42,
+      72
+     ],
+     [
+      43,
+      99
+     ],
+     [
+      44,
+      82
+     ],
+     [
+      45,
+      79
+     ],
+     [
+      46,
+      68
+     ],
+     [
+      47,
+      53
+     ],
+     [
+      48,
+      33
+     ],
+     [
+      49,
+      42
+     ],
+     [
+      50,
+      23
+     ],
+     [
+      51,
+      22
+     ],
+     [
+      52,
+      11
+     ],
+     [
+      53,
+      9
+     ],
+     [
+      54,
+      5
+     ],
+     [
+      55,
+      6
+     ],
+     [
+      56,
+      2
+     ],
+     [
+      57,
+      4
+     ],
+     [
+      58,
+      1
+     ],
+     [
+      61,
+      1
+     ]
+    ]
+   },
+   "firing_rates": {
+    "F1": 0.137,
+    "F2": 0.016,
+    "F3": 0.283,
+    "F4": 0.049,
+    "F5": 0.73,
+    "F6": 0.228
+   },
+   "score_dist": {
+    "0": 256,
+    "1": 1247,
+    "2": 850,
+    "3": 216,
+    "4": 28,
+    "5": 9,
+    "6": 2
+   },
+   "pre_news_buy_fills": 9362
+  },
+  {
+   "id": "nobel",
+   "short": "Machado Nobel",
+   "question": "Will Mar\u00eda Corina Machado win the Nobel Peace Prize in 2025?",
+   "slug": "will-mara-corina-machado-win-the-nobel-peace-prize-in-2025",
+   "condition_id": "0x14a3dfeba8b22a32feb0f10763db68bc4d2abeb5bff90e9ae20de53793b35a1d",
+   "open_utc": "2025-07-08T15:43:10Z",
+   "resolution": "Yes",
+   "resolution_utc": "2025-10-10T11:03:30Z",
+   "volume_usd": 2243006.0,
+   "why_insider_possible": "Resolves on the Norwegian Nobel Committee's private decision; known to the committee before announcement.",
+   "t_news": 1760086800,
+   "t_news_utc": "2025-10-10T09:00:00Z",
+   "t_news_basis": "Official announcement in Oslo, 11:00 CEST (minute single-sourced)",
+   "t_news_source": "https://www.nobelprize.org/prizes/peace/2025/prize-announcement/ | time: https://www.pw.live/upsc/exams/nobel-prize-in-peace-2025-winners",
+   "news_events": [
+    {
+     "utc": "2025-10-10T09:00:00Z",
+     "epoch": 1760086800,
+     "description": "Official announcement in Oslo, 11:00 CEST (minute single-sourced)",
+     "source": "https://www.nobelprize.org/prizes/peace/2025/prize-announcement/ | time: https://www.pw.live/upsc/exams/nobel-prize-in-peace-2025-winners"
+    }
+   ],
+   "n_wallets": 3554,
+   "n_high": 137,
+   "n_documented": 2,
+   "permutation": {
+    "observed": 137,
+    "null_mean": 88.2,
+    "null_p95": 99.0,
+    "null_min": 68,
+    "null_max": 110,
+    "p_value": 0.001,
+    "n_perm": 1000,
+    "hist": [
+     [
+      68,
+      1
+     ],
+     [
+      70,
+      3
+     ],
+     [
+      72,
+      5
+     ],
+     [
+      73,
+      1
+     ],
+     [
+      74,
+      8
+     ],
+     [
+      75,
+      7
+     ],
+     [
+      76,
+      13
+     ],
+     [
+      77,
+      16
+     ],
+     [
+      78,
+      22
+     ],
+     [
+      79,
+      20
+     ],
+     [
+      80,
+      26
+     ],
+     [
+      81,
+      27
+     ],
+     [
+      82,
+      29
+     ],
+     [
+      83,
+      55
+     ],
+     [
+      84,
+      57
+     ],
+     [
+      85,
+      43
+     ],
+     [
+      86,
+      71
+     ],
+     [
+      87,
+      48
+     ],
+     [
+      88,
+      64
+     ],
+     [
+      89,
+      64
+     ],
+     [
+      90,
+      58
+     ],
+     [
+      91,
+      57
+     ],
+     [
+      92,
+      51
+     ],
+     [
+      93,
+      44
+     ],
+     [
+      94,
+      32
+     ],
+     [
+      95,
+      42
+     ],
+     [
+      96,
+      26
+     ],
+     [
+      97,
+      31
+     ],
+     [
+      98,
+      23
+     ],
+     [
+      99,
+      14
+     ],
+     [
+      100,
+      17
+     ],
+     [
+      101,
+      11
+     ],
+     [
+      102,
+      3
+     ],
+     [
+      103,
+      2
+     ],
+     [
+      104,
+      2
+     ],
+     [
+      105,
+      3
+     ],
+     [
+      106,
+      2
+     ],
+     [
+      107,
+      1
+     ],
+     [
+      110,
+      1
+     ]
+    ]
+   },
+   "firing_rates": {
+    "F1": 0.086,
+    "F2": 0.021,
+    "F3": 0.228,
+    "F4": 0.027,
+    "F5": 0.313,
+    "F6": 0.378
+   },
+   "score_dist": {
+    "0": 1797,
+    "1": 557,
+    "2": 595,
+    "3": 468,
+    "4": 93,
+    "5": 42,
+    "6": 2
+   },
+   "pre_news_buy_fills": 9252
+  }
+ ],
+ "sensitivity": [
+  {
+   "F4_threshold": 1000,
+   "iran": 108,
+   "maduro": 42,
+   "nobel": 147
+  },
+  {
+   "F4_threshold": 2500,
+   "iran": 95,
+   "maduro": 39,
+   "nobel": 137
+  },
+  {
+   "F4_threshold": 10000,
+   "iran": 88,
+   "maduro": 33,
+   "nobel": 129
+  }
+ ],
+ "precision": [
+  {
+   "size_band": "<1k",
+   "is_high": false,
+   "n": 6337,
+   "win_rate": 0.273,
+   "dormant_rate": 0.389,
+   "n_dormant_known": 6337
+  },
+  {
+   "size_band": "<1k",
+   "is_high": true,
+   "n": 213,
+   "win_rate": 0.516,
+   "dormant_rate": 0.39,
+   "n_dormant_known": 213
+  },
+  {
+   "size_band": "1k-2.5k",
+   "is_high": false,
+   "n": 261,
+   "win_rate": 0.253,
+   "dormant_rate": 0.142,
+   "n_dormant_known": 261
+  },
+  {
+   "size_band": "1k-2.5k",
+   "is_high": true,
+   "n": 5,
+   "win_rate": 0.4,
+   "dormant_rate": 0.4,
+   "n_dormant_known": 5
+  },
+  {
+   "size_band": "2.5k-10k",
+   "is_high": false,
+   "n": 173,
+   "win_rate": 0.295,
+   "dormant_rate": 0.064,
+   "n_dormant_known": 173
+  },
+  {
+   "size_band": "2.5k-10k",
+   "is_high": true,
+   "n": 31,
+   "win_rate": 0.484,
+   "dormant_rate": 0.419,
+   "n_dormant_known": 31
+  },
+  {
+   "size_band": ">=10k",
+   "is_high": false,
+   "n": 97,
+   "win_rate": 0.165,
+   "dormant_rate": 0.124,
+   "n_dormant_known": 97
+  },
+  {
+   "size_band": ">=10k",
+   "is_high": true,
+   "n": 22,
+   "win_rate": 0.682,
+   "dormant_rate": 0.545,
+   "n_dormant_known": 22
+  }
+ ],
+ "impact": {
+  "impact_5m_per_1k": {
+   "high_n": 251,
+   "high_median": 6.505003252269333e-05,
+   "other_n": 5138,
+   "other_median": 0.0,
+   "p_mwu": 0.30021733321729327,
+   "other_ge2500_n": 215,
+   "other_ge2500_median": 0.0016791381264196254,
+   "p_mwu_vs_ge2500": 0.8616579731836452
+  },
+  "impact_60m_per_1k": {
+   "high_n": 220,
+   "high_median": 0.0023145769328525734,
+   "other_n": 4974,
+   "other_median": 0.0,
+   "p_mwu": 0.008832193222351757,
+   "other_ge2500_n": 208,
+   "other_ge2500_median": 0.0012793194761198628,
+   "p_mwu_vs_ge2500": 0.17048761450337602
+  }
+ }
+}
