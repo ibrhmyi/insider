@@ -22,7 +22,7 @@ function BuyTooltip({active, payload}: {active?: boolean; payload?: {payload: Hi
   const p = payload?.find(x => (x.payload as HighBuy).w)?.payload;
   if (!active || !p) return null;
   const flags = p.flags.split(',') as FlagId[];
-  return <div className="flex max-w-(--popover) flex-col gap-1 rounded-md bg-raised p-3 shadow-overlay type-body-sm">
+  return <div className="flex max-w-(--popover) flex-col gap-1 rounded-soft bg-raised p-3 frame type-body-sm">
     <span className="type-code-sm">{p.w}…</span>
     <span>Score {p.score} of 6, bought {p.side}</span>
     <span className="data">{usd(p.usd)} at YES {p.yes.toFixed(2)}</span>
@@ -30,6 +30,11 @@ function BuyTooltip({active, payload}: {active?: boolean; payload?: {payload: Hi
     <span className="text-text-3 data">{utc(p.t)}</span>
     {p.doc && <span className="text-text-2">Named in public reporting</span>}
   </div>;
+}
+
+/** Legend glyph: the same round mark the chart draws, always next to its text label. */
+function Swatch({kind}: {kind: 'run' | 'model'}) {
+  return <svg aria-hidden viewBox="0 0 10 10" className="size-2.5"><circle cx={5} cy={5} r={4} data-kind={kind} className="fill-accent-mark stroke-accent-line"/></svg>;
 }
 
 function Dot(props: {cx?: number; cy?: number; size?: number; payload?: HighBuy}) {
@@ -72,14 +77,14 @@ export function PriceTimeline({data, title}: {data: Timeline; title: string}) {
       <SegmentedControlItem value="72h">Last 72 h</SegmentedControlItem>
     </SegmentedControl>}
     footer={<div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-2 type-label-sm text-text-2">
-      <span className="inline-flex items-center gap-1.5"><span aria-hidden data-kind="run" className="size-2.5 rounded-full bg-accent-mark"/>Buy by a wallet scoring 4 or more, sized by USD ({otherBuys.length})</span>
-      <span className="inline-flex items-center gap-1.5"><span aria-hidden data-kind="model" className="size-2.5 rounded-full bg-accent-mark"/>Wallet named in public reporting ({docBuys.length})</span>
+      <span className="inline-flex items-center gap-1.5"><Swatch kind="run"/>Buy by a wallet scoring 4 or more, sized by USD ({otherBuys.length})</span>
+      <span className="inline-flex items-center gap-1.5"><Swatch kind="model"/>Wallet named in public reporting ({docBuys.length})</span>
       <span>Line: YES price of the last fill</span>
     </div>}
   >
     <figure className="size-full" aria-label={`YES price over time with ${buys.length} high-score buys; the first public news is at ${utc(data.t_news)}. Switch to the table view for the values.`}>
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart margin={{top: 16, right: 12, bottom: 0, left: -12}}>
+        <ComposedChart accessibilityLayer={false} margin={{top: 16, right: 12, bottom: 0, left: -12}}>
           <CartesianGrid vertical={false} stroke="var(--line-row)"/>
           <XAxis dataKey="t" type="number" domain={[lo, hi]} allowDataOverflow tickFormatter={t => fmtTick(t, span)} tickCount={6}
             stroke="var(--line-row)" tick={{fill: 'var(--text-3)', fontSize: 12}} tickLine={false}/>

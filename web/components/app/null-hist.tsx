@@ -10,7 +10,7 @@ export function NullHist({hist, observed, label}: {hist: [number, number][]; obs
   return <figure className="flex flex-col gap-1" aria-label={`${label}: random timing gives between ${hist[0][0]} and ${hist[hist.length - 1][0]} high scores; observed ${observed}.`}>
     <div className="h-32">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{top: 4, right: 8, bottom: 0, left: 8}} barCategoryGap={1}>
+        <BarChart accessibilityLayer={false} data={data} margin={{top: 4, right: 8, bottom: 0, left: 8}} barCategoryGap={1}>
           <XAxis dataKey="x" type="number" domain={[lo, hi]} stroke="var(--line-row)" tick={{fill: 'var(--text-3)', fontSize: 11}} tickLine={false} tickCount={5}/>
           <YAxis hide/>
           <Bar dataKey="n" fill="var(--chart-ink-2)" isAnimationActive={false}/>

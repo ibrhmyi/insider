@@ -71,7 +71,7 @@ export function Story({data}: {data: StoryData}) {
         <div className="flex flex-col gap-4">
           {[{l: 'Insider-possible markets', v: ip}, {l: 'Bitcoin price controls', v: ctl}].map(r => <div key={r.l} className="flex flex-col gap-1">
             <span className="flex items-baseline justify-between gap-4 type-body"><span>{r.l}</span><span className="data">+{r.v.mean_excess.toFixed(2)} extra wallets (n = {r.v.n_seeds} large trades)</span></span>
-            <span className="block h-(--space-3) bg-chart-ink-2" style={{width: `${(r.v.mean_excess / 2.5) * 100}%`}} aria-hidden/>
+            <span className="block h-(--space-3) w-(--pct) bg-chart-ink-2" style={{'--pct': `${(r.v.mean_excess / 2.5) * 100}%`} as React.CSSProperties} aria-hidden/>
           </div>)}
           <p className="type-body text-text-2">Permutation p = {v0.p_value.toFixed(2)}. Followers after a large trade were no more common where insiders were possible.</p>
         </div>
@@ -97,7 +97,7 @@ export function Story({data}: {data: StoryData}) {
         <figure className="flex flex-col gap-2" aria-label={`Wallets by score across 3 markets: ${data.dist.map(d => `score ${d.score}: ${d.wallets} wallets, ${d.documented} documented`).join('; ')}`}>
           <div className="h-80" data-kind="model">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.dist} margin={{top: 28, right: 8, bottom: 8, left: 0}}>
+              <BarChart accessibilityLayer={false} data={data.dist} margin={{top: 28, right: 8, bottom: 8, left: 0}}>
                 <CartesianGrid vertical={false} stroke="var(--line-row)"/>
                 <XAxis dataKey="score" stroke="var(--line-row)" tick={{fill: 'var(--text-3)', fontSize: 13}} tickLine={false} label={{value: 'Score (flags fired)', position: 'insideBottom', offset: -2, fill: 'var(--text-3)', fontSize: 12}} height={48}/>
                 <YAxis scale="log" domain={[1, 4000]} ticks={[1, 10, 100, 1000]} allowDataOverflow stroke="var(--line-row)" tick={{fill: 'var(--text-3)', fontSize: 12}} tickLine={false} axisLine={false} width={44}/>
@@ -149,8 +149,9 @@ export function Story({data}: {data: StoryData}) {
       <Button variant="secondary" size="sm" onClick={() => go(-1)} disabled={i === 0}>Previous step</Button>
       <ol className="flex items-center gap-1">
         {TITLES.map((t, k) => <li key={t}>
-          <button type="button" onClick={() => setI(k)} aria-label={`Step ${k + 1}: ${t}`} aria-current={k === i ? 'step' : undefined}
-            className={`block h-(--space-1) w-(--space-8) rounded-sm focus-visible:focus-ring ${k === i ? 'bg-ink' : 'bg-cell-quiet hover:bg-hover'}`}/>
+          <Button variant="ghost" size="icon-xs" onClick={() => setI(k)} aria-label={`Step ${k + 1}: ${t}`} aria-current={k === i ? 'step' : undefined}>
+            <span aria-hidden className={`block h-(--space-1) w-(--space-6) rounded-inner ${k === i ? 'bg-ink' : 'bg-cell-quiet'}`}/>
+          </Button>
         </li>)}
       </ol>
       <Button size="sm" onClick={() => go(1)} disabled={i === TITLES.length - 1}>Next step</Button>

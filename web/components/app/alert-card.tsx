@@ -139,7 +139,7 @@ export function AlertCard({wallet: w, market: m, flags: th, seeds, labels, impac
           </div> : <p className="type-body text-text-2">No public reporting names this wallet. It appears here only because the frozen screen scored it {th.HIGH} or more; that is a reason to look, not a finding.</p>}
         </Section>
 
-        {!compact && <section aria-labelledby={`${k}-post`} className="flex flex-col gap-3 bg-well rounded-xl p-4">
+        {!compact && <section aria-labelledby={`${k}-post`} className="flex flex-col gap-3 bg-well rounded-frame p-4">
           <div className="flex flex-col gap-1">
             <h2 id={`${k}-post`} className="type-heading-sm">After the fact, never in the score</h2>
             <p className="type-body-sm text-text-2">Measured after resolution, so a live screen could not have seen them. Shown only to judge the screen.</p>

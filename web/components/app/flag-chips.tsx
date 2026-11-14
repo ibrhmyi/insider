@@ -9,7 +9,7 @@ export function FlagChips({fired, only = false, of = FLAGS}: {fired: FlagId[]; o
   return <span className="inline-flex flex-wrap gap-1" aria-label={fired.length ? `Flags fired: ${fired.map(f => `${f} ${FLAG_NAMES[f]}`).join(', ')}` : 'No flags fired'} role="img">
     {shown.map(f => set.has(f)
       ? <Badge key={f} variant="outline" title={FLAG_NAMES[f]} aria-hidden>{f}</Badge>
-      : <Badge key={f} variant="ghost" className="text-text-disabled" title={`${FLAG_NAMES[f]}: not fired`} aria-hidden>{f}</Badge>)}
+      : <span key={f} className="inline-flex min-h-(--tag) items-center px-1.5 type-label-sm text-text-disabled" title={`${FLAG_NAMES[f]}: not fired`} aria-hidden>{f}</span>)}
   </span>;
 }
 

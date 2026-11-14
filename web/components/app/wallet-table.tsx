@@ -40,7 +40,7 @@ export function WalletTable({rows, market, marketName}: {rows: TableRow[]; marke
           {r.doc.handle && <span className="type-label-sm text-text-2">{r.doc.handle}</span>}
           <DocBadge confidence={r.doc.confidence}/>
           <a href={r.doc.source} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}
-            className="type-label-sm text-text-2 underline underline-offset-4 hover:text-text-1 focus-visible:focus-ring rounded-sm">{r.doc.confidence === 'charged' ? 'CFTC complaint' : `${r.doc.publisher.split(' ')[0]} report`}</a>
+            className="type-label-sm text-text-2 underline underline-offset-4 hover:text-text-1 focus-visible:focus-ring rounded-inner">{r.doc.confidence === 'charged' ? 'CFTC complaint' : `${r.doc.publisher.split(' ')[0]} report`}</a>
         </>}
       </span>,
     },
