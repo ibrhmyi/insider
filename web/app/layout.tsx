@@ -18,7 +18,7 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
           <Link href="/" className="shrink-0 type-label rounded-sm focus-visible:focus-ring">Insider Signal</Link>
           <SiteNav/>
         </header>
-        <main id="main" tabIndex={-1} className="outline-none">{children}</main>
+        <main id="main" tabIndex={-1} data-control>{children}</main>
       </QuartzPortalProvider>
     </body>
   </html>;

@@ -104,7 +104,7 @@ export function AlertCard({wallet: w, market: m, flags: th, seeds, labels, impac
       </div>
 
       <div className="flex min-w-0 flex-col gap-8">
-        <Section id={`${k}-wallet`} title="Wallet">
+        {!compact && <><Section id={`${k}-wallet`} title="Wallet">
           <DataList size="sm">
             <DataListItem><DataListLabel>Address</DataListLabel><DataListValue mono>
               {w.addr ? <span className="flex min-w-0 items-center gap-1"><span className="break-all">{w.addr}</span><CopyButton value={w.addr} label="Copy address" size="icon-xs"/></span> : `${w.id}…`}
@@ -126,12 +126,12 @@ export function AlertCard({wallet: w, market: m, flags: th, seeds, labels, impac
             </li>)}
           </ol>
           <p className="type-body-sm text-text-2">Its USD-weighted median buy came {hours(w.hours)} before the first news.</p>
-        </Section>
+        </Section></>}
 
         <Section id={`${k}-record`} title="Public record">
           {doc ? <div className="flex flex-col gap-4">
             <span className="flex items-center gap-2"><DocBadge confidence={conf}/><span className="type-body-sm text-text-2">{conf === 'charged' ? 'Charged, not adjudicated' : 'Alleged in reporting'}</span></span>
-            {labels.map(l => <div key={l.label_id} className="flex flex-col gap-1">
+            {(compact ? labels.slice(0, 1) : labels).map(l => <div key={l.label_id} className="flex flex-col gap-1">
               <p className="type-body-sm">{l.claim}</p>
               <p className="type-body-sm text-text-2">Reported amount: {l.amount}. Matched by {l.identifier_type === 'handle' ? `handle "${l.identifier}"` : `address prefix ${l.identifier}`}.</p>
               <a href={l.source} target="_blank" rel="noreferrer" className="type-body-sm underline underline-offset-4 w-fit">{l.publisher}, {l.date}</a>
@@ -139,7 +139,7 @@ export function AlertCard({wallet: w, market: m, flags: th, seeds, labels, impac
           </div> : <p className="type-body text-text-2">No public reporting names this wallet. It appears here only because the frozen screen scored it {th.HIGH} or more; that is a reason to look, not a finding.</p>}
         </Section>
 
-        <section aria-labelledby={`${k}-post`} className="flex flex-col gap-3 bg-well rounded-xl p-4">
+        {!compact && <section aria-labelledby={`${k}-post`} className="flex flex-col gap-3 bg-well rounded-xl p-4">
           <div className="flex flex-col gap-1">
             <h2 id={`${k}-post`} className="type-heading-sm">After the fact, never in the score</h2>
             <p className="type-body-sm text-text-2">Measured after resolution, so a live screen could not have seen them. Shown only to judge the screen.</p>
@@ -150,7 +150,7 @@ export function AlertCard({wallet: w, market: m, flags: th, seeds, labels, impac
             <DataListItem><DataListLabel>Score with F4 at $1,000 / $2,500 / $10,000</DataListLabel><DataListValue numeric>{w.sens['1000']} / {w.sens['2500']} / {w.sens['10000']}</DataListValue></DataListItem>
           </DataList>
           <p className="type-body-sm text-text-2">All three markets resolved toward the long-time longshot, so winning says little here.</p>
-        </section>
+        </section>}
       </div>
     </div>
   </div>;

@@ -17,3 +17,6 @@
 }
 
 @import "../components/quartz/styles.css";
+
+/* Story mode: a short fade when a step changes; only under motion-safe (see components/app/story.tsx). */
+@keyframes story-in { from { opacity: 0; } }
