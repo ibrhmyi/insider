@@ -149,3 +149,8 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Wallet table default.** Filtered to F4 (size) fired, as asked; rows scoring >= 4 open their alert (click or Enter).
 - **Quality.** Quartz lint clean except one deliberate warning (the requested "n/a — needs news time" uses an em dash, which Quartz discourages; the mandated disclaimer does too). ui-review run on every route at 390 and 1280 px with measured probes; 7 should-fix findings fixed (nav cut off at 390, chart tab stop with a meaningless name, empty submit shown as a failed scan, 13 lint errors, overflowing flags table, clipped story step, focus ring on the story region). Notes in `web/REVIEW.md`; screenshots in `figures/app_*.png`.
 - **Not done.** Deployment to Vercel needs the owner's Vercel account; steps are in `web/README.md`. No dark theme.
+
+### 2026-11-14 - Deployed the web app to Vercel
+- Vercel was blocked by the session's network policy. Created a personal cloud environment `insider` (Polymarket hosts plus `api.vercel.com`, `vercel.com`); the Vercel token is stored as a network secret on that environment, never in the repo.
+- `npx vercel link --project insider-signal` then `npx vercel deploy --prod` from `web/`. Production: https://insider-signal-rho.vercel.app (state READY, framework Next.js). `.vercel/` and `.env.local` are gitignored.
+- **Open:** the project has Vercel Authentication on for all non-custom domains (Vercel's default), so visitors who are not signed in to the owner's Vercel team see a login page. The owner decides whether to turn it off (Project Settings, Deployment Protection) or attach a custom domain.

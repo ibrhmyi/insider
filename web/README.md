@@ -51,6 +51,8 @@ curl -s "http://localhost:3000/api/scan?q=israel-x-iran-ceasefire-continues-thro
 
 ## Deploy (Vercel)
 
+Deployed 2026-11-14 as the Vercel project `insider-signal`: https://insider-signal-rho.vercel.app (production). To redeploy from `web/`: `npx vercel deploy --prod`.
+
 The app is static pages plus one server route (`/api/scan`, which calls `gamma-api.polymarket.com` and `data-api.polymarket.com`).
 
 1. Push the branch to GitHub.
