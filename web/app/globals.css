@@ -1,0 +1,19 @@
+/* Quartz ships its tokens with the font names "Quartz Sans" and "Quartz Mono"; the registry that serves the
+   font files (design.how) is blocked from this build environment, so the same names are mapped to open fonts
+   with the axes and features the tokens use (variable weight 340-500, tnum/zero/ss04). No token is changed. */
+@font-face {
+  font-family: "Quartz Sans";
+  src: url("/fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Quartz Mono";
+  src: url("/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import "../components/quartz/styles.css";
