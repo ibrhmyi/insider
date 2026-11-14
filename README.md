@@ -56,3 +56,12 @@ Rules frozen first: `rules/frozen_v1.md` (git commit `f39e644`). Labels from pub
 | Layer 2 follow-on (A vs B) | `src/v1_04_layer2.py` | `data/results/v1_layer2*.{csv,json}` |
 | Figures 4-7 | `src/v1_05_figures.py` | `figures/fig4..fig7*.png` |
 | Summary | `src/v1_06_summary.py` | `data/results/v1_summary.md` |
+
+## Web app: Insider Signal (2026-11-14)
+`web/` presents the frozen v1 screen as a product: overview, market view, wallet alert cards, a live scan, a method page and a keyboard-driven story mode for the video. It reads only frozen outputs, exported by `src/export_web.py` (last step of `run_all.sh`).
+```bash
+cd web && npm install && npm run dev     # http://localhost:3000
+python3 src/export_web.py               # regenerate web/public/data from the frozen results (repo root)
+cd web && npm test                      # TypeScript flag port vs the Python scores for 20 wallets
+```
+Deploy: import the repository in Vercel with Root Directory `web` (details in `web/README.md`). UI review: `web/REVIEW.md`. Screenshots: `figures/app_*.png`.
