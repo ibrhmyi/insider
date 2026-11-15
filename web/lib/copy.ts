@@ -31,6 +31,9 @@ export const FLAG_SOURCE: Record<FlagId, string> = {
   F6: 'Project brief: timing relative to the first public news',
 };
 
+/** Short words for the flag marks (the brief's labels). */
+export const FLAG_SHORT: Record<FlagId, string> = {F1: 'Fresh', F2: 'Focused', F3: 'Longshot', F4: 'Large', F5: 'One-sided', F6: 'Near news'};
+
 export const FLAGS: FlagId[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6'];
 
 export const usd = (v: number, digits = 0) => `$${v.toLocaleString('en-US', {maximumFractionDigits: digits, minimumFractionDigits: digits})}`;

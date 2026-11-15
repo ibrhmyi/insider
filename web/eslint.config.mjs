@@ -18,9 +18,9 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
-      "components/quartz/**",
-      "lib/quartz/**",
-      "quartz.eslint.config.mjs",
+      "components/sodium/**",
+      "lib/sodium/**",
+      "sodium.eslint.config.mjs",
     ],
   },
 ];

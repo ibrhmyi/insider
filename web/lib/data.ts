@@ -1,7 +1,7 @@
 import 'server-only';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-import type {Alerts, MarketsFile, Timeline, Validation, WalletRow, Layer2, V0Summary, MarketId} from './types';
+import type {Alerts, MarketsFile, Timeline, Validation, WalletRow, Layer2, V0Summary, MarketId, BuysFile} from './types';
 
 const dir = join(process.cwd(), 'public', 'data');
 const cache = new Map<string, unknown>();
@@ -16,6 +16,7 @@ export const getMarkets = () => read<MarketsFile>('markets.json');
 export const getMarket = (id: string) => getMarkets().markets.find(m => m.id === id);
 export const getTimeline = (id: MarketId) => read<Timeline>(`${id}_timeline.json`);
 export const getWallets = (id: MarketId) => read<WalletRow[]>(`${id}_wallets.json`);
+export const getBuys = (id: MarketId) => read<BuysFile>(`${id}_buys.json`);
 export const getAlerts = (id: MarketId) => read<Alerts>(`${id}_alerts.json`);
 export const getValidation = () => read<Validation[]>('validation.json');
 export const getLayer2 = () => read<Layer2>('layer2.json');

@@ -1,22 +1,21 @@
-/* Quartz ships its tokens with the font names "Quartz Sans" and "Quartz Mono"; the registry that serves the
-   font files (design.how) is blocked from this build environment, so the same names are mapped to open fonts
-   with the axes and features the tokens use (variable weight 340-500, tnum/zero/ss04). No token is changed. */
+/* Sodium names its faces "Inter Display" and "Commit Mono"; the registry that serves the font files (design.how)
+   is blocked from this build environment, so the same names map to the open font files below. No token changes. */
 @font-face {
-  font-family: "Quartz Sans";
-  src: url("/fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
+  font-family: "Inter Display";
+  src: url("/fonts/inter-latin-opsz-normal.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Quartz Mono";
-  src: url("/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations");
-  font-weight: 100 800;
+  font-family: "Commit Mono";
+  src: url("/fonts/commit-mono-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-@import "../components/quartz/styles.css";
+@import "../components/sodium/styles.css";
 
-/* Story mode: a short fade when a step changes; only under motion-safe (see components/app/story.tsx). */
-@keyframes story-in { from { opacity: 0; } }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

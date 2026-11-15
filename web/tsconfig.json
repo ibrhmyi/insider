@@ -23,8 +23,11 @@
       }
     ],
     "paths": {
-      "@/lib/quartz/*": [
-        "./components/quartz/lib/*"
+      "@/lib/sodium/*": [
+        "./components/sodium/lib/*"
+      ],
+      "@/hooks/sodium/*": [
+        "./components/sodium/hooks/*"
       ],
       "@/*": [
         "./*"
@@ -39,6 +42,6 @@
   ],
   "exclude": [
     "node_modules",
-    "lib/quartz/lint"
+    "lib/sodium/lint"
   ]
 }

@@ -13,6 +13,12 @@
       "skillPath": "systems/quartz/SKILL.md",
       "computedHash": "996c53d0c27d27d414bfec2023762fac9209e8cfca024d865e98cb84527b3814"
     },
+    "sodium": {
+      "source": "arla6ka/design.how",
+      "sourceType": "github",
+      "skillPath": "systems/sodium/SKILL.md",
+      "computedHash": "fcc8fea6bd9e81d496ad35cc8b053d11aa917df3fe32bbdf81450665686b77b5"
+    },
     "ui-review": {
       "source": "arla6ka/design.how",
       "sourceType": "github",

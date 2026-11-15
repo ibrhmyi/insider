@@ -57,3 +57,6 @@ export type V0Summary = {
   per_market: {market: string; label: string; n_compared: number; mean_excess: number | null; n_alerts: number}[];
   maduro_blind: {alerts_pre_news: number; hours_before_news: number; direction: string; note: string};
 };
+
+/** Every pre-news buy in the last 72 h: [time, YES price, USD, wallet index]. */
+export type BuysFile = {market: MarketId; t_news: number; window_h: number; wallets: {id: string; score: number; usd: number; doc: boolean}[]; buys: [number, number, number, number][]};
