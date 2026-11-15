@@ -8,15 +8,8 @@ import {useEffect, useMemo, useRef, useState, type ReactNode} from 'react';
  * flagged activity (score >= 4 and >= $2,500 bought) and the focus wallet. Under reduced motion every change is instant.
  */
 
-export type ChartState = {
-  line: 'none' | 'pre' | 'full';
-  dots: 'none' | 'faint' | 'flagged';
-  focus: boolean;
-  news: boolean;
-  callout: boolean;
-};
-
-export const STATE_ALL: ChartState = {line: 'full', dots: 'flagged', focus: true, news: true, callout: true};
+import type {ChartState} from '@/lib/chart-state';
+export type {ChartState};
 
 export type ChartBuy = {t: number; y: number; usd: number; flagged: boolean; focus: boolean};
 
