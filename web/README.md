@@ -1,6 +1,6 @@
 # Insider Signal (web app)
 
-The frozen v1 wallet screen from this repository as a web product: an overview, one page per market, an alert card per high-score wallet, a live scan of any Polymarket market, a plain-language method page and a keyboard-driven story mode for the course video.
+The frozen v1 wallet screen from this repository as one page that shows rather than tells.
 
 Everything shown is unusual activity for review, not proof of insider trading. No rule or result is changed here: the app only reads the frozen outputs.
 
@@ -12,16 +12,16 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. Pages:
+Open http://localhost:3000. It is one page that tells the story with working parts:
 
-| Route | What it shows |
-|---|---|
-| `/` | Headline and the three numbers, one card per market |
-| `/markets/[id]` | Price from fills with the first-news marker and high-score buys sized by USD; ranked wallet table (`maduro`, `nobel`, `iran`) |
-| `/markets/[id]/wallet/[prefix]` | Alert card for each wallet-market scoring 4 or more (271 pages) |
-| `/live` | Live scan of a Polymarket link or slug, F1-F5 only; "Load cached example" works offline |
-| `/method` | Attempt 1, the six flags, the permutation null, validation, Layer 2, limits |
-| `/story` | Six steps for screen recording: arrow keys, PageUp/PageDown, Home/End; `?step=3` opens a step |
+1. The hook: the CFTC-charged Maduro wallet, ranked first of 2,608 by the frozen screen, 30 hours before the news.
+2. Six signs, every wallet: switch market, see every buy by a flagged wallet on the price chart, click a buy or a row to see that wallet's six flags against their thresholds.
+3. Where do you draw the line: a slider over the cut-off shows how many wallets are flagged and how many of the 7 publicly named ones are caught (the frozen line is 4).
+4. Is it just timing: the 1,000-run timestamp shuffle per market, with the observed count marked.
+5. Run it on a market today: live scan of any Polymarket link (F1-F5); the cached example is shown on arrival and works offline.
+6. What it cannot say: four limits.
+
+The only other route is `/api/scan`.
 
 Tests (the TypeScript flag port against the Python scores for 20 wallets):
 
@@ -53,7 +53,7 @@ curl -s "http://localhost:3000/api/scan?q=israel-x-iran-ceasefire-continues-thro
 
 Deployed 2026-11-14 as the Vercel project `insider-signal`: https://insider-signal-rho.vercel.app (production). To redeploy from `web/`: `npx vercel deploy --prod`.
 
-The app is static pages plus one server route (`/api/scan`, which calls `gamma-api.polymarket.com` and `data-api.polymarket.com`).
+The app is one static page plus one server route (`/api/scan`, which calls `gamma-api.polymarket.com` and `data-api.polymarket.com`).
 
 1. Push the branch to GitHub.
 2. In Vercel, choose Add New, then Project, and import the repository.

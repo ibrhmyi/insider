@@ -1,6 +1,6 @@
 'use client';
 
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Button} from '@/components/quartz/ui/button';
 import {Field, FieldDescription, FieldLabel} from '@/components/quartz/ui/field';
 import {Input} from '@/components/quartz/ui/input';
@@ -10,7 +10,7 @@ import {Skeleton} from '@/components/quartz/ui/skeleton';
 import {DataList, DataListItem, DataListLabel, DataListValue} from '@/components/quartz/ui/data-list';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/quartz/ui/table';
 import {FlagChips} from '@/components/app/flag-chips';
-import {DISCLAIMER, compactUsd, usd, utc} from '@/lib/copy';
+import {DISCLAIMER, usd, utc} from '@/lib/copy';
 import type {FlagId} from '@/lib/types';
 
 type ScanResult = {
@@ -45,7 +45,10 @@ export function LiveScan() {
     requestAnimationFrame(() => result.current?.focus());
   }
 
-  async function cached() {
+  // Show the cached example on arrival, so the feature is visible before anyone types (works offline).
+  useEffect(() => { cached(false); }, []);
+
+  async function cached(focus = true) {
     setState({kind: 'loading', q: ''});
     try {
       const js = await (await fetch('/data/live_example.json')).json();
@@ -53,7 +56,7 @@ export function LiveScan() {
     } catch {
       setState({kind: 'error', message: 'The cached example could not be loaded.', q: ''});
     }
-    requestAnimationFrame(() => result.current?.focus());
+    if (focus) requestAnimationFrame(() => result.current?.focus());
   }
 
   const loading = state.kind === 'loading';
@@ -68,14 +71,14 @@ export function LiveScan() {
       </Field>
       <div className="flex flex-wrap gap-2">
         <Button type="submit" pending={loading && state.q !== ''} pendingLabel="Scanning">Scan market</Button>
-        <Button type="button" variant="secondary" onClick={cached} disabled={loading}>Load cached example</Button>
+        <Button type="button" variant="secondary" onClick={() => cached()} disabled={loading}>Load cached example</Button>
       </div>
     </form>
 
     <section aria-labelledby="result-heading" aria-busy={loading || undefined} className="flex flex-col gap-4">
-      <h2 id="result-heading" ref={result} tabIndex={-1} data-control className="type-heading">
+      <h3 id="result-heading" ref={result} tabIndex={-1} data-control className="type-heading-sm">
         {state.kind === 'done' ? state.data.market.question : 'Result'}
-      </h2>
+      </h3>
 
       {state.kind === 'idle' && <Empty variant="plain">
         <EmptyHeader>
@@ -96,7 +99,7 @@ export function LiveScan() {
           <span>{state.message}</span>
           <span className="flex flex-wrap gap-2">
             {state.q && <Button size="sm" variant="secondary" onClick={() => run(state.q)}>Retry scan</Button>}
-            <Button size="sm" variant="secondary" onClick={cached}>Load cached example</Button>
+            <Button size="sm" variant="secondary" onClick={() => cached()}>Load cached example</Button>
           </span>
         </AlertDescription>
       </Alert>}
@@ -110,10 +113,7 @@ function Result({data: d, cached}: {data: ScanResult; cached: boolean}) {
   return <div className="flex flex-col gap-6">
     <DataList size="sm" className="max-w-2xl">
       {cached && <DataListItem><DataListLabel>Source</DataListLabel><DataListValue>Cached example, scanned {utc(d.scanned_at)}</DataListValue></DataListItem>}
-      <DataListItem><DataListLabel>Status</DataListLabel><DataListValue>{d.market.closed ? 'Closed' : 'Open'}{d.market.end_date ? `, ends ${d.market.end_date.slice(0, 10)}` : ''}</DataListValue></DataListItem>
-      <DataListItem><DataListLabel>Volume</DataListLabel><DataListValue numeric>{compactUsd(d.market.volume)}</DataListValue></DataListItem>
       <DataListItem><DataListLabel>Fills read</DataListLabel><DataListValue numeric>{d.window.n_fills.toLocaleString('en-US')}{d.window.from && d.window.to ? `, ${utc(d.window.from)} to ${utc(d.window.to)}` : ''}</DataListValue></DataListItem>
-      <DataListItem><DataListLabel>Buyers in that window</DataListLabel><DataListValue numeric>{d.window.n_buyers}, of which the largest {d.window.n_scored} are scored</DataListValue></DataListItem>
     </DataList>
 
     {d.wallets.length === 0
@@ -123,7 +123,7 @@ function Result({data: d, cached}: {data: ScanResult; cached: boolean}) {
           <TableHead>Wallet</TableHead><TableHead>Live score</TableHead><TableHead>Flags</TableHead><TableHead>F6: n/a — needs news time</TableHead>
           <TableHead className="text-end">Bought</TableHead><TableHead className="text-end">Avg price</TableHead><TableHead>Side</TableHead>
         </TableRow></TableHeader>
-        <TableBody>{d.wallets.map(w => <TableRow key={w.id}>
+        <TableBody>{d.wallets.slice(0, 10).map(w => <TableRow key={w.id}>
           <TableCell className="type-code-sm">{w.id}…</TableCell>
           <TableCell className="data">{w.score} / 5</TableCell>
           <TableCell><FlagChips fired={w.fired} of={LIVE_FLAGS}/></TableCell>
@@ -133,8 +133,7 @@ function Result({data: d, cached}: {data: ScanResult; cached: boolean}) {
           <TableCell>{w.side}</TableCell>
         </TableRow>)}</TableBody>
       </Table>}
-    <ul className="flex flex-col gap-1 max-w-(--measure)">{d.notes.map(n => <li key={n} className="type-body-sm text-text-2">{n}</li>)}</ul>
-    <p className="type-body-sm text-text-2 max-w-(--measure)">The historical screen calls 4 or more of 6 a high score. Without F6, no live threshold has been validated; read a live score as a ranking, not an alert.</p>
+    <p className="type-body-sm text-text-2 max-w-(--measure)">Top 10 of the {d.window.n_scored} largest buyers in the {d.window.n_fills.toLocaleString('en-US')} most recent fills. No live cut-off has been validated, so read this as a ranking, not an alert.</p>
     <p className="type-body text-text-1">{DISCLAIMER}</p>
   </div>;
 }

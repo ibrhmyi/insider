@@ -1,5 +1,8 @@
 # UI review: Insider Signal web app
 
+> **2026-11-15 update.** The app was redesigned into a single page at the owner's request ("one page, concise, tell a story, show not tell"). The review below covers the earlier multi-page version; its fixes (phone nav, chart tab stops, lint, focus handling) carried over. Checks rerun on the one-page version: Quartz lint exit 0 with the same single em-dash warning; 23/23 tests; Playwright interaction check with no console errors (market switch, row click, chart-buy click, cut-off slider 4 to 6 giving 7/7, 5/7, 1/7 named wallets caught, cached live scan on arrival); screenshots `figures/app_onepage*.png` and `figures/app_hero.png`.
+
+
 The app is ready to demo: every page loads, reads at 390 and 1280 px, and can be used with the keyboard alone. All blocking and should-fix findings from the first pass are fixed.
 
 Ready to ship: yes, with fixes (blocking 0, should-fix 0 open, 3 notes, 3 questions for a person).
