@@ -5,7 +5,7 @@ Reads only files already produced by the frozen pipeline:
   data/results/v1_wallet_scores.csv, v1_validation.csv, v1_layer1.json, v1_layer2.json, v1_layer2_seeds.csv,
   v1_perm_null_*.npy, comparison_summary.{csv,md}, maduro_blind_validation.md
 Writes:
-  web/public/data/markets.json, {m}_timeline.json, {m}_wallets.json, {m}_alerts.json,
+  web/public/data/markets.json, {m}_timeline.json, {m}_wallets.json, {m}_alerts.json, {m}_buys.json,
   validation.json, layer2.json, v0_summary.json, live_example.json
   web/tests/fixtures/flags_20.json   (inputs + Python results for 20 wallets; the TypeScript port is tested on it)
 
@@ -114,6 +114,40 @@ def timeline(m, f, S, pref):
                 n_fills=int(len(g)), n_points=int(len(t)),
                 note="YES price of the last fill at or before each time (no historical mid-price exists); "
                      f"downsampled to at most {MAX_POINTS} points by keeping the last fill in each equal time bin.")
+
+
+BUYS_WINDOW_H = 72  # every pre-news buy in the last 72 h, for the scrollytelling chart
+
+
+def recent_buys(m, f, S, pref):
+    """All pre-news BUY fills in the last BUYS_WINDOW_H hours, merged per wallet within 30 min (same rule as high_buys).
+    Each buy points at its wallet's frozen score and pre-news USD; nothing is re-scored."""
+    T = t_news(m)
+    sc = S.set_index("wallet")
+    b = f[(f.side == "BUY") & (f.timestamp < T) & (f.timestamp >= T - BUYS_WINDOW_H * 3600) & (~f.after_resolution)]
+    wallets, idx, rows = [], {}, []
+    for w, gw in b.groupby("proxy_wallet"):
+        if w not in sc.index:
+            continue
+        gw = gw.sort_values("timestamp")
+        start, usd, yes, t0 = None, 0.0, 0.0, None
+        merged = []
+        for r in gw.itertuples():
+            if start is not None and r.timestamp - start <= MERGE_S:
+                usd += r.usd; yes = r.yes_price
+            else:
+                if start is not None:
+                    merged.append((t0, usd, yes))
+                start, t0, usd, yes = r.timestamp, r.timestamp, r.usd, r.yes_price
+        merged.append((t0, usd, yes))
+        if w not in idx:
+            idx[w] = len(wallets)
+            r = sc.loc[w]
+            wallets.append(dict(id=pref[w], score=int(r.score), usd=round(float(r.F4_buy_usd), 2), doc=(m, w) in DOC))
+        rows += [[int(t), round(float(y), 4), round(float(u), 2), idx[w]] for t, u, y in merged]
+    rows.sort()
+    return dict(market=m, t_news=T, window_h=BUYS_WINDOW_H, wallets=wallets, buys=rows,
+                note="Every pre-news BUY in the window, merged per wallet within 30 min: [time, YES price, USD, wallet index].")
 
 
 def handle_for(m, w):
@@ -235,6 +269,7 @@ def main():
         json.dump(timeline(m, f, S, pref), open(OUT / f"{m}_timeline.json", "w"), separators=(",", ":"))
         json.dump(wallets(m, S, pref), open(OUT / f"{m}_wallets.json", "w"), separators=(",", ":"))
         json.dump(alerts(m, S, pref), open(OUT / f"{m}_alerts.json", "w"), separators=(",", ":"))
+        json.dump(recent_buys(m, f, S, pref), open(OUT / f"{m}_buys.json", "w"), separators=(",", ":"))
         ev = NEWS[NEWS.market_key == m].sort_values("news_epoch")
         p = perm[m]
         mk_rows.append(dict(
