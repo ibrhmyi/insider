@@ -1,20 +1,6 @@
-/* Sodium names its faces "Inter Display" and "Commit Mono"; the registry that serves the font files (design.how)
-   is blocked from this build environment, so the same names map to the open font files below. No token changes. */
-@font-face {
-  font-family: "Inter Display";
-  src: url("/fonts/inter-latin-opsz-normal.woff2") format("woff2-variations");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Commit Mono";
-  src: url("/fonts/commit-mono-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
+/* Sodium's tokens.css loads its fonts from design.how and falls back to /fonts/sodium/. design.how is blocked from this
+   build environment, so the fallback files are open stand-ins: Inter (variable, optical sizes) as "Inter Display" and
+   Commit Mono from npm. No token changes. */
 @import "../components/sodium/styles.css";
 
 html { scroll-behavior: smooth; }
