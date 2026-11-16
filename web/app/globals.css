@@ -39,3 +39,14 @@ html { scroll-behavior: smooth; }
   --accent: var(--text-2);
   --accent-edge: var(--text-2);
 }
+
+/* Fit the research section on iyildiz.me: its black, a narrower reading column, and type scaled to it.
+   Labels use the site's small uppercase mono style. */
+[data-theme="dark"] body.sodium { --page: #0a0a0a; }
+.research-label { font: 400 11px/1.6 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+#main .type-story-title { font-size: clamp(26px, 4.6vw, 34px); line-height: 1.2; }
+#main .type-story { font-size: clamp(17px, 2.2vw, 19px); }
+#main .type-story-number { font-size: clamp(56px, 10vw, 84px); }
+#main .type-story-sign { font-size: clamp(19px, 2.6vw, 22px); }
+#main .type-product-title { font-size: clamp(21px, 3vw, 26px); line-height: 1.25; }
+#main .type-product { font-size: clamp(15px, 1.9vw, 16px); line-height: 1.7; }

@@ -3,7 +3,6 @@ import {join} from 'node:path';
 import {Replay, type ReplayData} from '@/components/product/replay';
 import {Watchlist} from '@/components/product/watchlist';
 import {ScanBox} from '@/components/product/scan-box';
-import {Outline} from '@/components/product/outline';
 import {How, Source, Where, Who} from '@/components/product/research';
 import {getValidation, getWallets, getMarket, getMarkets, getV0, MARKET_IDS} from '@/lib/data';
 import {FLAGS, FLAG_PLAIN, FLAG_SHORT, NOT_PROOF, usd} from '@/lib/copy';
@@ -11,10 +10,11 @@ import {SOURCES} from '@/lib/research';
 import type {FlagId} from '@/lib/types';
 
 const REPO = 'https://github.com/ibrhmyi/insider';
-const pad = 'px-6 sm:px-12 lg:px-24';
+// One centred reading column, the same width as the research articles on iyildiz.me/research.
+const pad = 'mx-auto w-full max-w-[680px] px-6';
 
 function Section({id, title, children, className = ''}: {id: string; title: string; children: React.ReactNode; className?: string}) {
-  return <section aria-labelledby={`${id}-title`} id={id} className={`flex scroll-mt-11 flex-col gap-8 border-t border-line py-20 ${pad} ${className}`}>
+  return <section aria-labelledby={`${id}-title`} id={id} className={`flex flex-col gap-8 border-t border-line py-16 ${pad} ${className}`}>
     <h2 id={`${id}-title`} className="type-product-title max-w-(--title-ch)">{title}</h2>
     {children}
   </section>;
@@ -50,20 +50,19 @@ export default function Home() {
   ];
 
   return <div id="top" className="bg-page text-text-1" style={{'--title-ch': '30ch'} as React.CSSProperties}>
-    <Outline/>
-
-    <section aria-labelledby="question-title" className={`flex min-h-[70svh] flex-col justify-center gap-6 py-20 ${pad}`}>
+    <header aria-labelledby="question-title" className={`flex flex-col gap-5 pt-[12vh] pb-14 ${pad}`}>
+      <a href="/research/" className="research-label w-fit text-text-3 transition-colors duration-(--dur-state) hover:text-text-1 focus-visible:focus-ring">← Research</a>
+      <p className="research-label mt-12 text-text-3"><time dateTime="2026-11-14">11.2026</time> · Capstone</p>
       <h1 id="question-title" className="type-story-title max-w-(--title-ch)">Can public trades reveal an insider before the news breaks?</h1>
       <p className="type-product max-w-measure text-text-2">On Polymarket every trade is public. This page asks who insiders are, where they trade and how they behave, then tests a model that looks for them.</p>
-      <p className="type-product text-text-3">Ibrahim Yildiz, CP191 nano capstone</p>
-    </section>
+    </header>
 
     <Section id="who" title="An insider trades on a secret they were trusted with."><Who/></Section>
     <Section id="where" title="They trade where a few people know the answer first."><Where/></Section>
     <Section id="how" title="They leave a pattern."><How/></Section>
 
     <Section id="model" title="The model turns that pattern into six signs per wallet.">
-      <ul className="grid gap-x-12 gap-y-6 md:grid-cols-2 xl:grid-cols-3" aria-label="The six signs">
+      <ul className="grid gap-x-12 gap-y-6 sm:grid-cols-2" aria-label="The six signs">
         {FLAGS.map(f => <li key={f} className="flex flex-col gap-1">
           <span className="type-product text-text-1">{FLAG_SHORT[f]}</span>
           <span className="type-product text-text-2">{FLAG_PLAIN[f]}</span>
@@ -84,7 +83,7 @@ export default function Home() {
     </Section>
 
     <Section id="findings" title="Tested on three past markets: Maduro, the Nobel Peace Prize, the Iran strike.">
-      <dl className="grid border-t border-line md:grid-cols-2 xl:grid-cols-4">
+      <dl className="grid border-t border-line sm:grid-cols-2">
         {results.map(r => <div key={r.label} className="flex flex-col-reverse justify-end gap-2 border-b border-line py-6 md:pe-8">
           <dt className="type-product text-text-2">{r.label}</dt>
           <dd className="type-product-title text-text-1">{r.figure}</dd>
