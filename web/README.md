@@ -1,6 +1,6 @@
 # Insider Signal (web app)
 
-One product page: the problem, the six signs, a replay of the Maduro market with alerts as they would have fired, a watchlist of open markets decided by small groups, and a box to scan any market. It only reads the frozen outputs; no rule or result is changed here. Earlier versions are in `archive/` (not built).
+One page that carries the whole presentation, top to bottom: the question, who insiders are (four cases), where they trade, how they behave, the six-sign model, findings on three past markets, the demo (Maduro replay, watchlist of open markets, scan any market), then limits and sources. The research facts and their source links are in `lib/research.ts`. It only reads the frozen outputs; no rule or result is changed here. Earlier versions are in `archive/` (not built).
 
 ## Run it
 

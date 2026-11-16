@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {default: 'Insider signal', template: '%s | Insider signal'},
-  description: 'Scores Polymarket wallets on six simple signs and flags bets worth a look. Unusual activity for review, not proof of insider trading.',
+  description: 'Who insiders are, where they trade and how they behave on prediction markets, and a model that scores Polymarket wallets on six signs. Unusual activity for review, not proof of insider trading.',
 };
 export const viewport: Viewport = {themeColor: '#141412', colorScheme: 'dark'};
 

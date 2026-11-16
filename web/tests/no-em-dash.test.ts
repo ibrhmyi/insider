@@ -11,7 +11,7 @@ const offending = (files: string[]) => files.filter(f => readFileSync(f, 'utf8')
 
 describe('no em dash in rendered copy', () => {
   it('page source, components and shared copy contain none', () => {
-    const files = [...walk(join(root, 'app')), ...walk(join(root, 'components', 'product')), ...['copy.ts', 'scan.ts', 'watchlist.ts', 'flags.ts'].map(f => join(root, 'lib', f))]
+    const files = [...walk(join(root, 'app')), ...walk(join(root, 'components', 'product')), ...['copy.ts', 'scan.ts', 'watchlist.ts', 'flags.ts', 'research.ts'].map(f => join(root, 'lib', f))]
       .filter(f => /\.(tsx?|css)$/.test(f));
     expect(offending(files)).toEqual([]);
   });
