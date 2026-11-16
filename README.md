@@ -58,10 +58,10 @@ Rules frozen first: `rules/frozen_v1.md` (git commit `f39e644`). Labels from pub
 | Summary | `src/v1_06_summary.py` | `data/results/v1_summary.md` |
 
 ## Web app: Insider Signal (2026-11-14)
-`web/` presents the frozen v1 screen as one page that tells the story with working parts: the wallet explorer, a cut-off slider, the timing-shuffle check and a live scan. Live at https://insider-signal-rho.vercel.app. It reads only frozen outputs, exported by `src/export_web.py` (last step of `run_all.sh`).
+`web/` presents the frozen v1 screen as a scrollytelling investigation (Sodium, dark): the Maduro case, three markets with Nobel as the second story, the method and its limits, a live scan and a recording mode for the video. Live at https://insider-signal-rho.vercel.app. It reads only frozen outputs, exported by `src/export_web.py` (last step of `run_all.sh`).
 ```bash
 cd web && npm install && npm run dev     # http://localhost:3000
 python3 src/export_web.py               # regenerate web/public/data from the frozen results (repo root)
 cd web && npm test                      # TypeScript flag port vs the Python scores for 20 wallets
 ```
-Deploy: import the repository in Vercel with Root Directory `web` (details in `web/README.md`). UI review: `web/REVIEW.md`. Screenshots: `figures/app_onepage.png`, `figures/app_onepage_phone.png`, `figures/app_hero.png`.
+Deploy: import the repository in Vercel with Root Directory `web` (details in `web/README.md`). UI review: `web/REVIEW.md`. Screenshots: `figures/app_*.png`.

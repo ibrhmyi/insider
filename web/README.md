@@ -1,8 +1,6 @@
 # Insider Signal (web app)
 
-The frozen v1 wallet screen from this repository as one page that shows rather than tells.
-
-Everything shown is unusual activity for review, not proof of insider trading. No rule or result is changed here: the app only reads the frozen outputs.
+A scrollytelling investigation of the frozen v1 wallet screen, in the Sodium design system (dark). It only reads the frozen outputs; no rule or result is changed here.
 
 ## Run it
 
@@ -12,16 +10,16 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. It is one page that tells the story with working parts:
+Open http://localhost:3000.
 
-1. The hook: the CFTC-charged Maduro wallet, ranked first of 2,608 by the frozen screen, 30 hours before the news.
-2. Six signs, every wallet: switch market, see every buy by a flagged wallet on the price chart, click a buy or a row to see that wallet's six flags against their thresholds.
-3. Where do you draw the line: a slider over the cut-off shows how many wallets are flagged and how many of the 7 publicly named ones are caught (the frozen line is 4).
-4. Is it just timing: the 1,000-run timestamp shuffle per market, with the observed count marked.
-5. Run it on a market today: live scan of any Polymarket link (F1-F5); the cached example is shown on arrival and works offline.
-6. What it cannot say: four limits.
-
-The only other route is `/api/scan`.
+| Route | What it is |
+|---|---|
+| `/` | The investigation: hero numbers, then a sticky chart beside seven steps for the Maduro case (price, every pre-news buy, flagged wallets in yellow, the charged wallet, the news, its six signs, the public record) |
+| `/cases` | Maduro, Nobel and Iran side by side, then the Nobel story |
+| `/cases/[id]` | Zoomed chart and the wallet table for one market (default: score >= 4 and >= $2,500; switch for small wallets) |
+| `/method` | The failed first idea, the six signs and sources, the shuffle test, the cut-off slider, the limits |
+| `/live` | Scan an open Polymarket market on 5 signs; the cached example works offline |
+| `/story` | Recording mode: 7 full-screen slides, arrow keys, `?slide=N` |
 
 Tests (the TypeScript flag port against the Python scores for 20 wallets):
 
@@ -29,10 +27,10 @@ Tests (the TypeScript flag port against the Python scores for 20 wallets):
 npm test
 ```
 
-Quartz's lint on the app code:
+Sodium's lint on the app code:
 
 ```bash
-npx eslint -c quartz.eslint.config.mjs app components/app lib/*.ts
+npx eslint -c sodium.eslint.config.mjs app components/inv components/site-nav.tsx lib/*.ts
 ```
 
 ## Regenerate the data
@@ -46,7 +44,7 @@ python3 src/export_web.py      # from the repository root
 It is also the last step of `./run_all.sh`. It writes `public/data/*.json` and `tests/fixtures/flags_20.json`. `public/data/live_example.json` is the cached live scan; to refresh it, run the app and save the route's answer:
 
 ```bash
-curl -s "http://localhost:3000/api/scan?q=israel-x-iran-ceasefire-continues-through-november-15" > public/data/live_example.json
+curl -s "http://localhost:3000/api/scan?q=will-zohran-mamdani-be-time-person-of-the-year-2026" > public/data/live_example.json
 ```
 
 ## Deploy (Vercel)
@@ -72,8 +70,8 @@ npx vercel --prod
 ## How it is built
 
 - Next.js 15 (App Router, TypeScript), Tailwind CSS 4.
-- Design system: Quartz from design.how. Its source is in `components/quartz/` and its lint in `lib/quartz/lint/`. The design.how skills (`quartz`, `build-design-system`, `ui-review`) are in `.agents/skills/` at the repository root.
-- Charts: Recharts inside Quartz's `ChartFrame`, colored only with Quartz tokens; each chart has a table view.
+- Design system: Sodium from design.how, dark theme. Its source is in `components/sodium/` (installed from the design.how GitHub repository; the design.how registry is blocked from the build environment) and its lint in `lib/sodium/lint/`. Skills (`sodium`, `build-design-system`, `ui-review`) are in `.agents/skills/` at the repository root.
+- Charts are hand-drawn SVG (`components/inv/chart.tsx`) driven by a scroll step or a story slide; colour comes only from Sodium roles, and yellow only marks flagged activity (score >= 4 and >= $2,500) and the charged wallet.
 - `lib/flags.ts` is the TypeScript port of the frozen F1-F6 features; `lib/scan.ts` is the live scan.
 - `REVIEW.md` holds the UI review.
 

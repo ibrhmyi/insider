@@ -1,82 +1,65 @@
-# UI review: Insider Signal web app
+# UI review: Insider Signal (scrollytelling redesign, Sodium dark)
 
-> **2026-11-15 update.** The app was redesigned into a single page at the owner's request ("one page, concise, tell a story, show not tell"). The review below covers the earlier multi-page version; its fixes (phone nav, chart tab stops, lint, focus handling) carried over. Checks rerun on the one-page version: Quartz lint exit 0 with the same single em-dash warning; 23/23 tests; Playwright interaction check with no console errors (market switch, row click, chart-buy click, cut-off slider 4 to 6 giving 7/7, 5/7, 1/7 named wallets caught, cached live scan on arrival); screenshots `figures/app_onepage*.png` and `figures/app_hero.png`.
+The redesign is ready to record and demo. The investigation lands, the chart shows the key trade, flagged means flagged, and every page works by keyboard, at phone width and under reduced motion. All findings ranked high are fixed.
 
-
-The app is ready to demo: every page loads, reads at 390 and 1280 px, and can be used with the keyboard alone. All blocking and should-fix findings from the first pass are fixed.
-
-Ready to ship: yes, with fixes (blocking 0, should-fix 0 open, 3 notes, 3 questions for a person).
+Ready to ship: yes, with fixes (blocking 0, should-fix 0 open, 4 notes, 3 questions for a person).
 
 ## Review record
-- Source: local production build (`next build && next start`, port 3100), branch `claude/hopeful-mendel-tado7n`.
-- Tools: ui-review skill (design.how), `build-design-system/scripts/capture.mjs` (16 captures with accessibility trees, `--no-backend`, guard blocked 0 requests), a Playwright probe script for full-page 390 captures and measured probes, and the Quartz lint (`npx eslint -c quartz.eslint.config.mjs app components/app lib/*.ts`).
-- Widths: 390 and 1280. Theme: light (the app ships no dark theme).
-- Date: 2026-11-14. Criteria: `.agents/skills/ui-review/references/criteria.md` plus the Quartz skill's rules, which count as agreed criteria.
-- Purpose of each screen (assumed from the brief):
-  - Overview: give the headline and the three numbers in one look, and route to a market.
-  - Market view: see when high-score wallets bought relative to the news, and find a wallet to review.
-  - Wallet alert: judge one wallet: flags against thresholds, what followed, the public record, and what is post-hoc.
-  - Live scan: score a live market's largest recent buyers on F1-F5, or show the cached example offline.
-  - Method: explain the method, its checks and limits to a non-specialist.
-  - Story: a keyboard-driven walkthrough to screen-record.
-- Gaps: no dark theme reviewed (none shipped); no screen reader run by a person (accessibility trees were captured and read instead); touch tested by width only, not on a device.
+- Source: local production build (`next build && next start`), branch `claude/hopeful-mendel-tado7n`, 2026-11-16.
+- Tools: design.how ui-review skill; `build-design-system/scripts/capture.mjs` (24 captures with accessibility trees, routes `/`, `/cases`, `/cases/maduro`, `/cases/nobel`, `/cases/iran`, `/method`, `/live`, `/story`; widths 390, 1440, 1920; theme dark; `--no-backend`); Playwright probe scripts; Lighthouse 12; Sodium lint (`npx eslint -c sodium.eslint.config.mjs app components/inv components/site-nav.tsx lib/*.ts`).
+- Criteria: `.agents/skills/ui-review/references/criteria.md` plus the Sodium skill's global rules and anti-slop list, which count as agreed criteria.
+- Purpose of each screen (given by the brief): `/` tell the Maduro case as an investigation; `/cases` compare three markets and tell Nobel; `/cases/[id]` review flagged wallets; `/method` state the method and its limits; `/live` score an open market; `/story` record the video.
+- Gaps: no screen reader run by a person (accessibility trees and Lighthouse instead); no real touch device (390 px emulation); light theme not reviewed (the brief asks for dark only).
 
-## Commands and exit codes
-- `npx eslint -c quartz.eslint.config.mjs app components/app lib/*.ts`: first run exit 1 (13 errors, 1 warning); after fixes, exit 0 with 1 warning (see notes).
-- `npx next build`: exit 0 (281 pages generated, including 271 alert pages; 1 server route).
-- `npx vitest run`: exit 0, 23 tests passed.
-- `node .agents/skills/build-design-system/scripts/capture.mjs --base http://localhost:3100 --kind after --out web/.ui-review/captures --no-backend --routes ...`: 16 of 16 captures, 0 routes not as expected, 0 requests blocked.
+## Commands and results
+| check | result |
+|---|---|
+| Sodium lint | first run exit 1 (17 errors); after fixes exit 0, no warnings |
+| `npx vitest run` | 23/23 pass (TypeScript flags vs Python scores for 20 wallets) |
+| `npx next build` | exit 0 |
+| capture.mjs | 24 of 24 captures, 0 routes not as expected; 48 requests blocked (Sodium's font URLs on design.how, unreachable from this sandbox) |
+| Lighthouse, mobile profile (performance / accessibility / best practices) | `/` 98/100/96, `/cases` 96/100/96, `/cases/maduro` 96/100/96, `/method` 98/100/96, `/live` 93/100/96, `/story` 99/100/96; desktop `/` 100/100 |
+| Blank-section probe (scroll in 0.8-viewport steps, flag frames with under 1% non-background pixels) | 0 blank frames on `/` and `/cases` at 1440x900, 1920x1080 and 390x844; the lowest frame is the intentionally dark hero (1.4 to 2.1%) |
+| Page overflow, 7 routes x 3 widths | 0 px everywhere after fix |
+| Console errors (excluding blocked font URLs and prefetches) | none |
 
-## Findings
+## Findings (all fixed)
 
-### Blocking
-None.
-
-### Should-fix (all fixed in this session)
-1. **Main navigation cut off at 390 px** (criterion 12, `nav 'Main'`, maduro-full-390). "Live scan" was clipped and Method and Story were off-screen with no visible scroll cue. Fixed: brand link hidden under 640 px (Overview is in the nav), tighter link padding and header gutter. Measured after: nav `scrollWidth - clientWidth` = 0 px at 390.
-2. **Chart took a Tab stop with a meaningless name** (criterion 5 and quartz-keyboard, `svg[application] "Dec 12Dec 16Dec 21…"`, tab path on /markets/maduro). Recharts' accessibility layer made the SVG focusable and named it from its tick labels. Fixed: `accessibilityLayer={false}` on all three charts. The keyboard path to the values is the chart's table view (segmented control in the chart header), and each chart has a figure label that states what it shows.
-3. **Empty Live scan submit reported "Scan failed"** (criteria 7 and 8, `button 'Scan market'`, live-error capture). Nothing had been sent, yet the result area showed a failure, away from the cause. Fixed: the field is marked `aria-invalid` with the message right under it (`role="alert"`). "Scan failed" now appears only for a real request error, with "Retry scan" and "Load cached example".
-4. **Quartz lint: 13 errors** (quartz-tokens-only, anti-slop-no-status-dots, quartz-components-first). Stock radii (`rounded-sm/md/xl`) changed to role radii (`rounded-inner/soft/frame`); a restyled Badge for unfired flags replaced by plain text; restyled nav Buttons replaced by links styled with `aria-current`; a shadow on the flat tooltip replaced by the frame utility; hue-only legend dots replaced by the same round mark as the chart, always beside its text; an inline width moved to a custom property; native step buttons replaced by Quartz Buttons.
-5. **Alert card flags table overflowed at 1280** (criterion 12, `table 'Flags with this wallet's values and thresholds'`, first alert capture). The value and Fired columns were clipped. Fixed: the rule moved under the flag name in one column.
-6. **Story step 5 clipped at the top** (criterion 12, story step 5 at 1280x800). Centring a tall step with `items-center` cut off its top. Fixed: safe centring (`my-auto`), and the story's alert card shows only the flags, the public record and the disclaimer, so it fits one screen for recording.
-7. **Story step region drew a focus ring when it received programmatic focus** (criterion 3). Fixed with `data-control`, Quartz's marker for a container that takes focus without being a control. The region still takes focus on every step change, so screen readers announce the new step.
+### Should-fix
+1. **The blank-section bug: step text disappeared behind the sticky chart on phones** (criterion 12, `/` at 390, step 4). The sticky chart is drawn above the steps, and a step centred on screen sat underneath it, so the screen showed the chart and empty background. Fixed: on phones the step cards sit in the lower part of the screen and the active zone moves there (`-70% 0px -12% 0px`); measured by the blank-section probe above.
+2. **Nobel chart drew no flagged buys and no announcement line** (criterion 7, `/story` slide 5). A server page spread a constant exported from a `'use client'` module and got an empty reference. Fixed by moving chart states to `lib/chart-state.ts`; probe counted 59 yellow buys after the fix.
+3. **Wallet table pushed the page 409 to 457 px wide at 390** (criterion 12, `/cases/maduro`, `/cases/nobel`). Grid children lacked `min-w-0`. Fixed; overflow 0 px.
+4. **Sticky chart covered the site header and its navigation** when the scrolly section ended (criterion 6, `/` at 1440, step 7). Header moved to Sodium's overlay layer; the last step is a full screen tall so the chart never scrolls away mid-read.
+5. **Story mode drew a yellow focus ring around the whole slide** (criterion 3, `/story`). The slide region received programmatic focus. It no longer takes focus; the live region announces each slide.
+6. **17 Sodium lint errors**, including a real layout bug: `max-w-7xl` does not exist in Sodium's theme, so containers had no limit. Sodium has no page-width token, so pages run full width with gutters (Sodium's tool layout) and prose is capped at `max-w-measure` or `max-w-3xl`. Also fixed: `z-[1]` to `z-(--z-raised)`, the callout's inline position to custom properties.
+7. **Heading order** (Lighthouse, `/cases/maduro`): wallet detail `h3` under the page `h1`; now `h2`.
 
 ### Notes
-1. **Em dash in mandated copy.** Quartz bans em dashes (anti-slop-no-em-dash; the lint warns once). The disclaimer ("Unusual activity for review — this does not identify an owner or prove insider trading.") is fixed wording under HANDOFF rule 1, and "n/a — needs news time" is the wording the brief asked for. Both kept on purpose.
-2. **Wide tables scroll inside their frame at 390** (alert follow-on table, market wallet table). Columns are reachable by horizontal scroll inside the table, and lower-priority columns hide below set widths. Page-level overflow is 0 px on every route at 390 and 1280.
-3. **Press feedback is close to the 100 ms limit on Nobel** (criterion 13, measured with the Event Timing API). Toggling the F4 filter re-filters 3,554 rows: click durations 88 ms and 80 ms. Passes today; a bigger market would need memoised filtering per flag.
+1. **Em dash in the mandated disclaimer.** Sodium bans em dashes; HANDOFF rule 1 fixes the wording "Unusual activity for review — this does not identify an owner or prove insider trading." It is kept verbatim, as is the brief's "n/a — needs news time" spirit (shown as "Near news n/a" in the live table).
+2. **Yellow use.** The brief reserves yellow for flagged activity and the charged wallet; Sodium reserves it for the one primary action, the selection and a chart series. Both hold: chart dots, fired signs, flagged counts, the charged wallet and the one primary button per view. The selected table row uses Sodium's selection wash, which is yellow-tinted in dark mode; rows that can be selected are all flagged wallets.
+3. **Stat tiles.** Sodium bans rows of equal stat cards, so the hero's three numbers are one ruled status strip at Sodium's largest type role (`type-display`); there is no larger token.
+4. **Scroll reveal.** Sodium bans content that fades in on scroll. Step text is always visible; only the sticky chart changes state. Under reduced motion every state change is instant (measured: dot and line `transition-property: none`, hero numbers show final values at once).
 
 ## Probes (measured)
 | probe | result |
 |---|---|
-| Horizontal overflow, 6 routes x 2 widths | 0 px everywhere |
-| Console errors on load, 6 routes x 2 widths | none (prefetch 404s for unbuilt routes disappeared once all routes existed) |
-| Tab path, /markets/maduro, 40 stops | skip link, brand, nav, breadcrumb, news source, market links, range control, view control, search, 8 filter toggles, table region, sort and column menus, rows, source links. Every stop draws a ring; the search field draws it on its container (checked in a capture) |
-| Enter on a focused table row | opens `/markets/maduro/wallet/0x31a5` |
-| Story keys | 2 x ArrowRight to `?step=3`; End to `?step=6`; ArrowLeft to `?step=5` |
-| Reduced motion | story step animation `none` under `prefers-reduced-motion: reduce`, `story-in` otherwise |
-| Press latency (Event Timing) | 80-88 ms for a filter toggle on the largest table |
-| Live scan states | empty, field error, loading (skeleton rows, pending button), request error with retry, success, cached example offline: all shown in captures |
-| Live scan against the real API | `/api/scan` for an open market answered in about 3 s with 25 scored wallets |
+| Tab path on `/` | skip link, brand, 5 nav links, scroll link, CFTC source link, 3 closing links; every stop shows a ring |
+| Table by keyboard (`/cases/maduro`) | 12 rows by default (score >= 4 and >= $2,500); Enter on row 3 opens `0x6baf…`; Space on the switch shows 39 rows (+27 small) |
+| Slider by keyboard (`/method`) | ArrowRight to 5: 5 of 7 named caught, 68 flagged, 43 under $1,000 |
+| Story keys | 3 x ArrowRight to slide 4; End to 7; Home to 1; `?slide=N` opens a slide |
+| Live scan states | cached example on arrival; empty submit marks the field; unknown slug gives "Scan failed" with retry; a real market with no hits (TIME Person of the Year, Pope Leo XIV) shows "No wallet crosses the line in this market right now." |
+| Press latency (Event Timing) | switch click 32 ms |
 
 ## Edge cases
-- Empty: shown (live scan before a scan; wallet table with no match says which filter to turn off).
-- Loading and slow loading: shown (live scan skeleton). Static pages have no loading state.
-- Error: shown (live scan field error and request error). Failed save: not applicable, the app writes nothing.
-- Partial data: shown (alert follow-on rows with "No match" or "Overlaps the news"; price impact "Not measured").
-- Long content: shown (long market questions wrap; full addresses break; handles never truncate).
-- Narrowest and widest width: shown. Layout switch widths (640, 768, 1024): not captured separately.
-- Offline: shown for live scan via the cached example; the other pages are static.
-- No permission or read-only role: not applicable.
-- Touch: hover-only content is the chart tooltip; the same values are in the table view.
+- Empty: shown (live scan with no wallet over the line). Loading: shown (live skeleton). Error: shown (unknown market).
+- Long content: market questions wrap; addresses only as prefixes except documented wallets.
+- Widths: 390, 1440, 1920 captured; the scrolly layout switches at 1024.
+- Offline: the cached live example; all other pages are static.
+- Reduced motion: shown. Touch: no hover-only content that carries meaning (sign tooltips repeat values that the detail panel shows).
 
 ## For a person to decide
-1. Quartz is light by default and the app ships no dark theme. Add one before the demo, or keep light for the recording?
-2. The live score is out of 5 and no live threshold has been validated, so the page calls it a ranking, not an alert. Is that the framing you want in the video?
-3. Story step 4 uses a log scale so the 5 wallets at score 6 are visible next to 2,054 at score 0. Keep it, or switch to a linear scale with labels?
+1. The square-root price scale makes the 5 to 11 cent run readable and is labelled on the chart. Keep it, or show a linear scale with the zoom alone?
+2. Sodium's real fonts load from design.how on the deployed site when that host allows it; locally the open stand-ins (Inter, Commit Mono) are used. Fine for the video?
+3. The live example (TIME Person of the Year, Mamdani) will age. Refresh it before recording with the command in `web/README.md`?
 
-## Dismissed and left out
-- The flag toggles take two rows at 1280. They are the main filter; collapsing them into a menu would hide F1-F6, which the brief asks to show. Left as is.
-- Market cards on the overview use a vertical label/value list. A matter of taste; no criterion is broken.
-
-Coverage: routes /, /markets/maduro, /markets/nobel, /markets/iran, /markets/maduro/wallet/0x31a5, /live, /method, /story (steps 1-6); widths 390 and 1280; theme light; probes: overflow, console, tab path, row Enter, story keys, reduced motion, event timing, live API. Not measured: screen reader by a person, a real touch device, a throttled CPU, dark theme.
+Coverage: routes `/`, `/cases`, `/cases/maduro`, `/cases/nobel`, `/cases/iran`, `/method`, `/live`, `/story` (7 slides); widths 390, 1440, 1920; theme dark; probes: blank sections, overflow, console, tab path, table keyboard, switch, slider, story keys, live states, reduced motion, event timing, Lighthouse. Not measured: screen reader by a person, real touch device, throttled CPU beyond Lighthouse's mobile profile.
