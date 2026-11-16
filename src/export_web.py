@@ -5,7 +5,7 @@ Reads only files already produced by the frozen pipeline:
   data/results/v1_wallet_scores.csv, v1_validation.csv, v1_layer1.json, v1_layer2.json, v1_layer2_seeds.csv,
   v1_perm_null_*.npy, comparison_summary.{csv,md}, maduro_blind_validation.md
 Writes:
-  web/public/data/markets.json, {m}_timeline.json, {m}_wallets.json, {m}_alerts.json, {m}_buys.json,
+  web/public/data/markets.json, {m}_timeline.json, {m}_wallets.json, {m}_alerts.json, {m}_buys.json, maduro_replay.json,
   validation.json, layer2.json, v0_summary.json, live_example.json
   web/tests/fixtures/flags_20.json   (inputs + Python results for 20 wallets; the TypeScript port is tested on it)
 
@@ -150,6 +150,68 @@ def recent_buys(m, f, S, pref):
                 note="Every pre-news BUY in the window, merged per wallet within 30 min: [time, YES price, USD, wallet index].")
 
 
+REPLAY_START = {"maduro": 1767225600}  # 2026-01-01 00:00 UTC
+
+
+def replay(m, S, pref):
+    """Replay of the pre-news buys from REPLAY_START to the news, with each wallet's score as it stood at that moment.
+    Uses the frozen features() from v1_03_layer1 on the wallet's own fills up to each buy (the same recomputation the
+    frozen pipeline uses for 'first reached score >= 4'). Only F1-F5 are counted during the replay: F6 needs the news
+    time. Buys are merged per wallet within 30 min, as elsewhere. Also writes a 5-minute price path from the fills."""
+    import v1_03_layer1 as L1  # frozen feature code; importing does not run its main()
+    f = L1.load(m)
+    T = t_news(m)
+    t0 = REPLAY_START[m]
+    res = int(MK.loc[m, "resolution_epoch"])
+    g = f[(f.timestamp >= t0) & (f.timestamp <= res)]
+    bins = (g.timestamp // 300) * 300
+    path = g.groupby(bins).yes_price.last()
+    price = [[int(t), round(float(p), 4)] for t, p in path.items()]
+    pre = f[(f.timestamp < T) & (~f.after_resolution)]
+    win = pre[(pre.side == "BUY") & (pre.timestamp >= t0)]
+    sc = S.set_index("wallet")
+    widx, wallets, rows, crossed = {}, [], [], {}
+    for w, gw in win.groupby("proxy_wallet"):
+        if w not in sc.index:
+            continue
+        own = pre[pre.proxy_wallet == w]
+        groups, start = [], None
+        for r in gw.sort_values("timestamp").itertuples():
+            if start is not None and r.timestamp - start <= MERGE_S:
+                groups[-1].append(r)
+            else:
+                groups.append([r]); start = r.timestamp
+        for grp in groups:
+            t_last = int(grp[-1].timestamp)
+            ft = L1.features(m, own, upto={w: t_last})
+            if not len(ft):
+                continue
+            x = ft.iloc[0]
+            five = [k for k in ["F1", "F2", "F3", "F4", "F5"] if x[f"flag_{k}"]]
+            usd = sum(r.usd for r in grp)
+            by = {}
+            for r in grp:
+                by[r.outcome] = by.get(r.outcome, 0) + r.usd
+            if w not in widx:
+                widx[w] = len(wallets)
+                fr = sc.loc[w]
+                wallets.append(dict(id=pref[w], doc=(m, w) in DOC, final_score=int(fr.score),
+                                    final_flags=[k for k in FLAG_IDS if fr[f"flag_{k}"]], n_markets=num(fr.F2_n_markets),
+                                    rank=int(fr.rank_in_market)))
+            alert = len(five) >= FLAGS["HIGH"] and float(x.F4_buy_usd) >= FLAGS["F4_usd"] and w not in crossed
+            if alert:
+                crossed[w] = t_last
+            rows.append([int(grp[0].timestamp), round(usd, 2), round(float(grp[-1].yes_price), 4), max(by, key=by.get),
+                         widx[w], len(five), "".join(k[1] for k in five), round(float(x.F4_buy_usd), 2), int(alert)])
+    rows.sort(key=lambda r: r[0])
+    return dict(market=m, question=MK.loc[m, "market_name"], t0=t0, t_news=T, resolution=res, price=price,
+                n_buyers=int(len(S)), wallets=wallets, buys=rows,
+                cols=["t", "usd", "price", "side", "wallet", "score5", "signs", "wallet_usd_so_far", "alert"],
+                note="Pre-news buys from t0 to the news, merged per wallet within 30 min. score5 counts F1-F5 from the "
+                     "wallet's fills up to that buy (frozen features); F6 needs the news time and is not counted. "
+                     "alert = first buy at which score5 >= 4 and the wallet's pre-news buys reach $2,500.")
+
+
 def handle_for(m, w):
     r = LAB[(LAB.market_key == m) & (LAB.matched_wallet == w) & (LAB.identifier_type == "handle")]
     return r.identifier.iloc[0] if len(r) else None
@@ -270,6 +332,8 @@ def main():
         json.dump(wallets(m, S, pref), open(OUT / f"{m}_wallets.json", "w"), separators=(",", ":"))
         json.dump(alerts(m, S, pref), open(OUT / f"{m}_alerts.json", "w"), separators=(",", ":"))
         json.dump(recent_buys(m, f, S, pref), open(OUT / f"{m}_buys.json", "w"), separators=(",", ":"))
+        if m in REPLAY_START:
+            json.dump(replay(m, S, pref), open(OUT / f"{m}_replay.json", "w"), separators=(",", ":"))
         ev = NEWS[NEWS.market_key == m].sort_values("news_epoch")
         p = perm[m]
         mk_rows.append(dict(
