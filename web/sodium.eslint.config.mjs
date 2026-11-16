@@ -30,4 +30,7 @@ export default [
     rules: sodium.configs.app.rules,
   },
   {files: ['**/components/sodium/{ui,ai}/**', '**/components/sodium/icon.tsx', '**/lib/sodium/**'], rules: sodium.configs.source.rules},
+  // Project exception: the watchlist card is a multi-line native <button> (Sodium's Button has a fixed control height).
+  // It keeps the focus ring and aria-expanded. Logged in log/process_log.md, 2026-11-17.
+  {files: ['**/components/product/watchlist.tsx'], rules: {'sodium/no-native-control': 'off'}},
 ];

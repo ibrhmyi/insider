@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {default: 'Insider signal', template: '%s | Insider signal'},
-  description: 'Could you have spotted a $32,538 bet on Maduro\'s fall from public data alone? Unusual activity for review, not proof of insider trading.',
+  description: 'Scores Polymarket wallets on six simple signs and flags bets worth a look. Unusual activity for review, not proof of insider trading.',
 };
 export const viewport: Viewport = {themeColor: '#141412', colorScheme: 'dark'};
 

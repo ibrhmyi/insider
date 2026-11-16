@@ -13,7 +13,7 @@ const MAX_PAGES = 3;          // up to 3,000 most recent fills
 const MAX_WALLETS = 25;       // profiles fetched for the largest buyers only, to stay within API rate limits
 const UA = {'User-Agent': 'insider-signal-web/0.1'};
 
-type GammaMarket = {id: string; question: string; slug: string; conditionId: string; outcomes: string; closed: boolean; endDate?: string; volume?: string; volumeNum?: number; events?: {slug: string; title?: string}[]};
+type GammaMarket = {id: string; question: string; slug: string; conditionId: string; outcomes: string; outcomePrices?: string; closed: boolean; endDate?: string; volume?: string; volumeNum?: number; events?: {slug: string; title?: string}[]};
 type RawFill = {proxy_wallet: string; side: 'BUY' | 'SELL'; outcome_index: number; size: number; price: number; timestamp: number; transaction_hash: string; token_id: string};
 
 export class ScanError extends Error { constructor(msg: string, public status = 400) { super(msg); } }
@@ -118,7 +118,7 @@ export async function scan(input: string) {
   rows.sort((a, b) => b.score - a.score || b.F4_buy_usd - a.F4_buy_usd);
   const ts = uniq.map(f => f.timestamp);
   return {
-    market: {question: market.question, slug: market.slug, closed: market.closed, end_date: market.endDate ?? null, volume: Number(market.volumeNum ?? market.volume ?? 0), event_siblings: siblings},
+    market: {question: market.question, slug: market.slug, closed: market.closed, yes_price: (() => { try { return Number(JSON.parse(market.outcomePrices ?? '[]')[0]); } catch { return null; } })(), end_date: market.endDate ?? null, volume: Number(market.volumeNum ?? market.volume ?? 0), event_siblings: siblings},
     window: {from: ts.length ? Math.min(...ts) : null, to: ts.length ? Math.max(...ts) : null, n_fills: uniq.length, n_wallets: byW.size, n_buyers: buyers.length, n_scored: rows.length},
     thresholds: FROZEN,
     wallets: rows,

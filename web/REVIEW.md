@@ -1,5 +1,29 @@
 # UI review: Insider Signal
 
+## 2026-11-17: product page (replay, watchlist, scan)
+
+Ready to ship: yes. One page: problem, idea, replay, watchlist, scan, one-line limits. Blocking 0, should-fix 0 open.
+
+| check | result |
+|---|---|
+| `npm run build` | runs `vitest run` (31 tests, including the no-em-dash test), `next build`, then `scripts/check-copy.mjs` on the rendered HTML; exit 0. With an em dash planted in page copy the build fails (exit 1), checked |
+| Sodium lint (`app components/product lib/*.ts`) | exit 0, no warnings; one project exception in `sodium.eslint.config.mjs`: the multi-line watchlist card is a native button |
+| capture.mjs | `/` at 390 and 1920 (dark), accessibility trees saved, 0 routes not as expected |
+| Lighthouse | mobile 98 / 100 / 96, desktop 96 / 98 to 100 / 96 (performance / accessibility / best practices) |
+| Replay at 1920x1080, 10x | plays Jan 1 to resolution in about 24 s; four alerts slide in (30.0 h, 8.3 h, 2.3 h, 0.4 h before the news); news line at 06:00 UTC; closing line "Alert fired 30 hours before the news. Ranked 1st of 2,608 buyers." |
+| Keyboard | Play, Next and Previous event, speed and the time slider (End jumps to the end) all work by keyboard; watchlist cards open with Enter (`aria-expanded`) |
+| Reduced motion | no Play button and no animation; Next and Previous event step through alerts, news and resolution; the slider scrubs |
+| Phone (390) | 0 px overflow; controls wrap, chart above, alerts and feed stacked; replay usable with the step buttons |
+| Yellow | only alerts: alert cards and markers, "worth a look" verdicts, scores of wallets over the line. Sodium's yellow selected and checked controls are mapped to neutral roles inside `neutral-controls` (token remap, no raw values) |
+| Type | body 20px or more (`type-product`), headings calmer than before (`type-product-title`) |
+
+Fixed during the review: alert cards scrolled the first (30 h) alert out of view at the end (now one-line rows with the relevant card expanded); the alert's own buy could be cut from the feed when several fills shared a minute; yellow on the slider and selected speed; the time slider had no accessible name on its thumb; heading order (h4 under h2).
+
+Notes: chart axis labels scale down with the SVG on phones (about 12px at 390); the em dash in HANDOFF's disclaimer is shown as a colon on the page (same words); market titles from Polymarket pass through `clean()` so an em dash in a title is shown as a colon or comma.
+
+---
+
+
 ## 2026-11-17: one-page version
 
 The site is now one page (`/`) with seven full-screen steps; the review below this section covers the archived multi-page version.

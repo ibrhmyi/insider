@@ -12,3 +12,30 @@ html { scroll-behavior: smooth; }
 @utility type-story-title { font: 400 clamp(40px, 4.6vw, 96px)/1.05 var(--font-sans); letter-spacing: var(--tracking-display); text-wrap: balance; }
 @utility type-story-number { font: 400 clamp(96px, 9vw, 176px)/0.95 var(--font-sans); letter-spacing: var(--tracking-display); font-variant-numeric: tabular-nums; }
 @utility type-story-sign { font: 400 clamp(26px, 2.2vw, 44px)/1.15 var(--font-sans); letter-spacing: var(--tracking-heading); }
+/* Product page: calmer headings than the story page; body never under 20px. */
+@utility type-product-title { font: 400 clamp(30px, 2.5vw, 52px)/1.12 var(--font-sans); letter-spacing: var(--tracking-display); text-wrap: balance; }
+@utility type-product { font: 400 clamp(20px, 1.15vw, 24px)/1.45 var(--font-sans); letter-spacing: var(--tracking-body); }
+
+@keyframes alert-in { from { opacity: 0; transform: translateY(-12px); } }
+
+/* Yellow is reserved for alerts on this page. Inside this scope, Sodium's selected/checked/primary roles (yellow in
+   dark mode) point at its own neutral roles instead. Token remap only: every value is an existing Sodium token. */
+@utility neutral-controls {
+  --selected: var(--well);
+  --selected-strong: var(--hover);
+  --check-bg: var(--well);
+  --check-edge: var(--text-2);
+  --check-mark: var(--text-1);
+  --check-range: var(--text-2);
+  --primary-bg: var(--well);
+  --primary-text: var(--text-1);
+  --primary-edge: var(--text-2);
+  --primary-edge-hover: var(--text-1);
+  --primary-hover: var(--hover);
+  --primary-pressed: var(--pressed);
+  --primary-light: var(--line);
+  --primary-light-hover: var(--line);
+  --primary-ring: var(--text-2);
+  --accent: var(--text-2);
+  --accent-edge: var(--text-2);
+}

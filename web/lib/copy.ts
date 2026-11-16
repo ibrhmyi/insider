@@ -1,8 +1,14 @@
 import type {FlagId} from './types';
 
-/** HANDOFF rule 1: every card or figure that shows a wallet carries this line, word for word. */
-export const DISCLAIMER = 'Unusual activity for review — this does not identify an owner or prove insider trading.';
-export const NOT_PROOF = 'Unusual activity for review — not proof of insider trading.';
+/**
+ * HANDOFF rule 1: every card or figure that shows a wallet carries this line. Same words as HANDOFF.md; the em dash
+ * became a colon on 2026-11-17 because the owner banned em dashes from the UI (see log/process_log.md).
+ */
+export const DISCLAIMER = 'Unusual activity for review: this does not identify an owner or prove insider trading.';
+export const NOT_PROOF = 'Unusual activity for review, not proof of insider trading.';
+
+/** Text from outside (market titles from Polymarket) can carry em dashes; show them as a colon or comma instead. */
+export const clean = (s: string) => s.replace(/\s+\u2014\s+/g, ': ').replace(/\u2014/g, ', ');
 
 export const FLAG_NAMES: Record<FlagId, string> = {
   F1: 'Fresh account',
@@ -32,7 +38,7 @@ export const FLAG_SOURCE: Record<FlagId, string> = {
 };
 
 /** Short words for the flag marks (the brief's labels). */
-export const FLAG_SHORT: Record<FlagId, string> = {F1: 'New account', F2: 'All-in', F3: 'Cheap', F4: 'Big', F5: 'One-way', F6: 'Early'};
+export const FLAG_SHORT: Record<FlagId, string> = {F1: 'New account', F2: 'All-in on one market', F3: 'Cheap price', F4: 'Big bet', F5: 'One direction', F6: 'Close to the news'};
 
 export const FLAGS: FlagId[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6'];
 

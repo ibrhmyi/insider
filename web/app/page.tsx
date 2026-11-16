@@ -1,37 +1,56 @@
-import {Story, type StoryData} from '@/components/one/story';
-import {getBuys, getMarket, getMarkets, getTimeline, getValidation, getWallets} from '@/lib/data';
+import {readFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {Replay, type ReplayData} from '@/components/product/replay';
+import {Watchlist} from '@/components/product/watchlist';
+import {ScanBox} from '@/components/product/scan-box';
+import {getValidation} from '@/lib/data';
+import {FLAGS, FLAG_SHORT} from '@/lib/copy';
 
-const CHARGED = 'MAD-CFTC-1';
 const REPO = 'https://github.com/ibrhmyi/insider';
 
-export default function Home() {
-  const {headline: h} = getMarkets();
-  const m = getMarket('maduro')!;
-  const tl = getTimeline('maduro'), bf = getBuys('maduro');
-  const label = getValidation().find(v => v.label_id === CHARGED)!;
-  const w = getWallets('maduro').find(x => x.id === label.wallet_id)!;
-  const x0 = m.t_news - 48 * 3600;
-  const me = bf.wallets.findIndex(x => x.id === w.id);
+function Section({id, title, children, className = ''}: {id: string; title?: string; children: React.ReactNode; className?: string}) {
+  return <section aria-labelledby={title ? `${id}-title` : undefined} aria-label={title ? undefined : id} id={id}
+    className={`flex flex-col gap-8 px-6 py-20 sm:px-12 lg:px-24 ${className}`}>
+    {title && <h2 id={`${id}-title`} className="type-product-title max-w-(--title-ch)">{title}</h2>}
+    {children}
+  </section>;
+}
 
-  const d: StoryData = {
-    chart: {
-      price: tl.price, tNews: m.t_news, x1: tl.resolution_epoch,
-      others: bf.buys.filter(b => b[0] >= x0 && b[3] !== me).map(([t, y, usd]) => [t, y, usd]),
-      // all of the wallet's pre-news buys as one dot: at its USD-weighted median buy time and its average price
-      dot: {t: m.t_news - w.hours * 3600, y: w.avg_price, label: `$${Math.round(w.usd).toLocaleString('en-US')} at ${Math.round(w.avg_price * 100)}¢`},
-    },
-    signs: [
-      {word: 'New account', value: `${w.f1_days.toFixed(1)} days`},
-      {word: 'All-in', value: `${Math.round((w.f2_share ?? 0) * 100)}% on one market`},
-      {word: 'Cheap', value: `${Math.round(w.avg_price * 100)}¢`},
-      {word: 'Big', value: `$${Math.round(w.usd).toLocaleString('en-US')}`},
-      {word: 'One-way', value: `${Math.round(w.f5 * 100)}%`},
-      {word: 'Early', value: `${w.hours.toFixed(1)} h before news`},
-    ],
-    source: label.source,
-    rank: h.rank, n: h.n_in_market, hoursEarly: h.hours_before, named: h.documented_flagged, namedTotal: h.documented_total,
-    othersFlagged: h.n_high_total - h.documented_total,
-    repo: REPO,
-  };
-  return <Story d={d}/>;
+export default function Home() {
+  const replay: ReplayData = JSON.parse(readFileSync(join(process.cwd(), 'public', 'data', 'maduro_replay.json'), 'utf8'));
+  const source = getValidation().find(v => v.label_id === 'MAD-CFTC-1')!.source;
+
+  return <div className="bg-page text-text-1" style={{'--title-ch': '30ch'} as React.CSSProperties}>
+    <section aria-labelledby="problem-title" className="flex min-h-[70svh] flex-col justify-center gap-6 px-6 py-20 sm:px-12 lg:px-24">
+      <h1 id="problem-title" className="type-product-title max-w-(--title-ch)">Some Polymarket bets may be placed by people who already know the answer. Every trade is public, but nobody is watching.</h1>
+      <p className="type-product max-w-measure text-text-2">
+        In the days before Jan 3, 2026, a 5-day-old account bet $32,538 on Maduro&apos;s fall at 7¢. The CFTC later charged its alleged owner. Charged, not convicted.{' '}
+        <a href={source} target="_blank" rel="noreferrer" className="text-text-1 underline underline-offset-4 focus-visible:focus-ring">Source</a>
+      </p>
+    </section>
+
+    <Section id="idea" title="Score every wallet on six simple signs.">
+      <ul className="flex flex-wrap gap-x-10 gap-y-4" aria-label="The six signs">
+        {FLAGS.map(f => <li key={f} className="flex items-center gap-3"><span aria-hidden className="size-3 border border-text-2"/><span className="type-product text-text-1">{FLAG_SHORT[f]}</span></li>)}
+      </ul>
+      <p className="type-product max-w-measure text-text-2">Four or more: worth a look. Rules based on published research and fixed before testing.</p>
+    </Section>
+
+    <Section id="replay" title="Replay: Maduro market, Jan 1 to Jan 3, 2026." className="border-t border-line">
+      <Replay d={replay}/>
+    </Section>
+
+    <Section id="watchlist" title="Open markets decided by small groups, scanned today." className="border-t border-line">
+      <Watchlist/>
+    </Section>
+
+    <Section id="scan" title="Scan any market." className="border-t border-line">
+      <ScanBox/>
+    </Section>
+
+    <footer className="flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-line px-6 py-10 sm:px-12 lg:px-24">
+      <p className="type-product text-text-2">Finds bets worth checking, not criminals. Also flags accounts nobody has accused. Tested on 3 past markets.</p>
+      <a href={REPO} target="_blank" rel="noreferrer" className="type-product text-text-1 underline underline-offset-4 focus-visible:focus-ring">Code and data on GitHub</a>
+    </footer>
+  </div>;
 }
