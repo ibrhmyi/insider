@@ -72,7 +72,8 @@ function AlertCard({row, d, now}: {row: ReplayData['buys'][number]; d: ReplayDat
     <ul className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Signs">
       {FLAGS.map(f => {
         const unknown = f === 'F6' && !after;
-        const on = f === 'F6' ? after && w.final_flags.includes('F6') : fired.has(f);
+        // before the news: signs as they stood at the alert; after: the wallet's final signs, matching its 6-sign score
+        const on = after ? w.final_flags.includes(f) : f !== 'F6' && fired.has(f);
         return <li key={f} className="flex items-center gap-2">
           <span aria-hidden className={`size-3 border ${on ? 'border-accent-edge bg-accent-text' : 'border-text-3'}`}/>
           <span className={`type-product ${on ? 'text-text-1' : 'text-text-3'}`}>{FLAG_SHORT[f]}{unknown ? ': unknown until news' : on ? '' : ': no'}</span>
@@ -112,8 +113,10 @@ export function Replay({d}: {d: ReplayData}) {
     setNow(n => (dir > 0 ? stops.find(s => s > n + 1) ?? d.resolution : [...stops].reverse().find(s => s < n - 1) ?? d.t0));
   }, [stops, d]);
   const done = now >= d.resolution;
-  const first = alertsAll[0];
+  // The story's wallet: the one ranked 1st of all pre-news buyers (the CFTC-charged wallet in this market).
+  const first = alertsAll.find(a => d.wallets[a[4]].rank === 1);
   const firstW = first ? d.wallets[first[4]] : null;
+  const unnamed = alertsAll.filter(a => !d.wallets[a[4]].doc).length;
 
   return <div className="flex flex-col gap-6">
     <div className="neutral-controls flex flex-wrap items-center gap-3">
@@ -155,7 +158,10 @@ export function Replay({d}: {d: ReplayData}) {
       </div>
     </div>
 
-    {done && first && firstW && <p className="type-product-title max-w-measure">Alert fired {Math.round((d.t_news - first[0]) / 3600)} hours before the news. Ranked {firstW.rank === 1 ? '1st' : `#${firstW.rank}`} of {d.n_buyers.toLocaleString('en-US')} buyers.</p>}
+    {done && first && firstW && <div className="flex flex-col gap-2">
+      <p className="type-product-title max-w-measure">In this replay, {alertsAll.length} wallets reached 4 signs before the news. The one later charged by the CFTC was flagged {Math.round((d.t_news - first[0]) / 3600)} hours early and ranks 1st of {d.n_buyers.toLocaleString('en-US')} buyers.</p>
+      <p className="type-product text-text-2">{unnamed} of the {alertsAll.length} have never been publicly accused.</p>
+    </div>}
     <p className="type-product text-text-3">{DISCLAIMER}</p>
   </div>;
 }

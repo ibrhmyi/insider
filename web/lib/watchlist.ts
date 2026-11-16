@@ -8,6 +8,8 @@ export const WATCHLIST: {slug: string; who: string}[] = [
   {slug: 'israel-military-action-against-lebanon-on-november-26', who: 'Decided by the Israeli government'},
 ];
 
-/** The live line: at least 3 of the 5 live signs and at least $2,500 bought (display filter, not a rule). */
-export const LIVE_MIN_SCORE = 3;
-export const LIVE_MIN_USD = 2500;
+/**
+ * One rule everywhere (decided 2026-11-17): worth a look = 4 or more of the signs that can be checked. With the news
+ * time known that is 4 of 6 (the frozen high score); while a market is open, close-to-the-news is unknown, so 4 of 5.
+ */
+export const LIVE_MIN_SCORE = 4;

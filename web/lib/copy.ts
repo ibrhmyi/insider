@@ -40,6 +40,16 @@ export const FLAG_SOURCE: Record<FlagId, string> = {
 /** Short words for the flag marks (the brief's labels). */
 export const FLAG_SHORT: Record<FlagId, string> = {F1: 'New account', F2: 'All-in on one market', F3: 'Cheap price', F4: 'Big bet', F5: 'One direction', F6: 'Close to the news'};
 
+/** One plain line per sign, with the frozen threshold (rules/frozen_v1.md). */
+export const FLAG_PLAIN: Record<FlagId, string> = {
+  F1: '7 days old or less when it first bet here.',
+  F2: '80% or more of its money in this market, or 2 markets or fewer in total.',
+  F3: 'Bought at 35¢ or less.',
+  F4: '$2,500 or more.',
+  F5: '80% or more of its trading one way.',
+  F6: 'Main buying within 72 hours of the news.',
+};
+
 export const FLAGS: FlagId[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6'];
 
 export const usd = (v: number, digits = 0) => `$${v.toLocaleString('en-US', {maximumFractionDigits: digits, minimumFractionDigits: digits})}`;

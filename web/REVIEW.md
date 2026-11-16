@@ -2,6 +2,8 @@
 
 ## 2026-11-17: product page (replay, watchlist, scan)
 
+Update, same day: one flagging rule everywhere (4 or more of the signs that can be checked; live 4 of 5, no separate dollar floor). Replay replayed in full at 10x (26.6 s, 8 alerts); watchlist shows "Nothing unusual" for all six markets; sign rules and a worked example added. See the process log.
+
 Ready to ship: yes. One page: problem, idea, replay, watchlist, scan, one-line limits. Blocking 0, should-fix 0 open.
 
 | check | result |
@@ -10,7 +12,7 @@ Ready to ship: yes. One page: problem, idea, replay, watchlist, scan, one-line l
 | Sodium lint (`app components/product lib/*.ts`) | exit 0, no warnings; one project exception in `sodium.eslint.config.mjs`: the multi-line watchlist card is a native button |
 | capture.mjs | `/` at 390 and 1920 (dark), accessibility trees saved, 0 routes not as expected |
 | Lighthouse | mobile 98 / 100 / 96, desktop 96 / 98 to 100 / 96 (performance / accessibility / best practices) |
-| Replay at 1920x1080, 10x | plays Jan 1 to resolution in about 24 s; four alerts slide in (30.0 h, 8.3 h, 2.3 h, 0.4 h before the news); news line at 06:00 UTC; closing line "Alert fired 30 hours before the news. Ranked 1st of 2,608 buyers." |
+| Replay at 1920x1080, 10x | plays Jan 1 to resolution in about 24 s; eight alerts slide in (51.4 h to 0.4 h before the news; the CFTC-charged wallet at 30.0 h); news line at 06:00 UTC; closing line "Alert fired 30 hours before the news. Ranked 1st of 2,608 buyers." |
 | Keyboard | Play, Next and Previous event, speed and the time slider (End jumps to the end) all work by keyboard; watchlist cards open with Enter (`aria-expanded`) |
 | Reduced motion | no Play button and no animation; Next and Previous event step through alerts, news and resolution; the slider scrubs |
 | Phone (390) | 0 px overflow; controls wrap, chart above, alerts and feed stacked; replay usable with the step buttons |

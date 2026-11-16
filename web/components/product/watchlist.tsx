@@ -35,7 +35,7 @@ export function Watchlist() {
   const sel = cards?.find(c => c.slug === open);
   return <div className="flex flex-col gap-6">
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <p className="type-product text-text-2">Six open markets whose answer a small group decides. Each is scanned on its largest recent buyers.</p>
+      <p className="type-product text-text-2">Six open markets whose answer a small group decides. Each is scored on its largest recent buyers, on the 5 signs we can check while a market is open. 4 or more: worth a look.</p>
       <Button variant="secondary" onClick={refresh} pending={busy !== null} disabled={!cards}>Refresh scans</Button>
     </div>
     {!cards ? <p className="type-product text-text-3">Loading the latest scans.</p> : <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -61,7 +61,7 @@ export function Watchlist() {
     </ul>}
     {sel && <div id="watch-detail" className="flex flex-col gap-3 border-t border-line pt-6">
       <h3 className="type-product text-text-1">{sel.market ? clean(sel.market.question) : sel.slug}</h3>
-      {sel.error ? <p className="type-product text-fail-text">{sel.error}</p> : <WalletRows wallets={(sel.wallets ?? []).filter(overLine)}/>}
+      {sel.error ? <p className="type-product text-fail-text">{sel.error}</p> : <WalletRows wallets={sel.wallets ?? []}/>}
       <p className="type-product text-text-3">{DISCLAIMER}</p>
     </div>}
   </div>;

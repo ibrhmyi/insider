@@ -198,7 +198,7 @@ def replay(m, S, pref):
                 wallets.append(dict(id=pref[w], doc=(m, w) in DOC, final_score=int(fr.score),
                                     final_flags=[k for k in FLAG_IDS if fr[f"flag_{k}"]], n_markets=num(fr.F2_n_markets),
                                     rank=int(fr.rank_in_market)))
-            alert = len(five) >= FLAGS["HIGH"] and float(x.F4_buy_usd) >= FLAGS["F4_usd"] and w not in crossed
+            alert = len(five) >= FLAGS["HIGH"] and w not in crossed  # one rule: 4 or more of the signs that can be checked (2026-11-17)
             if alert:
                 crossed[w] = t_last
             rows.append([int(grp[0].timestamp), round(usd, 2), round(float(grp[-1].yes_price), 4), max(by, key=by.get),
@@ -209,7 +209,7 @@ def replay(m, S, pref):
                 cols=["t", "usd", "price", "side", "wallet", "score5", "signs", "wallet_usd_so_far", "alert"],
                 note="Pre-news buys from t0 to the news, merged per wallet within 30 min. score5 counts F1-F5 from the "
                      "wallet's fills up to that buy (frozen features); F6 needs the news time and is not counted. "
-                     "alert = first buy at which score5 >= 4 and the wallet's pre-news buys reach $2,500.")
+                     "alert = first buy at which score5 >= 4 (4 or more of the 5 signs that can be checked before the news).")
 
 
 def handle_for(m, w):

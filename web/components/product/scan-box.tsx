@@ -5,7 +5,7 @@ import {Button} from '@/components/sodium/ui/button';
 import {Input} from '@/components/sodium/ui/input';
 import {Alert, AlertTitle} from '@/components/sodium/ui/alert';
 import {Skeleton} from '@/components/sodium/ui/skeleton';
-import {WalletRows, overLine, type LiveWallet} from './wallet-rows';
+import {WalletRows, type LiveWallet} from './wallet-rows';
 import {clean, utc} from '@/lib/copy';
 
 type Result = {market: {question: string; yes_price?: number | null}; window: {n_fills: number; n_scored: number}; wallets: LiveWallet[]; scanned_at: number};
@@ -43,8 +43,8 @@ export function ScanBox() {
       {st.kind === 'error' && <Alert status="fail"><AlertTitle>{st.message}</AlertTitle></Alert>}
       {st.kind === 'done' && <>
         <p className="type-product text-text-1">{clean(st.data.market.question)}</p>
-        <p className="type-product text-text-3">{st.cached ? `Saved scan from ${utc(st.data.scanned_at).slice(0, 10)}. ` : ''}The {st.data.window.n_scored} largest recent buyers, scored out of 5. Showing 3 or more, $2,500 or more.</p>
-        <WalletRows wallets={st.data.wallets.filter(overLine)}/>
+        <p className="type-product text-text-3">{st.cached ? `Saved scan from ${utc(st.data.scanned_at).slice(0, 10)}. ` : ''}The {st.data.window.n_scored} largest recent buyers, scored on the 5 signs we can check while a market is open. 4 or more: worth a look.</p>
+        <WalletRows wallets={st.data.wallets}/>
       </>}
     </div>
   </div>;
