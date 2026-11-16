@@ -50,3 +50,9 @@ html { scroll-behavior: smooth; }
 #main .type-story-sign { font-size: clamp(19px, 2.6vw, 22px); }
 #main .type-product-title { font-size: clamp(21px, 3vw, 26px); line-height: 1.25; }
 #main .type-product { font-size: clamp(15px, 1.9vw, 16px); line-height: 1.7; }
+
+/* A figure wider than the reading column, centred on it. The replay uses it from 1024px up, so the chart and its
+   alerts sit side by side and stay readable on a shared screen. Below that it stays in the column, stacked. */
+@media (min-width: 1024px) {
+  .wide-figure { --wide: min(1080px, 100vw - 48px); width: var(--wide); margin-inline: calc((100% - var(--wide)) / 2); }
+}

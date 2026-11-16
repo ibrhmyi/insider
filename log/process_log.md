@@ -217,3 +217,10 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Kept.** Frozen rules, results, the replay, the watchlist, the scan, the 4-or-more rule, the no-em-dash test (now also covers `lib/research.ts`), wording rules (no wallet is called an insider; named people are not named, only roles).
 - **Checks.** `npm run build` (31 tests, em-dash check) and the Sodium lint pass; rendered at 1920x1080 and 390 wide, no horizontal overflow; replay stepped to the end; outline anchors land under the sticky bar.
 - **Not done.** Deployment (needs the owner's Vercel token): from `web/`, `npx vercel deploy --prod`.
+
+### 2026-11-16 - Presentation fixes after the page moved into the 680px research column
+- The owner's agent fitted the page to iyildiz.me/research (one 680px reading column, smaller type, no outline bar). Three layouts built for a wide screen broke inside it; fixed without changing any number or rule.
+- **Replay.** The chart had shrunk to about 350px with unreadable axis labels. From 1024px up, the chart and its alerts now sit in a figure wider than the column (`.wide-figure`, up to 1080px, centred on the column); below that they stack in the column. When the replay ends, the wallet ranked 1st leads the alert list so its card is on screen.
+- **Cases.** The five-column case rows wrapped badly; each case is now two lines: who and alleged profit, then the secret, status and source.
+- **Watchlist.** Three cramped columns became two.
+- **Presenting.** Body text is 16px, so present at 150% browser zoom on a 1920-wide screen; checked at that zoom, at 100% and at 390px wide, no horizontal overflow. Build, 31 tests and the em-dash check pass.

@@ -13,12 +13,11 @@ export function Who() {
       US regulators call it misappropriation: using confidential information, in breach of a duty of trust, to trade. <Source href={SRC.cftcAdvisory}>CFTC</Source>
     </p>
     <ul aria-label="Four cases" className="flex flex-col border-t border-line">
-      {CASES.map(c => <li key={c.who} className="grid items-baseline gap-x-8 gap-y-1 border-b border-line py-4 md:grid-cols-[minmax(0,5fr)_minmax(0,5fr)_minmax(0,2fr)_minmax(0,5fr)_auto]">
+      {CASES.map(c => <li key={c.who} className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-1 border-b border-line py-4">
         <span className="type-product text-text-1">{c.who}</span>
-        <span className="type-product text-text-2">{c.secret}</span>
-        <span className="type-product text-text-1">{c.made}</span>
-        <span className="type-product text-text-2">{c.status}, {c.venue}</span>
-        <Source href={c.source}/>
+        <span className="type-product-title text-end text-text-1">{c.made}</span>
+        <span className="type-product text-text-2">{c.secret}. {c.status}, {c.venue}.</span>
+        <span className="text-end"><Source href={c.source}/></span>
       </li>)}
     </ul>
     <p className="type-product text-text-3">Amounts are alleged profits. Charged or indicted is not convicted.</p>

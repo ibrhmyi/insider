@@ -38,7 +38,7 @@ export function Watchlist() {
       <p className="type-product text-text-2">Six open markets whose answer a small group decides. Each is scored on its largest recent buyers, on the 5 signs we can check while a market is open. 4 or more: worth a look.</p>
       <Button variant="secondary" onClick={refresh} pending={busy !== null} disabled={!cards}>Refresh scans</Button>
     </div>
-    {!cards ? <p className="type-product text-text-3">Loading the latest scans.</p> : <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {!cards ? <p className="type-product text-text-3">Loading the latest scans.</p> : <ul className="grid gap-4 sm:grid-cols-2">
       {cards.map(c => {
         const over = (c.wallets ?? []).filter(overLine);
         const on = open === c.slug;

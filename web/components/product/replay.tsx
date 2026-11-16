@@ -117,6 +117,8 @@ export function Replay({d}: {d: ReplayData}) {
   const first = alertsAll.find(a => d.wallets[a[4]].rank === 1);
   const firstW = first ? d.wallets[first[4]] : null;
   const unnamed = alertsAll.filter(a => !d.wallets[a[4]].doc).length;
+  // Once the replay ends, the wallet ranked 1st leads the list, so its card is on screen without scrolling.
+  const shown = done && first ? [first, ...alerts.filter(x => x !== first)] : alerts;
 
   return <div className="flex flex-col gap-6">
     <div className="neutral-controls flex flex-wrap items-center gap-3">
@@ -132,11 +134,11 @@ export function Replay({d}: {d: ReplayData}) {
       onValueChange={v => { setPlaying(false); setNow(Array.isArray(v) ? v[0] : v); }}/></div>
     {reduced && <p className="type-product text-text-3">Animation is off: use Next event or the time slider to step through.</p>}
 
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+    <div className="wide-figure grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
       <Chart d={d} now={now} alerts={alerts}/>
       <div className="flex min-w-0 flex-col gap-4">
         <ul aria-live="polite" aria-label="Alerts" className="flex flex-col gap-3">
-          {alerts.map(a => a[0] === (done && first ? first[0] : alerts[0]?.[0])
+          {shown.map(a => a[0] === (done && first ? first[0] : alerts[0]?.[0])
             ? <AlertCard key={a[0]} row={a} d={d} now={now}/>
             : <li key={a[0]} className="flex flex-wrap items-baseline gap-x-4 border border-accent-edge px-4 py-2">
               <span className="type-label text-accent-text">Worth a look</span>
