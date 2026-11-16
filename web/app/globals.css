@@ -5,3 +5,10 @@
 
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* One-page story type. Sodium's largest role is 56px and its body 15px; the brief asks for 22px+ body text and
+   96px+ numbers for a 1920x1080 recording, so three roles extend the scale. Same face and tracking tokens as Sodium. */
+@utility type-story { font: 400 clamp(22px, 1.5vw, 30px)/1.4 var(--font-sans); letter-spacing: var(--tracking-body); }
+@utility type-story-title { font: 400 clamp(40px, 4.6vw, 96px)/1.05 var(--font-sans); letter-spacing: var(--tracking-display); text-wrap: balance; }
+@utility type-story-number { font: 400 clamp(96px, 9vw, 176px)/0.95 var(--font-sans); letter-spacing: var(--tracking-display); font-variant-numeric: tabular-nums; }
+@utility type-story-sign { font: 400 clamp(26px, 2.2vw, 44px)/1.15 var(--font-sans); letter-spacing: var(--tracking-heading); }

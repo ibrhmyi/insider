@@ -1,6 +1,6 @@
 # Insider Signal (web app)
 
-A scrollytelling investigation of the frozen v1 wallet screen, in the Sodium design system (dark). It only reads the frozen outputs; no rule or result is changed here.
+One page, one story (Maduro), seven full-screen steps: the hook, the question, a sticky price chart where one wallet's bet lights up, its six signs, the result, the catch, and a live scan to try. It only reads the frozen outputs; no rule or result is changed here. Earlier multi-page versions are in `archive/` (not built).
 
 ## Run it
 
@@ -10,16 +10,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000.
-
-| Route | What it is |
-|---|---|
-| `/` | The investigation: hero numbers, then a sticky chart beside seven steps for the Maduro case (price, every pre-news buy, flagged wallets in yellow, the charged wallet, the news, its six signs, the public record) |
-| `/cases` | Maduro, Nobel and Iran side by side, then the Nobel story |
-| `/cases/[id]` | Zoomed chart and the wallet table for one market (default: score >= 4 and >= $2,500; switch for small wallets) |
-| `/method` | The failed first idea, the six signs and sources, the shuffle test, the cut-off slider, the limits |
-| `/live` | Scan an open Polymarket market on 5 signs; the cached example works offline |
-| `/story` | Recording mode: 7 full-screen slides, arrow keys, `?slide=N` |
+Open http://localhost:3000. The only other route is `/api/scan` (the live scan). On a wide screen with motion allowed the chart is sticky and changes as you scroll; on phones or with reduced motion the steps are stacked and the chart shows its end state.
 
 Tests (the TypeScript flag port against the Python scores for 20 wallets):
 
@@ -30,7 +21,7 @@ npm test
 Sodium's lint on the app code:
 
 ```bash
-npx eslint -c sodium.eslint.config.mjs app components/inv components/site-nav.tsx lib/*.ts
+npx eslint -c sodium.eslint.config.mjs app components/one lib/*.ts
 ```
 
 ## Regenerate the data
@@ -71,7 +62,7 @@ npx vercel --prod
 
 - Next.js 15 (App Router, TypeScript), Tailwind CSS 4.
 - Design system: Sodium from design.how, dark theme. Its source is in `components/sodium/` (installed from the design.how GitHub repository; the design.how registry is blocked from the build environment) and its lint in `lib/sodium/lint/`. Skills (`sodium`, `build-design-system`, `ui-review`) are in `.agents/skills/` at the repository root.
-- Charts are hand-drawn SVG (`components/inv/chart.tsx`) driven by a scroll step or a story slide; colour comes only from Sodium roles, and yellow only marks flagged activity (score >= 4 and >= $2,500) and the charged wallet.
+- The page is `components/one/` (story, chart, live scan). The chart is hand-drawn SVG with a linear price axis; yellow marks only the one wallet. Three page-level type roles in `app/globals.css` extend Sodium's scale (22px+ body, 96px+ numbers) for a 1920x1080 recording.
 - `lib/flags.ts` is the TypeScript port of the frozen F1-F6 features; `lib/scan.ts` is the live scan.
 - `REVIEW.md` holds the UI review.
 

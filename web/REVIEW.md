@@ -1,4 +1,26 @@
-# UI review: Insider Signal (scrollytelling redesign, Sodium dark)
+# UI review: Insider Signal
+
+## 2026-11-17: one-page version
+
+The site is now one page (`/`) with seven full-screen steps; the review below this section covers the archived multi-page version.
+
+| check | result |
+|---|---|
+| Sodium lint (`app components/one lib/*.ts`) | exit 0 errors, 1 warning: the em dash in "a second look — not criminals", kept as the owner wrote it |
+| Tests | 23/23 |
+| Lighthouse | mobile 96 / 100 / 96, desktop 100 / 100 / 96 (performance / accessibility / best practices) |
+| 1920x1080 screen recording (Playwright video, wheel scrolling top to bottom, then the cached example) | every step lands; chart states change in order (line, yellow dot, news line, jump); signs light one by one; no blank screens |
+| Page overflow | 0 px at 1920 and 390 |
+| Phone (390) | steps stacked, chart static in its end state, news label shortened to fit, all six signs lit |
+| Reduced motion (1920) | no sticky chart, chart in end state, all six signs lit, no transitions |
+| Yellow | only the one wallet: the amount in the hook and caption, its chart dot and label, its six signs. The primary button was yellow (Sodium's slab) and was changed to the secondary style |
+| Type | body 22px or more, numbers 96px or more, via three page-level roles (Sodium's scale stops at 56px and 15px body) |
+| Words per step | at most about 25, except the catch (31, the owner's wording) |
+
+Wording changes from the brief, to stay inside the data and HANDOFF's wording rules: the hook says "a wallet" and "hours later" (its money went in mostly in the final hours; the 30 h is when it crossed the line); the CFTC line says "its alleged owner, a US soldier"; "Early" shows 4.4 h (median buy before the news), not 30 h; "suspects" became "publicly named wallets"; "271 wallets nobody has accused" became 264 (271 includes the 7 named).
+
+---
+
 
 The redesign is ready to record and demo. The investigation lands, the chart shows the key trade, flagged means flagged, and every page works by keyboard, at phone width and under reduced motion. All findings ranked high are fixed.
 

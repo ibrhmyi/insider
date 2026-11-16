@@ -19,6 +19,7 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
       "components/sodium/**",
+      "archive/**",
       "lib/sodium/**",
       "sodium.eslint.config.mjs",
     ],
