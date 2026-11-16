@@ -22,11 +22,17 @@ export type WalletInput = {
   vol_to_t: number | null;
   /** First `/v2/activity` row, used only when join_date is null. */
   first_activity: number | null;
+  /**
+   * Whether `fills` start at the wallet's first fill in this market (true for the frozen pipeline, which has every
+   * fill). The live scan reads only recent fills, so it passes false: its earliest fill is not the wallet's first one.
+   */
+  first_fill_known?: boolean;
 };
 
 export type Features = {
   main_outcome_index: number;
-  F1_days: number; F2_share: number | null; F2_markets: number | null; F3_vwap: number; F4_buy_usd: number; F5_conviction: number;
+  /** null when the account start is unknown (no join_date, no activity row, first fill in market not known). */
+  F1_days: number | null; F2_share: number | null; F2_markets: number | null; F3_vwap: number; F4_buy_usd: number; F5_conviction: number;
   F6_hours: number | null;
   flags: Record<FlagId, boolean | null>;
   fired: FlagId[];
@@ -54,8 +60,11 @@ export function computeFeatures(w: WalletInput, withTiming = true): Features | n
 
   // F1 freshness
   const firstM = Math.min(...g.map(f => f[0]));
-  const acct = w.join_date ?? Math.min(firstM, ...(w.first_activity !== null ? [w.first_activity] : []));
-  const f1 = Math.max(firstM - acct, 0) / 86400;
+  // Account start = join_date; if null, the earliest of (first /v2/activity row, first fill in this market), as in
+  // rules/frozen_v1.md and src/v1_03_layer1.py. If none of these is known, F1 is unknown: not evaluated, never 0.
+  const starts = w.join_date !== null ? [w.join_date]
+    : [...(w.first_activity !== null ? [w.first_activity] : []), ...(w.first_fill_known === false ? [] : [firstM])];
+  const f1 = starts.length ? Math.max(firstM - Math.min(...starts), 0) / 86400 : null;
 
   // F2 focus
   const gUsd = g.reduce((a, f) => a + usd(f), 0);
@@ -84,7 +93,7 @@ export function computeFeatures(w: WalletInput, withTiming = true): Features | n
   }
 
   const flags: Record<FlagId, boolean | null> = {
-    F1: f1 <= FROZEN.F1_days,
+    F1: f1 === null ? null : f1 <= FROZEN.F1_days,
     F2: (share !== null && share >= FROZEN.F2_share) || (w.n_markets !== null && w.n_markets <= FROZEN.F2_markets),
     F3: vwap <= FROZEN.F3_price,
     F4: buyUsd >= FROZEN.F4_usd,

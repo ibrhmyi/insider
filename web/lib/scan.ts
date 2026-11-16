@@ -98,12 +98,21 @@ export async function scan(input: string) {
       getJson<{data?: {trades?: number; join_date?: number | null}}>(`${DATA}/user-stats?user=${w}`),
       getJson<{data?: {volume_usdc?: number | null}}>(`${DATA}/user-volume?user=${w}&start=1&end=${t}`),
     ]);
-    const r = computeFeatures({fills: fs, t, join_date: st.data?.join_date ?? null, n_markets: st.data?.trades ?? null, vol_to_t: vol.data?.volume_usdc ?? null, first_activity: null}, false)!;
+    // join_date missing: fall back to the wallet's first /v2/activity row (src/v1_01_fetch.py _first_activity).
+    // The window's earliest fill is not the wallet's first fill in this market, so it is not used (first_fill_known: false).
+    const join = st.data?.join_date ?? null;
+    let firstActivity: number | null = null;
+    if (join === null) {
+      const act = await getJson<{data?: {timestamp?: number}[]}>(`${DATA}/activity?user=${w}&start=1&sort_direction=ASC&limit=1`).catch(() => ({data: []}));
+      firstActivity = act.data?.[0]?.timestamp ?? null;
+    }
+    const r = computeFeatures({fills: fs, t, join_date: join, n_markets: st.data?.trades ?? null, vol_to_t: vol.data?.volume_usdc ?? null, first_activity: firstActivity, first_fill_known: false}, false)!;
     return {
       id: pref.get(w)!, score: r.score, out_of: r.out_of, fired: r.fired,
       side: (JSON.parse(market.outcomes || '["Yes","No"]') as string[])[r.main_outcome_index] ?? String(r.main_outcome_index),
       F1_days: r.F1_days, F2_share: r.F2_share, F2_markets: r.F2_markets, F3_vwap: r.F3_vwap, F4_buy_usd: r.F4_buy_usd, F5_conviction: r.F5_conviction,
-      n_fills: fs.length, join_known: st.data?.join_date != null,
+      n_fills: fs.length, join_known: join !== null,
+      account_start: join !== null ? 'join_date' : firstActivity !== null ? 'first_activity' : 'unknown',
     };
   });
   rows.sort((a, b) => b.score - a.score || b.F4_buy_usd - a.F4_buy_usd);

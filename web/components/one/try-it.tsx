@@ -11,7 +11,7 @@ import type {FlagId} from '@/lib/types';
 type Result = {
   market: {question: string};
   window: {n_fills: number; n_scored: number};
-  wallets: {id: string; score: number; fired: FlagId[]; F3_vwap: number; F4_buy_usd: number; side: string}[];
+  wallets: {id: string; score: number; fired: FlagId[]; F1_days: number | null; F2_markets: number | null; F3_vwap: number; F4_buy_usd: number; side: string}[];
   scanned_at: number;
 };
 type State = {kind: 'idle'} | {kind: 'loading'} | {kind: 'error'; message: string} | {kind: 'done'; data: Result; cached: boolean};
@@ -63,6 +63,10 @@ export function TryIt() {
               <span className="type-story text-text-2">{usd(w.F4_buy_usd)} on {w.side} at {Math.round(w.F3_vwap * 100)}¢</span>
               <span className="type-story text-text-3">{LIVE.filter(f => w.fired.includes(f)).map(f => FLAG_SHORT[f]).join(', ')}</span>
               <span className="type-code text-text-3">{w.id}…</span>
+              <span className="basis-full type-story text-text-3">
+                Markets traded: {w.F2_markets === null ? 'unknown' : w.F2_markets.toLocaleString('en-US')}.
+                {' '}{w.F1_days === null ? 'Account age unknown' : `Account age: ${w.F1_days.toFixed(1)} days at its earliest trade in this scan`}.
+              </span>
             </li>)}</ul>}
         </>;
       })()}
