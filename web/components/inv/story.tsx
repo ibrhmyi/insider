@@ -45,7 +45,7 @@ export function Story({slides}: {slides: {title: string; body: ReactNode}[]}) {
     </div>
     <div ref={region} aria-live="polite" aria-label={`${slides[i].title}, slide ${i + 1} of ${n}`}
       className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-10 sm:px-12 lg:px-20">
-      <div key={i} className="my-auto flex w-full max-w-7xl flex-col gap-8 self-center">{slides[i].body}</div>
+      <div key={i} className="my-auto flex w-full flex-col gap-8 self-center">{slides[i].body}</div>
     </div>
     <div className="flex shrink-0 items-center justify-between gap-4 border-t border-line px-6 py-3">
       <Button variant="secondary" size="sm" onClick={() => go(-1)} disabled={i === 0}>Previous slide</Button>

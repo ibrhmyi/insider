@@ -14,8 +14,8 @@ const LINKS = [
 export function SiteNav() {
   const path = usePathname();
   if (path.startsWith('/story')) return null;
-  return <header className="sticky top-0 z-(--z-raised) border-b border-line bg-page">
-    <div className="mx-auto flex h-(--head) max-w-7xl items-center gap-6 px-4 sm:px-6">
+  return <header className="sticky top-0 z-(--z-overlay) h-(--head) border-b border-line bg-page">
+    <div className="flex h-full items-center gap-6 px-4 sm:px-6 xl:px-10">
       <Link href="/" className="hidden shrink-0 type-label-lg text-text-1 focus-visible:focus-ring sm:inline">Insider signal</Link>
       <nav aria-label="Main" className="flex min-w-0 items-center gap-4 overflow-x-auto sm:ms-auto sm:gap-6">
         {LINKS.map(l => {

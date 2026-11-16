@@ -37,7 +37,7 @@ export default function Cases() {
   };
 
   return <div className="flex flex-col">
-    <section aria-labelledby="cases-title" className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6">
+    <section aria-labelledby="cases-title" className="flex w-full flex-col gap-8 px-4 py-12 sm:px-6">
       <h1 id="cases-title" className="type-title max-w-3xl">Three markets, one screen. Only one of them shows a signal beyond chance.</h1>
       <ul className="grid gap-6 lg:grid-cols-3">
         {cards.map(({m, named, flagged, follow, price}) => {
@@ -64,7 +64,7 @@ export default function Cases() {
       <p className="type-body-sm text-text-2">{NOT_PROOF}</p>
     </section>
     <section aria-labelledby="nobel-title" className="border-t border-line">
-      <h2 id="nobel-title" className="mx-auto w-full max-w-7xl px-4 pt-12 type-heading sm:px-6">The second story: Nobel</h2>
+      <h2 id="nobel-title" className=" w-full px-4 pt-12 type-heading sm:px-6">The second story: Nobel</h2>
       <NobelStory d={nobel}/>
     </section>
   </div>;

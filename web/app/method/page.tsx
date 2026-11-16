@@ -23,7 +23,7 @@ export default function Method() {
   const markets = MARKET_IDS.map(id => getMarket(id)!);
   const {dist, namedTotal} = scoreDist();
 
-  return <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 py-12 sm:px-6">
+  return <div className="flex w-full flex-col gap-12 px-4 py-12 sm:px-6">
     <h1 className="type-title max-w-3xl">How the screen works, and what it cannot tell you.</h1>
 
     <Section id="v0" n={1} title="The first idea failed">

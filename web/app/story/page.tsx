@@ -22,16 +22,16 @@ export default function StoryPage() {
   const {dist, namedTotal} = scoreDist();
   const live = liveExample();
   const liveRows = live.wallets.filter(x => x.score >= 3 && x.F4_buy_usd >= 2500);
-  const big = 'type-display max-w-6xl text-balance';
+  const big = 'type-display max-w-3xl text-balance';
 
   const slides = [
     {title: 'The problem', body: <>
       <h1 className={big}>Some traders may know how a market ends before anyone else does.</h1>
-      <p className="type-heading max-w-4xl text-text-2">Can public trade data alone point to them, before the news breaks? Three Polymarket markets decided by a small group: a US strike on Iran, Maduro out by January 31, and the 2025 Nobel Peace Prize.</p>
+      <p className="type-heading max-w-3xl text-text-2">Can public trade data alone point to them, before the news breaks? Three Polymarket markets decided by a small group: a US strike on Iran, Maduro out by January 31, and the 2025 Nobel Peace Prize.</p>
     </>},
     {title: 'A first idea that failed', body: <>
       <h1 className={big}>First idea: big trades draw copycats. It found nothing.</h1>
-      <div className="flex max-w-4xl flex-col gap-5">
+      <div className="flex max-w-3xl flex-col gap-5">
         {[{l: 'Markets where insiders were possible', v: ip}, {l: 'Bitcoin price markets (no insiders possible)', v: ctl}].map(r => <div key={r.l} className="flex flex-col gap-2">
           <span className="flex flex-wrap justify-between gap-x-6 type-heading-sm"><span>{r.l}</span><span className="type-code">+{r.v.mean_excess.toFixed(2)} extra wallets, n = {r.v.n_seeds}</span></span>
           <span aria-hidden className="block h-6 w-(--w) bg-text-3" style={{'--w': `${(r.v.mean_excess / 2.2) * 100}%`} as React.CSSProperties}/>
@@ -41,7 +41,7 @@ export default function StoryPage() {
     </>},
     {title: 'Six signs', body: <>
       <h1 className={big}>Six signs from published research, fixed before any result was seen.</h1>
-      <ul className="grid max-w-5xl gap-x-12 gap-y-6 sm:grid-cols-2">
+      <ul className="grid max-w-3xl gap-x-12 gap-y-6 sm:grid-cols-2">
         {FLAGS.map(f => <li key={f} className="flex flex-col gap-1"><FlagMark f={f} fired size="lg"/><span className="type-heading-sm text-text-2">{FLAG_RULE_SHORT[f]}</span></li>)}
       </ul>
       <p className="type-heading-sm text-text-2">A wallet showing 4 or more is flagged for review.</p>
@@ -89,7 +89,7 @@ export default function StoryPage() {
       <p className="type-heading-sm text-text-2">{live.market.question}</p>
       {liveRows.length === 0
         ? <p className="type-heading">No wallet crosses the line in this market right now.</p>
-        : <ul className="flex max-w-5xl flex-col gap-3">{liveRows.slice(0, 5).map(r => <li key={r.id} className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-line pb-3">
+        : <ul className="flex max-w-3xl flex-col gap-3">{liveRows.slice(0, 5).map(r => <li key={r.id} className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-line pb-3">
           <span className="type-code">{r.id}…</span><span className="type-code text-accent-text">{r.score}/5</span>
           <span className="type-code">{usd(r.F4_buy_usd)}</span>
           <span className="flex flex-wrap gap-x-4">{(['F1', 'F2', 'F3', 'F4', 'F5'] as const).map(f => <FlagMark key={f} f={f} fired={r.fired.includes(f)}/>)}</span>

@@ -136,8 +136,8 @@ export function InvestigationChart({price, buys, tNews, x0, x1, state, newsLabel
     {inset && <InsetChart price={inset.price} x0={x0} x1={x1} label={inset.label}/>}
 
     {callout && biggest && <div aria-hidden={!state.callout}
-      className={`pointer-events-none absolute w-48 border border-accent-edge bg-panel p-2 sm:w-60 sm:p-3 ${fade} ${state.callout ? 'opacity-100' : 'opacity-0'}`}
-      style={{left: flip ? undefined : Math.min(cx + 18, w - 248), right: flip ? Math.max(w - cx + 18, 8) : undefined, top: Math.max(PAD.t, cy - (w < 640 ? 120 : 150))}}>
+      className={`pointer-events-none absolute start-(--cl) end-(--cr) top-(--ct) w-48 border border-accent-edge bg-panel p-2 sm:w-60 sm:p-3 ${fade} ${state.callout ? 'opacity-100' : 'opacity-0'}`}
+      style={{'--cl': flip ? 'auto' : `${Math.min(cx + 18, w - 248)}px`, '--cr': flip ? `${Math.max(w - cx + 18, 8)}px` : 'auto', '--ct': `${Math.max(PAD.t, cy - (w < 640 ? 120 : 150))}px`} as React.CSSProperties}>
       {callout}
     </div>}
   </div>;

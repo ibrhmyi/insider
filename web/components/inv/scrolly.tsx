@@ -29,8 +29,8 @@ export function Scrolly({steps, chart, aside, label}: {
   }, [steps.length]);
   const s = steps[active];
 
-  return <div className="mx-auto grid w-full max-w-7xl gap-x-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
-    <div className="sticky top-(--head) z-[1] -mx-4 h-[58svh] border-b border-line bg-page px-4 py-3 sm:-mx-6 sm:px-6 lg:order-2 lg:mx-0 lg:h-[calc(100svh-var(--head))] lg:border-b-0 lg:px-0 lg:py-6">
+  return <div className="grid w-full gap-x-10 px-4 sm:px-6 xl:px-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
+    <div className="sticky top-(--head) z-(--z-raised) -mx-4 h-[58svh] border-b border-line bg-page px-4 py-3 sm:-mx-6 sm:px-6 xl:-mx-10 xl:px-10 lg:order-2 lg:mx-0 lg:h-[calc(100svh-var(--head))] lg:border-b-0 lg:px-0 lg:py-6">
       <div className="flex h-full flex-col gap-3">
         <InvestigationChart {...chart} state={s.state} label={`${label}. ${s.title}`} className="flex-1"/>
         {aside?.(active)}
@@ -38,7 +38,7 @@ export function Scrolly({steps, chart, aside, label}: {
     </div>
     <ol className="relative flex flex-col lg:order-1">
       {steps.map((st, i) => <li key={st.id} id={st.id} data-index={i} ref={el => { refs.current[i] = el; }}
-        className="flex min-h-[75svh] items-end pb-6 last:min-h-[90svh] lg:min-h-[85svh] lg:items-center lg:py-10 lg:first:pt-16">
+        className="flex min-h-[75svh] items-end pb-6 last:min-h-[90svh] lg:min-h-[85svh] lg:last:min-h-svh lg:items-center lg:py-10 lg:first:pt-16">
         <article aria-current={i === active ? 'step' : undefined}
           className={`flex flex-col gap-3 border bg-panel p-5 ${i === active ? 'border-text-3' : 'border-line'}`}>
           <h2 className="type-heading-sm">{st.title}</h2>

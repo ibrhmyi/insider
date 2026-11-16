@@ -29,7 +29,7 @@ export default function Investigation() {
   return <>
     <Hero n={h.n_in_market} hoursBefore={h.hours_before} named={h.documented_flagged} namedTotal={h.documented_total}/>
     <MaduroInvestigation d={d}/>
-    <section aria-labelledby="next-title" className="mx-auto flex w-full max-w-7xl flex-col gap-6 border-t border-line px-4 py-16 sm:px-6">
+    <section aria-labelledby="next-title" className="flex w-full flex-col gap-6 border-t border-line px-4 py-16 sm:px-6">
       <h2 id="next-title" className="type-heading max-w-2xl">One case is a story, not a result. The same screen, run on three markets, flagged {h.n_high_total} wallets, and {h.n_high_under_1k} of them bought under $1,000.</h2>
       <nav aria-label="Continue" className="flex flex-wrap gap-x-8 gap-y-3">
         <Link href="/cases" className="type-label text-text-1 underline underline-offset-4 focus-visible:focus-ring">See the three markets</Link>

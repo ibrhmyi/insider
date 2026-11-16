@@ -37,9 +37,9 @@ export default async function CasePage({params}: {params: Promise<{id: string}>}
   const flagged = rows.filter(r => isFlagged(r.score, r.usd)).length;
   const beats = m.permutation.p_value < 0.05;
 
-  return <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6">
+  return <div className="flex w-full flex-col gap-8 px-4 py-10 sm:px-6">
     <nav aria-label="Breadcrumb" className="type-label text-text-3"><Link href="/cases" className="hover:text-text-1 focus-visible:focus-ring">Cases</Link> <span aria-hidden>/</span> <span className="text-text-1">{m.short}</span></nav>
-    <h1 className="type-title max-w-4xl">{m.question}</h1>
+    <h1 className="type-title max-w-3xl">{m.question}</h1>
     <StatusStrip label={`${m.short} results`}>
       <StatusStripCell><StatusStripLabel>Pre-news buyers</StatusStripLabel><StatusStripValue>{m.n_wallets.toLocaleString('en-US')}</StatusStripValue></StatusStripCell>
       <StatusStripCell><StatusStripLabel>Flagged, $2,500 or more</StatusStripLabel><StatusStripValue className="text-accent-text">{flagged}</StatusStripValue></StatusStripCell>

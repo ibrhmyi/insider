@@ -44,7 +44,7 @@ export function WalletTable({rows, flaggedMin, selected, onSelect, market}: {
   const small = rows.filter(r => r.usd < flaggedMin);
   const shown = useMemo(() => rows.filter(r => showSmall || r.usd >= flaggedMin), [rows, showSmall, flaggedMin]);
 
-  return <div className="flex flex-col gap-3">
+  return <div className="flex min-w-0 flex-col gap-3">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <p className="type-body-sm text-text-2">Wallets with 4 or more signs that bought {usd(flaggedMin)} or more before the news, ranked by score, then by money. Hover a sign for its value.</p>
       <label className="flex items-center gap-2 type-label-sm text-text-2">

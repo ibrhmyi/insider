@@ -25,7 +25,7 @@ function useCountUp(targets: number[], ms = 1100) {
 
 export function Hero({n, hoursBefore, named, namedTotal}: {n: number; hoursBefore: number; named: number; namedTotal: number}) {
   const [a, b, c] = useCountUp([n, hoursBefore, named]);
-  return <section aria-labelledby="hero-title" className="mx-auto flex min-h-[calc(100svh-var(--head))] w-full max-w-7xl flex-col justify-center gap-10 px-4 py-16 sm:px-6">
+  return <section aria-labelledby="hero-title" className="mx-auto flex min-h-[calc(100svh-var(--head))] w-full flex-col justify-center gap-10 px-4 py-16 sm:px-6">
     <h1 id="hero-title" className="type-title max-w-3xl text-balance">
       One wallet bet on Maduro&apos;s fall before anyone knew. A screen written before the results ranked it first.
     </h1>
