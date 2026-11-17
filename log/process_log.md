@@ -236,3 +236,10 @@ more than equally large trades by established wallets? BTC controls are dropped 
 ### 2026-11-17 - Faint background swirl
 - Added the ASCII swirl from iyildiz.me/yvonne behind the page (`web/components/product/swirl.tsx`), white at 3% opacity so the page stays black and text contrast is unchanged. Runs at about 24 fps, pauses in hidden tabs, draws one still frame under reduced motion. Decoration only; no copy, number or rule changed.
 - Swirl opacity raised from 3% to 6% on request.
+
+### 2026-11-17 - Page rewritten as a short first-person article
+- **Why.** Feedback: the page read as generic, with too many features and no story. It now reads like the other research articles on iyildiz.me/research: question, what the cases have in common, the check, what happened, why that is less than it sounds, what I take away, sources.
+- **Removed from the page:** the live watchlist, the scan box, the headline tiles, the sign-rate bars, the long-shot bars and the ruled-row sections (why, who, where, how, four checks, limits). Their facts are kept as prose with the same `<Source>` links. The components and data files stay in the repo, unused by the page.
+- **Kept:** the Maduro replay as the one figure, the sources list, the GitHub link and the "not proof" line.
+- **No number, threshold or rule changed.** Every number is still read from the frozen exports at build time (rank 1st of 2,608; 30 h; 7 of 7; 264 others; Nobel 137 vs 88, p = 0.001; v0 1.98 vs 1.58, p = 0.72; layer 2 pooled fewer followers, Nobel more).
+- **Checks.** Build passes (31 tests, em-dash check). At 1024, 1280, 1920 and 390 wide there is no overflow; the replay is 976 to 1080 px wide from 1024 up, column width on phones.
