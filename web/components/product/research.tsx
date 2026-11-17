@@ -1,9 +1,20 @@
-import {BEHAVIOURS, CASES, SRC, WHERE} from '@/lib/research';
+import {BEHAVIOURS, CASES, SRC, WHERE, WHY} from '@/lib/research';
 
 const link = 'underline underline-offset-4 focus-visible:focus-ring';
 
 export function Source({href, children = 'Source'}: {href: string; children?: React.ReactNode}) {
   return <a href={href} target="_blank" rel="noreferrer" className={`type-label-lg text-text-3 hover:text-text-1 ${link}`}>{children}</a>;
+}
+
+/** Why: who loses, what is public, what is missing. Ruled rows, one column, same style as How. */
+export function Why() {
+  return <ul aria-label="Why this project" className="flex flex-col border-t border-line">
+    {WHY.map(r => <li key={r.label} className="flex flex-col gap-1 border-b border-line py-5">
+      <span className="type-product text-text-1">{r.label}</span>
+      <span className="type-product text-text-2">{r.text}</span>
+      <span className="flex flex-wrap gap-x-4">{r.sources.map(s => <Source key={s.href} href={s.href}>{s.by}</Source>)}</span>
+    </li>)}
+  </ul>;
 }
 
 /** Who: the definition, then four cases as ruled rows. */

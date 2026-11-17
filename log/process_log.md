@@ -224,3 +224,11 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Cases.** The five-column case rows wrapped badly; each case is now two lines: who and alleged profit, then the secret, status and source.
 - **Watchlist.** Three cramped columns became two.
 - **Presenting.** Body text is 16px, so present at 150% browser zoom on a 1920-wide screen; checked at that zoom, at 100% and at 390px wide, no horizontal overflow. Build, 31 tests and the em-dash check pass.
+
+### 2026-11-17 - Page additions after proposal feedback: target group, gap, importance, public data
+- **Why.** The proposal feedback asked the page to say who it is for, what gap it fills, why it matters and which public data it rests on. These are copy additions only; no number, threshold, rule, the replay, the watchlist or the scan changed.
+- **Header.** One muted line under the intro: who the page is for (journalists, researchers and traders who watch these markets).
+- **New section "The trades are public. The check is missing." (id `why`).** Three ruled rows, each sourced: why it matters (CFTC, Apr 2026 case), what is public (Polymarket docs, order lifecycle), what is missing (Bock and Guenthoer; Nechepurenko, arXiv 2605.00459). Text and links live in `web/lib/research.ts` (`WHY`, `SRC`).
+- **Findings: "Four checks, one that held up".** Replaces the single v0 sentence with four ruled rows read at build time from the frozen exports, nothing hardcoded: v0 ripple 1.98 vs 1.58 extra wallets, p = 0.72 (No); named wallets 7 of 7 flagged, charged wallet ranks 1st of 2,608 (Yes, partly circular); timestamp permutation, 1,000 shuffles, Nobel 137 vs 88 expected, p = 0.001, Maduro and Iran no better than chance (Nobel only); layer 2 at 30 min, mean_diff -1.88 pooled and +8.93 Nobel, so fewer followers except in Nobel (Nobel only). All values matched the expected numbers.
+- **Sources.** Polymarket docs and Nechepurenko (2026) added to the footer list.
+- **Checks.** `npm run build` passes (31 tests, em-dash test already covers `lib/research.ts`, rendered-copy check). Rendered at 1280x720 at 150% zoom, 1920x1080 and 390 wide: no horizontal overflow; the replay figure stays wider than the column from 1024px up; p-values kept on one line. All four new source links opened and loaded (CFTC 9217-26, Polymarket docs order lifecycle, arXiv 2605.00459).

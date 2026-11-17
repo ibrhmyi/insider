@@ -15,6 +15,8 @@ export const SRC = {
   gomezCram: 'https://www.theblock.co/amp/post/398902/skilled-polymarket-traders-are-a-3-minority-and-everyone-else-funds-their-gains-study',
   mittsOfir: 'https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6426778',
   bock: 'http://www.vernimmen.com/ftp/mif2026_rp_bock_guenthoer.pdf',
+  polymarketDocs: 'https://docs.polymarket.com/concepts/order-lifecycle',
+  nechepurenko: 'https://arxiv.org/pdf/2605.00459',
 };
 
 export type Case = {who: string; secret: string; venue: string; made: string; status: string; source: string};
@@ -44,6 +46,15 @@ export const BEHAVIOURS: Behaviour[] = [
   {name: 'Covers their tracks', evidence: 'One changed his handle after online suspicion. Another had a friend place the bets.', by: 'Google case', source: SRC.googleHide, by2: 'Israel case', source2: SRC.israel},
 ];
 
+/** Why this project: who loses, what is public, what is missing. Each row links its sources. */
+export type WhyRow = {label: string; text: string; sources: {by: string; href: string}[]};
+
+export const WHY: WhyRow[] = [
+  {label: 'Why it matters', text: 'Whoever takes the other side of an informed bet loses. In 2026 US regulators brought their first insider trading cases on prediction markets.', sources: [{by: 'CFTC', href: SRC.cftcSoldier}]},
+  {label: 'What is public', text: 'Every Polymarket trade settles on a public blockchain and is served by a public API: time, wallet, side, size and price. Who owns a wallet is not public, and neither are orders that never filled.', sources: [{by: 'Polymarket docs', href: SRC.polymarketDocs}]},
+  {label: 'What is missing', text: 'Published screens work after a market resolves, and their flagged lists are not released. This project tests a simple check that can run while a market is open and shows its evidence.', sources: [{by: 'Bock and Guenthoer', href: SRC.bock}, {by: 'Nechepurenko', href: SRC.nechepurenko}]},
+];
+
 export const SOURCES: {name: string; what: string; href: string}[] = [
   {name: 'CFTC, Feb 2026', what: 'Enforcement advisory on prediction markets', href: SRC.cftcAdvisory},
   {name: 'CFTC, Apr 2026', what: 'Complaint against a US service member', href: SRC.cftcSoldier},
@@ -52,4 +63,6 @@ export const SOURCES: {name: string; what: string; href: string}[] = [
   {name: 'Gomez-Cram, Guo, Jensen, Kung, 2026', what: 'Crowd wisdom or informed minority', href: SRC.gomezCram},
   {name: 'Mitts and Ofir, 2026', what: 'Informed trading in prediction markets', href: SRC.mittsOfir},
   {name: 'Bock and Guenthoer, 2026', what: 'An ex-ante screen for insider activity', href: SRC.bock},
+  {name: 'Polymarket docs', what: 'How orders and trades settle', href: SRC.polymarketDocs},
+  {name: 'Nechepurenko, 2026', what: 'Information leakage at population scale', href: SRC.nechepurenko},
 ];

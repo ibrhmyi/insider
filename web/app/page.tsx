@@ -3,8 +3,8 @@ import {join} from 'node:path';
 import {Replay, type ReplayData} from '@/components/product/replay';
 import {Watchlist} from '@/components/product/watchlist';
 import {ScanBox} from '@/components/product/scan-box';
-import {How, Source, Where, Who} from '@/components/product/research';
-import {getValidation, getWallets, getMarket, getMarkets, getV0, MARKET_IDS} from '@/lib/data';
+import {How, Source, Where, Who, Why} from '@/components/product/research';
+import {getLayer2, getValidation, getWallets, getMarket, getMarkets, getV0, MARKET_IDS} from '@/lib/data';
 import {FLAGS, FLAG_PLAIN, FLAG_SHORT, NOT_PROOF, usd} from '@/lib/copy';
 import {SOURCES} from '@/lib/research';
 import type {FlagId} from '@/lib/types';
@@ -38,6 +38,28 @@ export default function Home() {
   const head = getMarkets().headline;
   const v0 = getV0();
   const rates = signRates();
+  // Four checks, every number read from the frozen result files.
+  const perm = Object.fromEntries(MARKET_IDS.map(m => [m, getMarket(m)!.permutation]));
+  const l2 = (scope: string) => getLayer2().tests.find(t => t.outcome === 'wallets' && t.H === 30 && t.scope === scope)!;
+  const pooledL2 = l2('pooled').mean_diff;
+  const nobelL2 = l2('nobel').mean_diff;
+  const chanceOnly = MARKET_IDS.filter(m => m !== 'nobel' && perm[m].p_value >= 0.05).map(m => ({maduro: 'Maduro', iran: 'Iran', nobel: 'Nobel'})[m]);
+  const checks: {check: string; result: string; verdict: string}[] = [
+    {check: 'Do big bets draw more copycats where insiders are possible?',
+      result: `${v0.pooled['insider-possible'].mean_excess} against ${v0.pooled['insider-impossible'].mean_excess} extra wallets, p\u00a0=\u00a0${v0.p_value.toFixed(2)}.`,
+      verdict: v0.p_value < 0.05 ? 'Yes' : 'No'},
+    {check: 'Do the six signs find the wallets named in public reporting?',
+      result: `${head.documented_flagged} of ${head.documented_total} flagged. The wallet later charged ranks ${head.rank === 1 ? '1st' : `#${head.rank}`} of ${head.n_in_market.toLocaleString('en-US')}.`,
+      verdict: 'Yes, partly circular'},
+    {check: 'Could random timing explain the flags?',
+      result: `${perm.nobel.n_perm.toLocaleString('en-US')} shuffles per market. Nobel: ${perm.nobel.observed} flagged against ${Math.round(perm.nobel.null_mean)} expected, p\u00a0=\u00a0${perm.nobel.p_value.toFixed(3)}. ${chanceOnly.join(' and ')}: no better than chance.`,
+      verdict: 'Nobel only'},
+    {check: 'Do other traders follow flagged wallets?',
+      result: pooledL2 < 0 && nobelL2 > 0
+        ? 'Fewer followers than after ordinary bets of the same size, except in the Nobel market.'
+        : `Followers after flagged bets, against ordinary bets of the same size: ${pooledL2.toFixed(1)} pooled, ${nobelL2.toFixed(1)} in the Nobel market.`,
+      verdict: pooledL2 < 0 && nobelL2 > 0 ? 'Nobel only' : 'See result'},
+  ];
   const value: Record<FlagId, string> = {
     F1: `${w.f1_days.toFixed(1)} days`, F2: `${Math.round((w.f2_share ?? 0) * 100)}%`, F3: `${Math.round(w.avg_price * 100)}¢`,
     F4: usd(w.usd), F5: `${Math.round(w.f5 * 100)}%`, F6: `${w.hours.toFixed(1)} h`,
@@ -55,8 +77,10 @@ export default function Home() {
       <p className="research-label mt-12 text-text-3"><time dateTime="2026-11-14">11.2026</time> · Capstone</p>
       <h1 id="question-title" className="type-story-title max-w-(--title-ch)">Can public trades reveal an insider before the news breaks?</h1>
       <p className="type-product max-w-measure text-text-2">On Polymarket every trade is public. This page asks who insiders are, where they trade and how they behave, then tests a model that looks for them.</p>
+      <p className="type-product max-w-measure text-text-3">For journalists, researchers and traders who watch these markets.</p>
     </header>
 
+    <Section id="why" title="The trades are public. The check is missing."><Why/></Section>
     <Section id="who" title="An insider trades on a secret they were trusted with."><Who/></Section>
     <Section id="where" title="They trade where a few people know the answer first."><Where/></Section>
     <Section id="how" title="They leave a pattern."><How/></Section>
@@ -107,7 +131,16 @@ export default function Home() {
         </div>
         <p className="type-product max-w-measure text-text-2">Wallets named in public reporting, against every buyer before the news. Big bets and all-in accounts separate them most.</p>
       </div>
-      <p className="type-product max-w-measure text-text-2">A first idea was dropped: that big bets draw more copycats where insiders are possible. They do not: {v0.pooled['insider-possible'].mean_excess} against {v0.pooled['insider-impossible'].mean_excess} extra wallets, p = {v0.p_value.toFixed(2)}.</p>
+      <div className="flex flex-col gap-4">
+        <h3 className="type-product text-text-1">Four checks, one that held up</h3>
+        <ul aria-label="Four checks" className="flex flex-col border-t border-line">
+          {checks.map(c => <li key={c.check} className="grid grid-cols-1 gap-x-6 gap-y-1 border-b border-line py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
+            <span className="type-product text-text-1 sm:col-start-1">{c.check}</span>
+            <span className="type-product text-text-2 sm:col-start-1">{c.result}</span>
+            <span className="type-label-lg text-text-2 sm:col-start-2 sm:row-start-1 sm:text-end">{c.verdict}</span>
+          </li>)}
+        </ul>
+      </div>
     </Section>
 
     <Section id="demo" title="Demo: replay the Maduro market, Jan 1 to Jan 3, 2026.">
