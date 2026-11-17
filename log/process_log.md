@@ -235,3 +235,4 @@ more than equally large trades by established wallets? BTC controls are dropped 
 
 ### 2026-11-17 - Faint background swirl
 - Added the ASCII swirl from iyildiz.me/yvonne behind the page (`web/components/product/swirl.tsx`), white at 3% opacity so the page stays black and text contrast is unchanged. Runs at about 24 fps, pauses in hidden tabs, draws one still frame under reduced motion. Decoration only; no copy, number or rule changed.
+- Swirl opacity raised from 3% to 6% on request.

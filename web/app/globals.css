@@ -62,7 +62,7 @@ html { scroll-behavior: smooth; }
   position: fixed; inset: 0; z-index: 0; margin: 0; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12px; line-height: 15px; color: #fff; opacity: 0.03; filter: blur(0.6px);
+  font-size: 12px; line-height: 15px; color: #fff; opacity: 0.06; filter: blur(0.6px);
   pointer-events: none; user-select: none;
 }
 #main { position: relative; z-index: 1; }
