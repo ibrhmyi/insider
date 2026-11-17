@@ -71,7 +71,7 @@ export default function Home() {
     {figure: `${head.n_high_total - head.documented_flagged}`, label: 'Other wallets flagged, never accused'},
   ];
 
-  return <div id="top" className="bg-page text-text-1" style={{'--title-ch': '30ch'} as React.CSSProperties}>
+  return <div id="top" className="text-text-1" style={{'--title-ch': '30ch'} as React.CSSProperties}>
     <header aria-labelledby="question-title" className={`flex flex-col gap-5 pt-[12vh] pb-14 ${pad}`}>
       <a href="/research/" className="research-label w-fit text-text-3 transition-colors duration-(--dur-state) hover:text-text-1 focus-visible:focus-ring">← Research</a>
       <p className="research-label mt-12 text-text-3"><time dateTime="2026-11-14">11.2026</time> · Capstone</p>

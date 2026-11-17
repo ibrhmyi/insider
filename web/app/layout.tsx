@@ -1,5 +1,6 @@
 import type {Metadata, Viewport} from 'next';
 import {SodiumPortalProvider} from '@/lib/sodium/portal';
+import {Swirl} from '@/components/product/swirl';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
   return <html lang="en" data-theme="dark">
     <body className="sodium min-h-dvh bg-page text-text-1">
       <SodiumPortalProvider>
+        <Swirl/>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-(--z-overlay) focus:bg-panel focus:px-3 focus:py-2 focus-ring type-label">Skip to content</a>
         <main id="main" tabIndex={-1}>{children}</main>
       </SodiumPortalProvider>
