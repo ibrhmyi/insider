@@ -25,3 +25,14 @@ export const getV0 = () => read<V0Summary>('v0_summary.json');
 export function isMarketId(id: string): id is MarketId {
   return (MARKET_IDS as string[]).includes(id);
 }
+
+export interface V2 {
+  learned: {train_markets: number; val_markets: number; train_wallets: number; modelled_markets: number; modelled_wallets: number};
+  persistence: {n_top: number; top_2025: number; n_top_2026: number; top_2026: number[]; others_2026: number[]; n_others_2026: number; diff: number[]};
+  validation: {verdict: string; n_points: number; n_markets: number; brier_market: number; brier_market_ci: number[]; brier_model: number; brier_model_ci: number[]; diff: number; diff_ci: number[];
+    unit: {n_units: number; brier_market: number; brier_model: number; diff_ci: number[]}};
+  coefficients: {feature: string; plain: string; coef: number; lo: number; hi: number; excludes_zero: boolean; direction: string}[];
+  forward: {snapshot_utc: string; commit: string; commit_url: string; commit_time: string; sha256: string;
+    predictions: {question: string; slug: string; market: number; model: number; status: string}[]};
+}
+export const getV2 = () => read<V2>('v2.json');

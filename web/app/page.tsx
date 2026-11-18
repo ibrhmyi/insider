@@ -2,7 +2,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {Replay, type ReplayData} from '@/components/product/replay';
 import {Source} from '@/components/product/research';
-import {getLayer2, getValidation, getWallets, getMarket, getMarkets, getV0, MARKET_IDS} from '@/lib/data';
+import {getLayer2, getValidation, getWallets, getMarket, getMarkets, getV0, getV2, MARKET_IDS} from '@/lib/data';
 import {FLAGS, FLAG_PLAIN, FLAG_SHORT, NOT_PROOF} from '@/lib/copy';
 import {CASES, SOURCES, SRC, WHERE} from '@/lib/research';
 
@@ -22,6 +22,10 @@ const P = ({children, muted = false}: {children: React.ReactNode; muted?: boolea
   <p className={`type-product max-w-measure ${muted ? 'text-text-2' : 'text-text-1'}`}>{children}</p>;
 
 const lcFirst = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
+const sg = (x: number, d = 2) => `${x >= 0 ? '+' : '-'}${Math.abs(x).toFixed(d)}`;
+const pts = (x: number) => `${x >= 0 ? '+' : '-'}${Math.abs(x * 100).toFixed(0)}`;
+const pct = (x: number) => `${Math.round(x * 100)}%`;
+const n0 = (x: number) => x.toLocaleString('en-US');
 const ordinal = (n: number) => n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`;
 
 export default function Home() {
@@ -37,6 +41,7 @@ export default function Home() {
   const nobelL2 = l2('nobel').mean_diff;
   const chanceOnly = MARKET_IDS.filter(m => m !== 'nobel' && perm[m].p_value >= 0.05).map(m => ({maduro: 'Maduro', iran: 'Iran', nobel: 'Nobel'})[m]);
   const others = head.n_high_total - head.documented_flagged;
+  const v2 = getV2();
   const [soldier, google, israel, youtube] = CASES;
   const [allMk, political, military] = WHERE;
 
@@ -84,9 +89,55 @@ export default function Home() {
         : `Followers after flagged bets, against ordinary bets of the same size: ${pooledL2.toFixed(1)} overall, ${nobelL2.toFixed(1)} in the Nobel market.`}</P>
     </Part>
 
+    <Part id="v2" title="Next model: let the data choose the weights.">
+      <P>I replaced my hand-picked signs with weights learned from {v2.learned.train_markets} resolved markets and {n0(v2.learned.train_wallets)} wallets, then tested them on {v2.learned.val_markets} later markets the model had not seen.</P>
+      <div className="flex flex-col gap-2">
+        <h3 className="type-product text-text-1">Do winners keep winning?</h3>
+        <P muted>{v2.persistence.diff[1] > 0 ? 'Partly.' : 'Not clearly.'} The top 5% of wallets in 2025 (n&nbsp;=&nbsp;{v2.persistence.n_top}) beat the price they paid by {pts(v2.persistence.top_2025)} points; in 2026 the same group (n&nbsp;=&nbsp;{v2.persistence.n_top_2026}) beat it by {pts(v2.persistence.top_2026[0])} points ({pts(v2.persistence.top_2026[1])} to {pts(v2.persistence.top_2026[2])}), against {pts(v2.persistence.others_2026[0])} for everyone else. The gap of {pts(v2.persistence.diff[0])} points ranges from {pts(v2.persistence.diff[1])} to {pts(v2.persistence.diff[2])}, which includes zero.</P>
+      </div>
+      <div className="flex flex-col gap-3">
+        <h3 className="type-product text-text-1">Does it beat the market price?</h3>
+        <dl className="grid grid-cols-2 gap-x-6 border-y border-line py-4">
+          <div className="flex flex-col gap-1">
+            <dt className="type-product text-text-2">Model Brier score</dt>
+            <dd className="type-product-title text-text-1">{v2.validation.brier_model.toFixed(3)}</dd>
+            <dd className="type-product text-text-3">{v2.validation.brier_model_ci[0].toFixed(3)} to {v2.validation.brier_model_ci[1].toFixed(3)}</dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="type-product text-text-2">Market price Brier score</dt>
+            <dd className="type-product-title text-text-1">{v2.validation.brier_market.toFixed(3)}</dd>
+            <dd className="type-product text-text-3">{v2.validation.brier_market_ci[0].toFixed(3)} to {v2.validation.brier_market_ci[1].toFixed(3)}</dd>
+          </div>
+        </dl>
+        <P><strong className="font-medium">{v2.validation.verdict}.</strong> Lower is better. The difference is {sg(v2.validation.diff, 3)}, with an interval from {sg(v2.validation.diff_ci[0], 3)} to {sg(v2.validation.diff_ci[1], 3)}, so it cannot be told apart from zero (n&nbsp;=&nbsp;{v2.validation.n_points} points in {v2.validation.n_markets} markets). On {n0(v2.validation.unit.n_units)} individual positions the scores are {v2.validation.unit.brier_model.toFixed(3)} for the model and {v2.validation.unit.brier_market.toFixed(3)} for the market.</P>
+      </div>
+      <div className="flex flex-col gap-3">
+        <h3 className="type-product text-text-1">What it learned</h3>
+        <ul aria-label="Largest weights" className="flex flex-col border-t border-line">
+          {v2.coefficients.map(c => <li key={c.feature} className="flex flex-col gap-1 border-b border-line py-4">
+            <span className="type-product text-text-1">{c.plain.charAt(0).toUpperCase() + c.plain.slice(1)}</span>
+            <span className="type-product text-text-2">A higher value went with {c.direction} winning than the price already says ({sg(c.coef, 2)} per standard deviation, interval {sg(c.lo, 2)} to {sg(c.hi, 2)}). {c.excludes_zero ? 'The interval excludes zero, but the effect is small.' : 'The interval includes zero, so it may be nothing.'}</span>
+          </li>)}
+        </ul>
+      </div>
+    </Part>
+
+    <Part id="forward" title="Ten predictions, locked before the outcome.">
+      <ul aria-label="Ten locked predictions" className="flex flex-col border-t border-line">
+        {v2.forward.predictions.map(p => <li key={p.slug} className="flex flex-col gap-1 border-b border-line py-4">
+          <span className="type-product text-text-1">{p.question}</span>
+          <span className="type-product flex flex-wrap gap-x-5 gap-y-1 text-text-2">
+            <span>Market price {pct(p.market)}</span>
+            <span>Model {pct(p.model)}</span>
+            <span className="text-text-3">{p.status}</span>
+          </span>
+        </li>)}
+      </ul>
+      <P muted>Locked {v2.forward.snapshot_utc.replace('T', ' ').replace(/:\d\dZ$/, ' UTC')} in <a href={v2.forward.commit_url} target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-text-1 focus-visible:focus-ring">commit {v2.forward.commit.slice(0, 7)}</a>. The model passes if its Brier score beats the market price on the markets that resolve.</P>
+    </Part>
+
     <Part id="takeaway" title="What I take away">
       <P>A flag is a reason to look, not proof. The check finds the obvious pattern, held up in one market of three, and misses anyone who uses an old account, as in the Google case.</P>
-      <P muted>Next I want to learn how much each sign should count from resolved markets, then lock predictions on 10 open markets and score them when they resolve.</P>
     </Part>
 
     <footer className={`flex flex-col gap-5 py-10 ${pad}`}>

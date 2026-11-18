@@ -1,0 +1,167 @@
+{
+ "learned": {
+  "train_markets": 106,
+  "val_markets": 49,
+  "train_wallets": 32624,
+  "modelled_markets": 155,
+  "modelled_wallets": 44859
+ },
+ "persistence": {
+  "n_top": 89,
+  "top_2025": 0.3015183276661611,
+  "n_top_2026": 57,
+  "top_2026": [
+   0.03729834243904572,
+   -0.04738493311869857,
+   0.1148709611552945
+  ],
+  "others_2026": [
+   -0.015612127651591956,
+   -0.01954390771746346,
+   -0.011485949631327886
+  ],
+  "n_others_2026": 25782,
+  "diff": [
+   0.05291047009063768,
+   -0.03027565760900312,
+   0.12809504176286599
+  ]
+ },
+ "validation": {
+  "verdict": "No",
+  "n_points": 114,
+  "n_markets": 47,
+  "brier_market": 0.17397374511507252,
+  "brier_market_ci": [
+   0.10633397541394565,
+   0.24794488753077745
+  ],
+  "brier_model": 0.16563043495526375,
+  "brier_model_ci": [
+   0.11029348656633917,
+   0.2279937540376847
+  ],
+  "diff": -0.00834331015980877,
+  "diff_ci": [
+   -0.03111239026259991,
+   0.011196103966612069
+  ],
+  "unit": {
+   "n_units": 33431,
+   "brier_market": 0.14179451052718428,
+   "brier_model": 0.14214643538363464,
+   "diff_ci": [
+    -0.0011551502142282185,
+    0.0015826888077501516
+   ]
+  }
+ },
+ "coefficients": [
+  {
+   "feature": "conviction",
+   "plain": "how much of the bought position the wallet kept (did not sell part of it)",
+   "coef": -0.1767407205573164,
+   "lo": -0.27645108770697396,
+   "hi": -0.09220213375140636,
+   "excludes_zero": true,
+   "direction": "less"
+  },
+  {
+   "feature": "log_rel_size",
+   "plain": "the size of the bet relative to the market",
+   "coef": 0.08310246313014616,
+   "lo": -0.3510653553810656,
+   "hi": 0.4702863420564788,
+   "excludes_zero": false,
+   "direction": "more"
+  },
+  {
+   "feature": "log_hours_to_end",
+   "plain": "how long before the deadline the bet was placed",
+   "coef": 0.017201719000334088,
+   "lo": -0.11538575264305816,
+   "hi": 0.1645859218415325,
+   "excludes_zero": false,
+   "direction": "more"
+  }
+ ],
+ "forward": {
+  "snapshot_utc": "2026-11-18T00:58:42Z",
+  "commit": "d1e93d6b6451a6ea27d075a7c6cf6696bb7182bb",
+  "commit_url": "https://github.com/ibrhmyi/insider/commit/d1e93d6b6451a6ea27d075a7c6cf6696bb7182bb",
+  "commit_time": "2026-11-18T01:00:46+00:00",
+  "sha256": "b0c2eec27373b5021df4a7268bdd78ac59263d758ea821e2d6d15e7211e480fb",
+  "predictions": [
+   {
+    "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
+    "slug": "will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636",
+    "market": 0.93,
+    "model": 0.752,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "US announces end of Iranian blockade by November 30, 2026?",
+    "slug": "us-announces-end-of-iranian-blockade-by-november-30-2026",
+    "market": 0.047,
+    "model": 0.101,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "Israel x Iran ceasefire continues through November 30?",
+    "slug": "israel-x-iran-ceasefire-continues-through-november-30",
+    "market": 0.85,
+    "model": 0.7373,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "Will Pedro S\u00e1nchez be the next Prime Minister of Spain?",
+    "slug": "will-pedro-sanchez-be-the-next-prime-minister-of-spain-20260625005710096",
+    "market": 0.145,
+    "model": 0.2455,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "Pete Hegseth out as Secretary of Defense by November 30?",
+    "slug": "pete-hegseth-out-as-secretary-of-defense-by-october-31-20261001003401433",
+    "market": 0.037,
+    "model": 0.065,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "Next White House Press Secretary announced by November 30, 2026?",
+    "slug": "next-white-house-press-secretary-announced-by-november-30-2026",
+    "market": 0.18,
+    "model": 0.1817,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "Will Predict.fun launch a token by November 30, 2026?",
+    "slug": "will-predictfun-launch-a-token-by-november-30-2026",
+    "market": 0.126,
+    "model": 0.1703,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "US x Iran Effective Ceasefire by November 22?",
+    "slug": "us-x-iran-effective-ceasefire-by-november-22-20261108",
+    "market": 0.41,
+    "model": 0.4361,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "Will Anthropic have the best AI model at the end of November 2026?",
+    "slug": "will-anthropic-have-the-best-ai-model-at-the-end-of-november-2026",
+    "market": 0.09,
+    "model": 0.0989,
+    "status": "Waiting for the result"
+   },
+   {
+    "question": "Russia x Ukraine ceasefire agreement by November 30, 2026?",
+    "slug": "russia-x-ukraine-ceasefire-agreement-by-november-30-2026",
+    "market": 0.0305,
+    "model": 0.0598,
+    "status": "Waiting for the result"
+   }
+  ]
+ }
+}
