@@ -32,3 +32,10 @@ Resolved Polymarket markets (binary Yes/No) with resolution date from 2025-01-01
 
 ## 5. Unit and timing
 Unit = wallet x market x side. "Close" = the market's `closedTime` (else `endDate`). Position "before" = fills with timestamp <= close minus 1 hour. Prices paid are volume-weighted prices of that wallet's buys on that side.
+
+## Amendment A (2026-11-18, after the Gamma list was pulled, before any trade was pulled)
+Reading a random sample of candidates showed election and market-cap questions passing the screen. Added to the exclusion keywords: elected, market cap, parliament, mayor, governor, senate, approval rating, olympic, coach, transfer. Added an event cap: at most 3 markets per event (highest volume first), so one event cannot dominate. Still text-only; no outcome or trade information was used.
+
+## Amendment B (2026-11-18, before any trade was pulled)
+- Gamma windows of 3 days hit the 2,000-row offset cap in 95 of 224 windows (the `volume_num_min` filter is ignored by the API). Those windows were re-pulled day by day, ordered by volume descending, which recovers every market >= USD 20k except possibly on 2025-12-31 (cap hit again, logged as a gap).
+- Page-cap proxy: markets with lifetime volume above USD 12 million are excluded up front (they exceed the 400-page limit in practice; trying them would waste hours). Remaining candidates are ranked by volume descending; fills are fetched down the list until 160 markets succeed. Markets that exceed 400 pages anyway are dropped and logged.

@@ -248,3 +248,9 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Decision.** Task is a learned model v2 plus a pre-registered forward test. Rules from HANDOFF.md kept (wording "informed flow"/"worth a look", freeze before test, nulls reported plainly). `web/` not touched.
 - **Decision.** Universe rule written and committed to `rules/model_v2_universe.md` before any v2 pull. Practical limits (min volume 20k, max 400 fill pages per market) are stated there in advance.
 - **Process.** Branch is `claude/peaceful-gauss-q31p61`; `git pull origin claude/hopeful-mendel-tado7n` merged cleanly.
+
+### 2026-11-18 - v2 step 1: market list
+- **Problem.** Gamma `volume_num_min` is ignored; 3-day windows hit the 2,000-row offset cap in 95 of 224 windows (Nov 2025 onward). **Fix:** re-pulled those days one by one ordered by `volumeNum` desc (285 days, 298,700 rows). One day (2025-12-31) still hit the cap: a possible small gap among markets >= $20k.
+- **Decision (Amendment A, universe rule).** Sample showed election/market-cap questions passing the keyword screen; added exclusion words and a cap of 3 markets per event. Done before any trade pull.
+- **Decision (Amendment B).** Markets > $12M volume excluded up front (page-cap proxy); rank the rest by volume; fetch down the list until 160 succeed.
+- **Count.** 4,309 text-qualified markets; 117 over $12M; 4,192 ranked. Exclusions per reason in `data/v2/exclusions.csv`. The keyword screen is imperfect (some non-qualifying questions pass, some qualifying ones missed); a read-through of the final set is in the summary.

@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 insider.bundle
+data/raw/v2_fills/
+data/raw/v2_gamma/
+data/raw/v2_gamma_vol/
