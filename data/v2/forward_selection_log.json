@@ -1,0 +1,34 @@
+{
+ "snapshot": 1794963522,
+ "pulled": 300,
+ "passed_screen": 28,
+ "skipped": [
+  [
+   "Will Jensen Huang rejoin NVIDIA by November 30, 2026?",
+   "price 0.029 outside 0.03-0.97"
+  ],
+  [
+   "Strait of Hormuz traffic returns to normal by November 30?",
+   "price 0.013 outside 0.03-0.97"
+  ],
+  [
+   "GTA 6 launch postponed again?",
+   "price 0.013 outside 0.03-0.97"
+  ],
+  [
+   "Will Anthropic IPO by November 30, 2026?",
+   "price 0.989 outside 0.03-0.97"
+  ],
+  [
+   "US-Iran Final Nuclear Deal by November 30, 2026?",
+   "price 0.011 outside 0.03-0.97"
+  ]
+ ],
+ "excl_counts": {
+  "excluded:sports/crypto/election/weather/stat/mention/other keyword": 140,
+  "": 61,
+  "volume<50k": 54,
+  "no_category_match": 43,
+  "not_Yes/No": 2
+ }
+}

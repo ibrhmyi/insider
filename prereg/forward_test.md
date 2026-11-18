@@ -16,4 +16,6 @@ Resolution = Gamma outcome prices exactly 1/0 for Yes by 2026-12-20. Markets sti
 3. Reported plainly whatever the result. With n = 10, one market can flip either metric: this test can only show an obvious failure or give weak support, and cannot validate the model. No metric, threshold or market may be changed after the snapshot.
 
 ## SHA-256 of prereg/forward_test_locked.csv
-(filled in after the file is written; see below)
+`b0c2eec27373b5021df4a7268bdd78ac59263d758ea821e2d6d15e7211e480fb`
+
+Snapshot UTC: see the `snapshot_utc` column of the CSV. Selection is mechanical (rule above); one selected market, "Pedro Sanchez next Prime Minister of Spain", is arguably an election-type market that the keyword screen let through; it stays in because the rule was fixed before selection. Markets skipped at selection (price outside 0.03-0.97): Jensen Huang rejoin NVIDIA, Strait of Hormuz traffic, GTA 6 postponed, Anthropic IPO, US-Iran final nuclear deal; list in `data/v2/forward_selection_log.json`.
