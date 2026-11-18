@@ -4,3 +4,5 @@ insider.bundle
 data/raw/v2_fills/
 data/raw/v2_gamma/
 data/raw/v2_gamma_vol/
+data/v2/buys.csv.gz
+data/v2/*stdout.log

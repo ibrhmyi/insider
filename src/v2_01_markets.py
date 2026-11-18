@@ -1,4 +1,4 @@
-"""v2 step 1b: category screen (text only) per rules/model_v2_universe.md. Output data/v2/markets_candidates.csv + exclusions.csv"""
+"""v2 step 1b: category screen (text only) per rules/model_v2_universe.md. Output data/v2/markets_candidates.csv + exclusions.csv.gz"""
 import json, glob, re
 import pandas as pd
 from common import *
@@ -60,7 +60,7 @@ cand = cand[cand.event_rank < 3]
 out = cand[["conditionId","slug","question","event_title","category","res_ts","closed_ts","end_ts","volumeNum","yes_won","yes_token","no_token","negRisk"]]
 (DATA / "v2").mkdir(exist_ok=True)
 out.sort_values("volumeNum", ascending=False).to_csv(DATA / "v2" / "markets_candidates.csv", index=False)
-pd.DataFrame(ex, columns=["conditionId","question","reason"]).to_csv(DATA / "v2" / "exclusions.csv", index=False)
+pd.DataFrame(ex, columns=["conditionId","question","reason"]).to_csv(DATA / "v2" / "exclusions.csv.gz", index=False)
 print("pulled", n_pulled, "candidates", len(out))
 print(pd.DataFrame(ex, columns=["c","q","reason"]).reason.str[:40].value_counts().head(12))
 print(out.category.value_counts())

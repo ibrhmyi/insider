@@ -1,0 +1,11 @@
+{
+ "markets_no_pre_cutoff_fills": [],
+ "neg_or_zero_net_units": 244312,
+ "zero_usd_units": 0,
+ "fills_after_cutoff": 8938,
+ "markets": 165,
+ "units": 590721,
+ "wallets": 306168,
+ "units_ge_100usd": 130629,
+ "wallets_ge_100usd": 59074
+}
