@@ -270,3 +270,9 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Decision.** Market-level evaluation points = 25/50/75% of life at which price still in 0.03-0.97 (only undecided markets are scorable, as in the forward test). Unit scores in the training-set market-level fit are 5-fold out-of-fold by market.
 - **Caveat.** Features share_event and size ratios use positions as built up to T_dec, so market-level scoring at earlier evaluation points leaks a little future position-building; stated limitation.
 - **Freeze.** `rules/frozen_v2.md/.json` written after seeing validation results (stated in the file). No parameter changed afterwards. Forward test is the only clean test.
+
+### 2026-11-18 - v2 step 5: forward test locked
+- **Decision.** Pre-registration (`prereg/forward_test.md`) committed before selection. Selection by rule: 300 open markets pulled, 28 pass screen (1 per event), top 10 by volume with price in 0.03-0.97 (5 skipped for price outside the band). Snapshot 2026-11-18T00:58:42Z. Locked CSV SHA-256 b0c2eec2...e480fb written into the prereg file; pushed right away.
+- **Problem.** First push was rejected (GitHub 100 MB limit): a 1.6 GB intermediate `data/raw/v2_gamma_all.json` had been committed locally. Removed from the unpushed local history with filter-branch and added to .gitignore; only unpushed commits were rewritten. Commit times of the pushed commits therefore come from the push, not the original local commit.
+- **Note.** The selection includes one election-like market (Spanish PM) because the mechanical screen allowed it; not removed after the fact. `scripts/score_forward_test.py` written, not run.
+- **Summary** in `data/results/v2_summary.md`: verdict is no demonstrated edge.
