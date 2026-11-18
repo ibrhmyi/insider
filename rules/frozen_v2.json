@@ -1,0 +1,55 @@
+{
+ "version": "v2",
+ "frozen_on": "2026-11-18",
+ "features": [
+  "log_age",
+  "share_event",
+  "log_usd",
+  "log_rel_size",
+  "conviction",
+  "log_hours_to_end",
+  "log_prior_markets",
+  "prior_excess"
+ ],
+ "intercept": -0.07460775873554891,
+ "coef": {
+  "log_age": -0.0002123648449709988,
+  "share_event": 0.0003989049566076602,
+  "log_usd": -0.0019918152302812126,
+  "log_rel_size": 0.08310246313014616,
+  "conviction": -0.1767407205573164,
+  "log_hours_to_end": 0.017201719000334088,
+  "log_prior_markets": 0.004027211754744354,
+  "prior_excess": -0.0005127072289327787
+ },
+ "feat_mean": {
+  "log_age": 4.313590939679999,
+  "share_event": 0.587572946623193,
+  "log_usd": 6.508638312328469,
+  "log_rel_size": 0.3326014553819273,
+  "conviction": 0.4888304412580602,
+  "log_hours_to_end": 6.0533167907870125,
+  "log_prior_markets": 0.76244365402741,
+  "prior_excess": 0.002002579636333167
+ },
+ "feat_sd": {
+  "log_age": 1.8952054180470046,
+  "share_event": 0.3941750269776873,
+  "log_usd": 1.5094509884879546,
+  "log_rel_size": 1.4962636989610936,
+  "conviction": 0.4671083530798209,
+  "log_hours_to_end": 1.936708111124366,
+  "log_prior_markets": 1.0609764556335637,
+  "prior_excess": 0.04841986136485738
+ },
+ "l2_lambda": 100,
+ "K_shrink": 5.0,
+ "min_unit_usd": 100,
+ "N_hours": 24,
+ "gamma": -5.042102706307714,
+ "eval_price_range": [
+  0.03,
+  0.97
+ ],
+ "min_diff_points": 5.0
+}

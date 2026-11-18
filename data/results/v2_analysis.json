@@ -1,0 +1,397 @@
+{
+ "persistence": {
+  "n_wallets_ge5_markets_2025": 1778,
+  "top5pct_cutoff_mean_excess_2025": 0.22134032408429233,
+  "n_top": 89,
+  "top_mean_excess_2025": 0.3015183276661611,
+  "top_with_2026_units": 57,
+  "top_2026": [
+   0.03729834243904572,
+   -0.04738493311869857,
+   0.1148709611552945
+  ],
+  "others_with_2026_units": 25782,
+  "others_2026": [
+   -0.015612127651591956,
+   -0.01954390771746346,
+   -0.011485949631327886
+  ],
+  "eligible_others_with_2026_units": 1151,
+  "eligible_others_2026": [
+   -0.0024471190557949643,
+   -0.01536092222135851,
+   0.010123965967209828
+  ],
+  "diff_top_minus_others": [
+   0.05291047009063768,
+   -0.03027565760900312,
+   0.12809504176286599
+  ],
+  "diff_top_minus_eligible_others": [
+   0.039745461494840685,
+   -0.04293659475914237,
+   0.11777844002156904
+  ],
+  "top_2026_unit_level_mean": 0.04239062556250598,
+  "top_2026_units": 377
+ },
+ "model": {
+  "lambda_grid_inner_logloss": {
+   "1": 0.5592806908809921,
+   "10": 0.5592227144496213,
+   "100": 0.5590540964582212,
+   "1000": 0.5592487513048566,
+   "10000": 0.5609426416643775
+  },
+  "lam": 100,
+  "n_train_units": 68982,
+  "n_train_markets": 106,
+  "n_val_units": 33431,
+  "n_val_markets": 49,
+  "intercept": -0.07460775873554891,
+  "coef": {
+   "log_age": -0.0002123648449709988,
+   "share_event": 0.0003989049566076602,
+   "log_usd": -0.0019918152302812126,
+   "log_rel_size": 0.08310246313014616,
+   "conviction": -0.1767407205573164,
+   "log_hours_to_end": 0.017201719000334088,
+   "log_prior_markets": 0.004027211754744354,
+   "prior_excess": -0.0005127072289327787
+  },
+  "feat_mean": {
+   "log_age": 4.313590939679999,
+   "share_event": 0.587572946623193,
+   "log_usd": 6.508638312328469,
+   "log_rel_size": 0.3326014553819273,
+   "conviction": 0.4888304412580602,
+   "log_hours_to_end": 6.0533167907870125,
+   "log_prior_markets": 0.76244365402741,
+   "prior_excess": 0.002002579636333167
+  },
+  "feat_sd": {
+   "log_age": 1.8952054180470046,
+   "share_event": 0.3941750269776873,
+   "log_usd": 1.5094509884879546,
+   "log_rel_size": 1.4962636989610936,
+   "conviction": 0.4671083530798209,
+   "log_hours_to_end": 1.936708111124366,
+   "log_prior_markets": 1.0609764556335637,
+   "prior_excess": 0.04841986136485738
+  },
+  "coef_ci95": {
+   "log_age": [
+    -0.04031994736150108,
+    0.04259503444712902
+   ],
+   "share_event": [
+    -0.0880985622139428,
+    0.10112840353752336
+   ],
+   "log_usd": [
+    -0.43344723473375263,
+    0.4324132969072212
+   ],
+   "log_rel_size": [
+    -0.3510653553810656,
+    0.4702863420564788
+   ],
+   "conviction": [
+    -0.27645108770697396,
+    -0.09220213375140636
+   ],
+   "log_hours_to_end": [
+    -0.11538575264305816,
+    0.1645859218415325
+   ],
+   "log_prior_markets": [
+    -0.03242956895512726,
+    0.0445568587843228
+   ],
+   "prior_excess": [
+    -0.04823177500567167,
+    0.06229455961428458
+   ]
+  }
+ },
+ "unit_validation": {
+  "n_units": 33431,
+  "logloss_market": 0.43092138310977246,
+  "logloss_model": 0.43233316922583204,
+  "brier_market": 0.14179451052718428,
+  "brier_model": 0.14214643538363464,
+  "logloss_diff_model_minus_market": 0.0014117861160595768,
+  "logloss_diff_ci": [
+   -0.0019725158562336254,
+   0.0043436628121059934
+  ],
+  "brier_diff_ci": [
+   -0.0011551502142282185,
+   0.0015826888077501516
+  ]
+ },
+ "market_level": {
+  "n_points_train": 250,
+  "n_markets_train": 100,
+  "n_points_val": 114,
+  "n_markets_val": 47,
+  "train_logloss_market": 0.7269816467221083,
+  "per_N": {
+   "1": {
+    "gamma": -3.5095774078134623,
+    "train_logloss": 0.7152600283101064
+   },
+   "3": {
+    "gamma": -4.0169378288955135,
+    "train_logloss": 0.7124046748635967
+   },
+   "6": {
+    "gamma": -3.7600206801041747,
+    "train_logloss": 0.7118166776233392
+   },
+   "12": {
+    "gamma": -4.211220084432397,
+    "train_logloss": 0.7093317929689861
+   },
+   "24": {
+    "gamma": -5.042102706307714,
+    "train_logloss": 0.7045196678098412
+   },
+   "48": {
+    "gamma": -3.896818270062551,
+    "train_logloss": 0.7157132282077397
+   },
+   "72": {
+    "gamma": -4.321549867793277,
+    "train_logloss": 0.7132698283407499
+   }
+  },
+  "N_selected": 24,
+  "gamma": -5.042102706307714,
+  "eval_fractions": [
+   0.25,
+   0.5,
+   0.75
+  ],
+  "validation": {
+   "brier_market": 0.17397374511507252,
+   "brier_model": 0.16563043495526375,
+   "logloss_market": 0.5162199666801986,
+   "logloss_model": 0.4972848171832303,
+   "brier_diff_model_minus_market": -0.00834331015980877,
+   "brier_diff_ci": [
+    -0.03111239026259991,
+    0.011196103966612069
+   ],
+   "logloss_diff_ci": [
+    -0.0851261636649276,
+    0.03395333121453217
+   ],
+   "brier_market_ci": [
+    0.10633397541394565,
+    0.24794488753077745
+   ],
+   "brier_model_ci": [
+    0.11029348656633917,
+    0.2279937540376847
+   ]
+  }
+ },
+ "documented": [
+  {
+   "label": "MAD-CFTC-1",
+   "wallet": "0x31a56e..",
+   "market": "Maduro out by January 31, 2026?",
+   "side": "Yes",
+   "usd": 32538.339997573697,
+   "rank": 330,
+   "of": 1187,
+   "pct": 0.7219882055602359,
+   "in_train": true,
+   "won": 1
+  },
+  {
+   "label": "MAD-CFTC-1",
+   "wallet": "0x31a56e..",
+   "market": "Will the U.S. invade Venezuela by January 31, 2026?",
+   "side": "Yes",
+   "usd": 999.9999991187188,
+   "rank": 212,
+   "of": 917,
+   "pct": 0.7688113413304253,
+   "in_train": true,
+   "won": 0
+  },
+  {
+   "label": "MAD-LOOK-1",
+   "wallet": "0x31a56e..",
+   "market": "Maduro out by January 31, 2026?",
+   "side": "Yes",
+   "usd": 32538.339997573697,
+   "rank": 330,
+   "of": 1187,
+   "pct": 0.7219882055602359,
+   "in_train": true,
+   "won": 1
+  },
+  {
+   "label": "MAD-LOOK-1",
+   "wallet": "0x31a56e..",
+   "market": "Will the U.S. invade Venezuela by January 31, 2026?",
+   "side": "Yes",
+   "usd": 999.9999991187188,
+   "rank": 212,
+   "of": 917,
+   "pct": 0.7688113413304253,
+   "in_train": true,
+   "won": 0
+  },
+  {
+   "label": "MAD-LOOK-2",
+   "wallet": "0xa72db1..",
+   "market": "Maduro out by January 31, 2026?",
+   "side": "Yes",
+   "usd": 5782.660001638865,
+   "rank": 427,
+   "of": 1187,
+   "pct": 0.6402695871946082,
+   "in_train": true,
+   "won": 1
+  },
+  {
+   "label": "MAD-LOOK-3",
+   "wallet": "0x6baf05..",
+   "market": "Maduro out by January 31, 2026?",
+   "side": "Yes",
+   "usd": 9999.999996355633,
+   "rank": 386,
+   "of": 1187,
+   "pct": 0.6748104465037911,
+   "in_train": true,
+   "won": 1
+  },
+  {
+   "label": "NOB-BLM-1",
+   "wallet": "0x234cc4..",
+   "status": "not in the v2 universe or below $100/no stats (market not in the 165, or no position)"
+  },
+  {
+   "label": "NOB-WSJ-1",
+   "wallet": "0xa43050..",
+   "status": "not in the v2 universe or below $100/no stats (market not in the 165, or no position)"
+  },
+  {
+   "label": "IRN-ACDC-1",
+   "wallet": "0xfe6eee..",
+   "market": "US military action against Iran by Saturday?",
+   "side": "Yes",
+   "usd": 8982.859995226938,
+   "rank": 180,
+   "of": 439,
+   "pct": 0.5899772209567198,
+   "in_train": true,
+   "won": 1
+  },
+  {
+   "label": "IRN-ACDC-1",
+   "wallet": "0xfe6eee..",
+   "market": "Israel strikes Iran by February 28, 2026?",
+   "side": "Yes",
+   "usd": 375.6799989651555,
+   "rank": 558,
+   "of": 820,
+   "pct": 0.3195121951219512,
+   "in_train": true,
+   "won": 1
+  },
+  {
+   "label": "IRN-ACDC-1",
+   "wallet": "0xfe6eee..",
+   "market": "Israel military action against Iran by Friday?",
+   "side": "Yes",
+   "usd": 2362.9299981699683,
+   "rank": 252,
+   "of": 416,
+   "pct": 0.3942307692307692,
+   "in_train": true,
+   "won": 1
+  },
+  {
+   "label": "IRN-ACDC-1",
+   "wallet": "0xfe6eee..",
+   "market": "Israel x Hezbollah ceasefire by April 15, 2026?",
+   "side": "Yes",
+   "usd": 7294.386983196835,
+   "rank": 673,
+   "of": 1000,
+   "pct": 0.327,
+   "in_train": false,
+   "won": 0
+  },
+  {
+   "label": "IRN-ACDC-1",
+   "wallet": "0xfe6eee..",
+   "market": "Will the Iran ceasefire continue through May 25?",
+   "side": "No",
+   "usd": 2044.8829632141287,
+   "rank": 37,
+   "of": 336,
+   "pct": 0.8898809523809523,
+   "in_train": false,
+   "won": 1
+  },
+  {
+   "label": "IRN-ACDC-2",
+   "wallet": "0x88e6bd..",
+   "market": "Israel x Hamas ceasefire before August?",
+   "side": "Yes",
+   "usd": 26942.49039580912,
+   "rank": 874,
+   "of": 1313,
+   "pct": 0.33434881949733436,
+   "in_train": true,
+   "won": 0
+  },
+  {
+   "label": "IRN-ACDC-2",
+   "wallet": "0x88e6bd..",
+   "market": "Will Iran close the Strait of Hormuz before July?",
+   "side": "Yes",
+   "usd": 4088.4757400034105,
+   "rank": 522,
+   "of": 1105,
+   "pct": 0.5276018099547511,
+   "in_train": true,
+   "won": 0
+  },
+  {
+   "label": "IRN-ACDC-2",
+   "wallet": "0x88e6bd..",
+   "market": "Israel x Hamas ceasefire by July 15?",
+   "side": "Yes",
+   "usd": 647.5304219821003,
+   "rank": 261,
+   "of": 1162,
+   "pct": 0.7753872633390706,
+   "in_train": true,
+   "won": 0
+  },
+  {
+   "label": "IRN-ACDC-2",
+   "wallet": "0x88e6bd..",
+   "market": "US military action against Iran by Saturday?",
+   "side": "Yes",
+   "usd": 739.2879990254294,
+   "rank": 302,
+   "of": 439,
+   "pct": 0.3120728929384966,
+   "in_train": true,
+   "won": 1
+  }
+ ],
+ "splits": {
+  "split_ts": 1775001600,
+  "train_markets": 106,
+  "val_markets": 49
+ }
+}

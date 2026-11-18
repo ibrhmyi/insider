@@ -1,0 +1,9 @@
+{
+ "units_net_long_at_decision": 458864,
+ "units_ge_100usd": 105774,
+ "units_no_wallet_stats": 3361,
+ "units_modelled": 102413,
+ "wallets_modelled": 44859,
+ "markets": 155,
+ "missing_share_event": 0
+}
