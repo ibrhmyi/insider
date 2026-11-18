@@ -243,3 +243,8 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Kept:** the Maduro replay as the one figure, the sources list, the GitHub link and the "not proof" line.
 - **No number, threshold or rule changed.** Every number is still read from the frozen exports at build time (rank 1st of 2,608; 30 h; 7 of 7; 264 others; Nobel 137 vs 88, p = 0.001; v0 1.98 vs 1.58, p = 0.72; layer 2 pooled fewer followers, Nobel more).
 - **Checks.** Build passes (31 tests, em-dash check). At 1024, 1280, 1920 and 390 wide there is no overflow; the replay is 976 to 1080 px wide from 1024 up, column width on phones.
+
+### 2026-11-18 - Model v2 started (data-driven detector + forward test)
+- **Decision.** Task is a learned model v2 plus a pre-registered forward test. Rules from HANDOFF.md kept (wording "informed flow"/"worth a look", freeze before test, nulls reported plainly). `web/` not touched.
+- **Decision.** Universe rule written and committed to `rules/model_v2_universe.md` before any v2 pull. Practical limits (min volume 20k, max 400 fill pages per market) are stated there in advance.
+- **Process.** Branch is `claude/peaceful-gauss-q31p61`; `git pull origin claude/hopeful-mendel-tado7n` merged cleanly.
