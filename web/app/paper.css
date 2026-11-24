@@ -104,7 +104,7 @@
 .paper .token.comment { color: #6f6f6a; font-style: italic; }
 .paper .token.string { color: #b9c48f; }
 .paper .token.number, .paper .token.boolean { color: #d6a86a; }
-.paper .token.keyword { color: #c9a14a; }
+.paper .token.keyword { color: #b9b4d6; }
 .paper .token.function { color: #9ec3d4; }
 .paper .token.builtin { color: #c8a2c8; }
 .paper .token.operator, .paper .token.punctuation { color: #8a8a85; }
@@ -126,3 +126,21 @@
   .code-cell pre { font-size: 11px; }
   .nb-figure img { padding: 6px; }
 }
+
+/* Server-drawn charts in the site's greys. */
+.paper-figure { margin: 8px 0 12px; }
+.paper-svg { display: block; width: 100%; height: auto; overflow: visible; font-family: "IBM Plex Mono", monospace; }
+.svg-grid { stroke: #1f1f1d; }
+.svg-zero { stroke: #6f6f6a; stroke-dasharray: 3 3; }
+.svg-base { stroke: #3a3a37; }
+.svg-axis { fill: #6f6f6a; font-size: 12px; }
+.svg-label { fill: #b8b8b2; font-size: 14px; }
+.svg-label.is-main { fill: #ecebe6; }
+.svg-value { fill: #ecebe6; font-size: 13px; }
+.svg-bar { fill: #4a4a46; }
+.svg-observed { stroke: #ecebe6; stroke-width: 2; }
+.svg-ci { stroke: #8a8a85; stroke-width: 2; }
+.svg-ci.is-main { stroke: #ecebe6; stroke-width: 2.5; }
+.svg-dot { fill: #8a8a85; }
+.svg-dot.is-main { fill: #ecebe6; }
+@media (max-width: 560px) { .svg-axis { font-size: 15px; } .svg-label { font-size: 17px; } .svg-value { font-size: 16px; } }
