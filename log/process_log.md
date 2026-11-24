@@ -132,3 +132,7 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - Wrote `HANDOFF.md` for agents taking over (rules, what was done, weaknesses, prioritized open tasks, API facts, repo map).
 - Raw API cache (`data/raw/`, ~71 MB, rejected SOL control pages included) is now committed so the pipeline re-runs without re-downloading.
 - **Push blocked:** the session's GitHub token is invalid and no repository is attached. The repo is committed locally on `main`, waiting for a GitHub repository to push to.
+
+### 2026-11-24 - CI guard for frozen rules
+- Added `tests/test_frozen_rules.py` and `.github/workflows/ci.yml`. CI byte-compiles `src/` and checks that `src/measures.py` still matches the sha256 in `rules/frozen_v0.json`, that the frozen rule documents exist, and that every documented wallet label carries a source column.
+- No frozen definition, threshold, data file or result was changed. This only makes the existing "freeze before validate" rule fail loudly in CI.
