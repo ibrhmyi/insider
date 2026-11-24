@@ -49,7 +49,7 @@ export type Validation = {
 };
 
 export type L2Test = {H: number; outcome: string; scope: string; n_A_seeds: number; n_A_wallets: number; mean_A: number; mean_B: number; mean_diff: number; ci95: [number, number]; p_signflip: number; wallet_clustered_mean_diff: number; wallet_clustered_p: number};
-export type Layer2 = {whale_cut_usd: number; n_whales: number; n_bots: number; n_A_seeds_total: number; tests: L2Test[]};
+export type Layer2 = {whale_cut_usd: number; n_whales: number; n_bots: number; n_A_seeds_total: number; tests: L2Test[]; excluded_counts: {kind: string; H: number; n: number}[]; A_seeds_without_B_H30: number; A_seeds_without_B_H120: number};
 
 export type V0Summary = {
   quantile: number; p_value: number; placebo_bias: number;

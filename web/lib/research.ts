@@ -66,3 +66,29 @@ export const SOURCES: {name: string; what: string; href: string}[] = [
   {name: 'Polymarket docs', what: 'How orders and trades settle', href: SRC.polymarketDocs},
   {name: 'Nechepurenko, 2026', what: 'Information leakage at population scale', href: SRC.nechepurenko},
 ];
+
+/** When each rule was frozen, and what it was frozen before. Copied from the rule files (rules/*.md, prereg/forward_test.md). */
+export const FREEZES: {rule: string; file: string; frozen: string; before: string}[] = [
+  {rule: 'Market labels', file: 'rules/labeling_rule.md', frozen: '2026-11-09 16:11 UTC', before: 'any trade-level analysis; labels come from resolution rules only'},
+  {rule: 'v0 ripple detector', file: 'rules/frozen_v0.md', frozen: '2026-11-09 16:31 UTC', before: 'any insider-possible market was run; tuned on controls only'},
+  {rule: 'v1 screen and Layer 2', file: 'rules/frozen_v1.md', frozen: '2026-11-11 00:31 UTC', before: 'any v1 feature was computed or any public label matched'},
+  {rule: 'v2 universe', file: 'rules/model_v2_universe.md', frozen: '2026-11-18', before: 'any v2 market list or trade was pulled'},
+  {rule: 'v2 model', file: 'rules/frozen_v2.md', frozen: '2026-11-18', before: 'any forward-test market was selected or scored'},
+  {rule: 'Forward test', file: 'prereg/forward_test.md', frozen: '2026-11-18', before: 'the ten markets were selected; locked file hashed with SHA-256'},
+];
+
+/** Plain definitions of the six ex-ante features (rules/frozen_v1.md). Thresholds are read from markets.json. */
+export const FEATURE_DEFS: Record<'F1' | 'F2' | 'F3' | 'F4' | 'F5' | 'F6', string> = {
+  F1: 'Days from account start to the wallet\'s first fill in this market',
+  F2: 'Share of the wallet\'s volume (to the news time) in this market, or lifetime markets traded',
+  F3: 'Volume-weighted price paid on the main side, pre-news buys',
+  F4: 'Total pre-news buy USD, both tokens',
+  F5: 'Absolute net YES-direction USD over gross USD, all pre-news fills',
+  F6: 'Hours from the USD-weighted median main-side buy time to the news',
+};
+
+/** Methods references (in addition to the sources above). */
+export const METHOD_REFS: {name: string; what: string; href: string}[] = [
+  {name: 'Bock and Guenthoer, 2026', what: 'Timestamp permutation null for an ex-ante screen', href: SRC.bock},
+  {name: 'Gomez-Cram, Guo, Jensen, Kung, 2026', what: 'Price impact per dollar of informed traders', href: SRC.gomezCram},
+];

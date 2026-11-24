@@ -11,6 +11,12 @@ export const viewport: Viewport = {themeColor: '#141412', colorScheme: 'dark'};
 
 export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
   return <html lang="en" data-theme="dark">
+    <head>
+      <link rel="preconnect" href="https://fonts.googleapis.com"/>
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""/>
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&display=swap"/>
+    </head>
     <body className="sodium min-h-dvh bg-page text-text-1">
       <SodiumPortalProvider>
         <Swirl/>

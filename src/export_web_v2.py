@@ -71,6 +71,13 @@ OUT = dict(
                     unit=dict(n_units=uv["n_units"], brier_market=uv["brier_market"], brier_model=uv["brier_model"],
                               diff_ci=uv["brier_diff_ci"])),
     coefficients=coefs,
+    # Every frozen coefficient with its bootstrap interval, for the methods table on the page.
+    model=dict(lam=A["model"]["lam"], lambda_grid=A["model"]["lambda_grid_inner_logloss"],
+               n_train_units=A["model"]["n_train_units"], n_val_units=A["model"]["n_val_units"],
+               all_coefs=[dict(feature=k, coef=coef[k], lo=ci[k][0], hi=ci[k][1], excludes_zero=bool(ci[k][0] > 0 or ci[k][1] < 0))
+                          for k in coef],
+               n_hours=ml["N_selected"], gamma=ml["gamma"],
+               unit_logloss_market=uv["logloss_market"], unit_logloss_model=uv["logloss_model"]),
     forward=dict(snapshot_utc=rows[0]["snapshot_utc"], commit=sha, commit_url=f"{REPO}/commit/{sha}", commit_time=commit_iso,
                  sha256=sha256, predictions=preds),
 )

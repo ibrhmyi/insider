@@ -32,6 +32,9 @@ export interface V2 {
   validation: {verdict: string; n_points: number; n_markets: number; brier_market: number; brier_market_ci: number[]; brier_model: number; brier_model_ci: number[]; diff: number; diff_ci: number[];
     unit: {n_units: number; brier_market: number; brier_model: number; diff_ci: number[]}};
   coefficients: {feature: string; plain: string; coef: number; lo: number; hi: number; excludes_zero: boolean; direction: string}[];
+  model: {lam: number; lambda_grid: Record<string, number>; n_train_units: number; n_val_units: number;
+    all_coefs: {feature: string; coef: number; lo: number; hi: number; excludes_zero: boolean}[];
+    n_hours: number; gamma: number; unit_logloss_market: number; unit_logloss_model: number};
   forward: {snapshot_utc: string; commit: string; commit_url: string; commit_time: string; sha256: string;
     predictions: {question: string; slug: string; market: number; model: number; status: string}[]};
 }

@@ -85,6 +85,80 @@
    "direction": "more"
   }
  ],
+ "model": {
+  "lam": 100,
+  "lambda_grid": {
+   "1": 0.5592806908809921,
+   "10": 0.5592227144496213,
+   "100": 0.5590540964582212,
+   "1000": 0.5592487513048566,
+   "10000": 0.5609426416643775
+  },
+  "n_train_units": 68982,
+  "n_val_units": 33431,
+  "all_coefs": [
+   {
+    "feature": "log_age",
+    "coef": -0.0002123648449709988,
+    "lo": -0.04031994736150108,
+    "hi": 0.04259503444712902,
+    "excludes_zero": false
+   },
+   {
+    "feature": "share_event",
+    "coef": 0.0003989049566076602,
+    "lo": -0.0880985622139428,
+    "hi": 0.10112840353752336,
+    "excludes_zero": false
+   },
+   {
+    "feature": "log_usd",
+    "coef": -0.0019918152302812126,
+    "lo": -0.43344723473375263,
+    "hi": 0.4324132969072212,
+    "excludes_zero": false
+   },
+   {
+    "feature": "log_rel_size",
+    "coef": 0.08310246313014616,
+    "lo": -0.3510653553810656,
+    "hi": 0.4702863420564788,
+    "excludes_zero": false
+   },
+   {
+    "feature": "conviction",
+    "coef": -0.1767407205573164,
+    "lo": -0.27645108770697396,
+    "hi": -0.09220213375140636,
+    "excludes_zero": true
+   },
+   {
+    "feature": "log_hours_to_end",
+    "coef": 0.017201719000334088,
+    "lo": -0.11538575264305816,
+    "hi": 0.1645859218415325,
+    "excludes_zero": false
+   },
+   {
+    "feature": "log_prior_markets",
+    "coef": 0.004027211754744354,
+    "lo": -0.03242956895512726,
+    "hi": 0.0445568587843228,
+    "excludes_zero": false
+   },
+   {
+    "feature": "prior_excess",
+    "coef": -0.0005127072289327787,
+    "lo": -0.04823177500567167,
+    "hi": 0.06229455961428458,
+    "excludes_zero": false
+   }
+  ],
+  "n_hours": 24,
+  "gamma": -5.042102706307714,
+  "unit_logloss_market": 0.43092138310977246,
+  "unit_logloss_model": 0.43233316922583204
+ },
  "forward": {
   "snapshot_utc": "2026-11-18T00:58:42Z",
   "commit": "d1e93d6b6451a6ea27d075a7c6cf6696bb7182bb",
