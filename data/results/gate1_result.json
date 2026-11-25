@@ -1,0 +1,279 @@
+{
+ "freeze_commit": "b7b8d636d90834ba14803eedf23c5b03c97e2ce4 2026-11-25T21:58:30+00:00",
+ "primary": {
+  "n_units": 443,
+  "n_markets": 556,
+  "n_episodes": 2083,
+  "estimate": -0.007928808718644058,
+  "ci_lo": -0.038106699576863946,
+  "ci_hi": 0.023083794587546023,
+  "t_p": 0.6119562009191565,
+  "mean_y": 0.2313970235237638,
+  "mean_pa": 0.20564036495045349
+ },
+ "decision": "NULL",
+ "secondary": [
+  {
+   "label": "market unit",
+   "n_units": 556,
+   "n_markets": 556,
+   "n_episodes": 2083,
+   "estimate": -0.019414381481071507,
+   "ci_lo": -0.04605784934024159,
+   "ci_hi": 0.008280784754636047,
+   "t_p": 0.15717212128544084,
+   "mean_y": 0.2313970235237638,
+   "mean_pa": 0.20564036495045349
+  },
+  {
+   "label": "series unit",
+   "n_units": 312,
+   "n_markets": 556,
+   "n_episodes": 2083,
+   "estimate": -0.008394262033809075,
+   "ci_lo": -0.04353951117522802,
+   "ci_hi": 0.028003368017824434,
+   "t_p": 0.6451500795153734,
+   "mean_y": 0.2313970235237638,
+   "mean_pa": 0.20564036495045349
+  },
+  {
+   "label": "t_a < T_dec - 24 h",
+   "n_units": 371,
+   "n_markets": 467,
+   "n_episodes": 1882,
+   "estimate": 0.011212832139843823,
+   "ci_lo": -0.025258812131455026,
+   "ci_hi": 0.048613005044073725,
+   "t_p": 0.5553677193602726,
+   "mean_y": 0.2385759829968119,
+   "mean_pa": 0.20956352625454813
+  },
+  {
+   "label": "$1,000, cap 0.35",
+   "n_units": 692,
+   "n_markets": 891,
+   "n_episodes": 3661,
+   "estimate": -0.008742452775078804,
+   "ci_lo": -0.03123045051672687,
+   "ci_hi": 0.014072009949783873,
+   "t_p": 0.44628833438194027,
+   "mean_y": 0.2223436219612128,
+   "mean_pa": 0.19596736808679188
+  },
+  {
+   "label": "$10,000, cap 0.35",
+   "n_units": 203,
+   "n_markets": 246,
+   "n_episodes": 701,
+   "estimate": 0.007371065168115474,
+   "ci_lo": -0.04048129723082392,
+   "ci_hi": 0.057936225552035404,
+   "t_p": 0.7708597895002945,
+   "mean_y": 0.25106990014265335,
+   "mean_pa": 0.21670657872792717
+  },
+  {
+   "label": "$2,500, cap 0.20",
+   "n_units": 313,
+   "n_markets": 390,
+   "n_episodes": 1179,
+   "estimate": -0.0026634493434133048,
+   "ci_lo": -0.034273634118058324,
+   "ci_hi": 0.030481293348913627,
+   "t_p": 0.8715197046381415,
+   "mean_y": 0.13061916878710772,
+   "mean_pa": 0.1291429724188691
+  },
+  {
+   "label": "category: military/government",
+   "n_units": 411,
+   "n_markets": 517,
+   "n_episodes": 1903,
+   "estimate": -0.007231750751291095,
+   "ci_lo": -0.038385701414193514,
+   "ci_hi": 0.0251448822475033,
+   "t_p": 0.6603182896850985,
+   "mean_y": 0.2422490803993694,
+   "mean_pa": 0.20755533270336
+  },
+  {
+   "label": "category: company",
+   "n_units": 23,
+   "n_markets": 26,
+   "n_episodes": 130,
+   "estimate": 0.0036156904251926055,
+   "ci_lo": -0.10374868439016428,
+   "ci_hi": 0.12720458635217924,
+   "t_p": 0.9530700513844541,
+   "mean_y": 0.13846153846153847,
+   "mean_pa": 0.20097228770771064
+  },
+  {
+   "label": "category: appointment",
+   "n_units": 7,
+   "n_markets": 10,
+   "n_episodes": 36,
+   "estimate": -0.10826232779516765,
+   "ci_lo": -0.22454747534358327,
+   "ci_hi": 0.03369294495056928,
+   "t_p": 0.18105847753069285,
+   "mean_y": 0.027777777777777776,
+   "mean_pa": 0.13441134893538462
+  },
+  {
+   "label": "category: award",
+   "n_units": 2,
+   "n_markets": 3,
+   "n_episodes": 14,
+   "estimate": 0.0672313556040329,
+   "ci_lo": -0.06748015160404705,
+   "ci_hi": 0.20194286281211285,
+   "t_p": 0.7053032425487168,
+   "mean_y": 0.14285714285714285,
+   "mean_pa": 0.17184829240173852
+  },
+  {
+   "label": "category: central bank",
+   "n_units": 0,
+   "n_markets": 0,
+   "n_episodes": 0
+  },
+  {
+   "label": "period P1",
+   "n_units": 373,
+   "n_markets": 446,
+   "n_episodes": 1595,
+   "estimate": -0.009314084994635997,
+   "ci_lo": -0.0426317891435226,
+   "ci_hi": 0.025470034891181135,
+   "t_p": 0.5890551743315902,
+   "mean_y": 0.2244514106583072,
+   "mean_pa": 0.20648365159591467
+  },
+  {
+   "label": "period P2",
+   "n_units": 77,
+   "n_markets": 110,
+   "n_episodes": 488,
+   "estimate": -0.009421509842353726,
+   "ci_lo": -0.07432569365153624,
+   "ci_hi": 0.06284012680703417,
+   "t_p": 0.7911065953852396,
+   "mean_y": 0.2540983606557377,
+   "mean_pa": 0.20288413093506297
+  },
+  {
+   "label": "v2's 165 markets (seen in v2 work)",
+   "n_units": 114,
+   "n_markets": 139,
+   "n_episodes": 784,
+   "estimate": 0.03388048640807181,
+   "ci_lo": -0.02230210070731292,
+   "ci_hi": 0.09336223360780306,
+   "t_p": 0.24565465016864835,
+   "mean_y": 0.22321428571428573,
+   "mean_pa": 0.1991841638861111
+  },
+  {
+   "label": "markets new in v3 (out of sample)",
+   "n_units": 350,
+   "n_markets": 417,
+   "n_episodes": 1299,
+   "estimate": -0.021369525256856058,
+   "ci_lo": -0.05533570932415006,
+   "ci_hi": 0.013935201594017456,
+   "t_p": 0.23078868564950508,
+   "mean_y": 0.2363356428021555,
+   "mean_pa": 0.20953694819482943
+  }
+ ],
+ "calibration": [
+  {
+   "band": "0.0-0.1",
+   "n": 401,
+   "mean_pa": 0.062374702324016644,
+   "mean_y": 0.07481296758104738,
+   "excess": 0.012438265257030734
+  },
+  {
+   "band": "0.1-0.2",
+   "n": 581,
+   "mean_pa": 0.14906591314745898,
+   "mean_y": 0.14113597246127366,
+   "excess": -0.007929940686185322
+  },
+  {
+   "band": "0.2-0.3",
+   "n": 641,
+   "mean_pa": 0.2494861045544582,
+   "mean_y": 0.296411856474259,
+   "excess": 0.04692575191980078
+  },
+  {
+   "band": "0.3-0.4",
+   "n": 433,
+   "mean_pa": 0.3346230534503433,
+   "mean_y": 0.3903002309468822,
+   "excess": 0.055677177496538895
+  },
+  {
+   "band": "0.4-0.5",
+   "n": 27,
+   "mean_pa": 0.4413686613994034,
+   "mean_y": 0.4074074074074074,
+   "excess": -0.033961253991996
+  }
+ ],
+ "ffic": [
+  {
+   "case": "fficd-001 2024 U.S. Presidential Election",
+   "markets": 3,
+   "episodes": 44,
+   "with_outcome": 0,
+   "mean_excess": null
+  },
+  {
+   "case": "fficd-002 October 2024 Iran strike on Israel",
+   "markets": 1,
+   "episodes": 2,
+   "with_outcome": 0,
+   "mean_excess": null
+  },
+  {
+   "case": "fficd-003 2026 U.S.-Iran Conflict Cluster",
+   "markets": 5,
+   "episodes": 35,
+   "with_outcome": 33,
+   "mean_excess": 0.690853738775955
+  },
+  {
+   "case": "fficd-004 January 2026 U.S.\u2013Venezuela / Maduro operation cluster",
+   "markets": 9,
+   "episodes": 42,
+   "with_outcome": 30,
+   "mean_excess": -0.11537137601239861
+  },
+  {
+   "case": "fficd-005 Bitcoin ETF SEC approval",
+   "markets": 1,
+   "episodes": 1,
+   "with_outcome": 0,
+   "mean_excess": null
+  },
+  {
+   "case": "fficd-007 FTX / SBF case cluster",
+   "markets": 3,
+   "episodes": 12,
+   "with_outcome": 9,
+   "mean_excess": -0.0488149101209544
+  },
+  {
+   "case": "fficd-008 Romanian presidential election 2024-2025",
+   "markets": 1,
+   "episodes": 3,
+   "with_outcome": 0,
+   "mean_excess": null
+  }
+ ]
+}

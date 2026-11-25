@@ -321,3 +321,11 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Frozen.** Primary: core universe, main definition, t_a < T_dec, event as the unit, mean of (outcome - p_a), 95% event bootstrap CI (10,000 resamples, seed 20261125). POSITIVE if CI > 0, NEGATIVE if CI < 0, otherwise NULL. Secondary analyses are listed in advance and decide nothing.
 - **Inputs fixed by hash.** `src/feasibility_gate1.py` now also writes the blind episode table `data/v3/episodes.csv.gz` (no outcome). The feasibility report is byte-identical after this change. Hashes of the episode table, `market_info.csv` and the script are in the freeze file; the run script checks them before loading outcomes.
 - **Stated.** The 165 v2 markets' outcomes were used in the v2 model work (2026-11-18). A secondary row separates them from the markets new in v3.
+
+### 2026-11-25 - Gate 1 run (once, as frozen)
+- **Run.** `src/gate1_run.py` was run once after the freeze commit b7b8d63 was pushed. Input hashes matched. No code, parameter or data was changed after the outcomes were loaded.
+- **Primary result: NULL.** 443 events, 556 markets, 2,083 episodes. Event-level mean excess -0.008, 95% CI -0.038 to +0.023, t-test p = 0.61. Alert sides do not win more often than the price right after the alert implies, at an MDE of about 0.04 to 0.05.
+- **Stated plainly.** At the episode level the alert side won 0.231 vs a mean p_a of 0.206 (+0.025). Weighting each event equally gives -0.008. The frozen estimator is the event one; the episode-level gap is driven by events with many episodes and is not the test.
+- **Secondary (decide nothing).** Every CI includes zero: market unit, series unit, 24 h-before-T_dec, the three variants, every category and both periods. Markets new in v3 (out of sample): -0.021 (CI -0.055 to +0.014). v2's 165 markets: +0.034 (CI -0.022 to +0.093); these were seen in the v2 work. Calibration bands 0.2-0.4 show +0.05; descriptive only.
+- **FFIC (descriptive only).** The 2026 US-Iran cluster shows +0.69 mean excess (5 markets, 33 episodes with outcome). Venezuela/Maduro cluster: -0.12 (30 episodes); SBF/FTX: -0.05 (9). These are hindsight-selected documented cases, not a test. FFIC markets outside v2's candidate list have no outcome in this data and were not looked up.
+- **Output.** `data/results/gate1_result.md`/`.json`.
