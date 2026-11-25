@@ -186,6 +186,10 @@ L.append("\nThe full list, with the reason for each market, is in `data/v2/fills
 # 2 counts
 heads = ["category", "period", "markets", "events", "markets with ep.", "events with ep.", "episodes", "wallets", "markets with ep. (24 h)", "events with ep. (24 h)", "episodes (24 h)", "wallets (24 h)"]
 cols = ["cat", "period", "markets", "events", "mkts_ep", "ev_ep", "episodes", "wallets", "mkts_ep24", "ev_ep24", "episodes24", "wallets24"]
+# episode table for the frozen Gate 1 run (blind: no outcome here)
+ep_rows = [dict(conditionId=cid, definition=dn, side=e["side"], t_a=e["t_a"], p_a=e["p_a"], pa_src=e["pa_src"], n_wallets=len(e["wallets"]),
+                keep=e["keep"], keep24=e["keep24"]) for (cid, dn), eps in res.items() for e in eps]
+pd.DataFrame(ep_rows).sort_values(["definition", "conditionId", "t_a", "side"]).to_csv(DATA / "v3" / "episodes.csv.gz", index=False, compression="gzip")
 out_json = {}
 for dn in DEFS:
     rows = count_rows(dn, core, CATS, ("P1", "P2"))
