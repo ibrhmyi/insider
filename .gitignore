@@ -7,3 +7,6 @@ data/raw/v2_gamma_vol/
 data/v2/buys.csv.gz
 data/v2/*stdout.log
 data/raw/v2_gamma_all.json
+data/v3/fetch_heartbeat.json
+data/v3/fetch_stdout.log
+data/v3/*.jsonl
