@@ -1,0 +1,20 @@
+[
+ {
+  "mode": "fetch_log",
+  "started_utc": "2026-11-25T01:44:29Z",
+  "elapsed_s": 2330,
+  "workers": 6,
+  "requests": 30753,
+  "errors": 2,
+  "retries": 2,
+  "pause_s": 4.0,
+  "error_kinds": {
+   "network:ProxyError": 2
+  },
+  "markets": 2080,
+  "status": {
+   "ok": 2080
+  },
+  "largest_pages": 5110
+ }
+]

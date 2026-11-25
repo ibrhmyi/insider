@@ -173,8 +173,8 @@ L.append(f"- **Exact fills everywhere; no proxy.** All maker and taker fills wer
 c = coreall
 ok = c[c.status == "ok"]
 L.append("## 1. Data integrity\n")
-L.append(f"- Fetch status (core): {c.status.value_counts().to_dict()}. Largest page count: {int(ok.pages.max()):,} (cursor pagination; no cap for the over-$12M set). Run totals are in the process log and `data/v3/fetch_run_log.json`.\n"
-         f"- Gamma start date vs first fill: median {((ok.first_fill_ts - ok.start_ts) / 3600).median():.1f} h after the start; {int(((ok.first_fill_ts - ok.start_ts) > 7 * DAY).sum())} markets have their first fill more than 7 days after the start; {int(((ok.first_fill_ts - ok.start_ts) < -DAY).sum())} have fills more than 1 day before the Gamma start date.\n"
+L.append(f"- Fetch status (core): {c.status.value_counts().to_dict()}. Largest page count: {int(ok.pages.max()):,} in the core set, {int(allm.pages.max()):,} over all fetched markets incl. FFIC (cursor pagination; no cap for the over-$12M, v1 and FFIC sets). No v2-rule market reached the 400-page cap. Run totals are in the process log and `data/v3/fetch_run_log.json`.\n"
+         f"- Gamma start date vs first fill: median {((ok.first_fill_ts - ok.start_ts) / 3600).median():.1f} h after the start; {int(((ok.first_fill_ts - ok.start_ts) > 7 * DAY).sum())} markets have their first fill more than 7 days after the start; {int(((ok.first_fill_ts - ok.start_ts) < -DAY).sum())} market(s) have fills more than 1 day before the Gamma start date.\n"
          f"- Last fill vs resolution: median {((ok.res_ts - ok.last_fill_ts) / 3600).median():.1f} h before; {int(((ok.res_ts - ok.last_fill_ts) > 2 * DAY).sum())} markets have their last fill more than 2 days before resolution.\n"
          f"- Earliest first fill: {iso(ok.first_fill_ts.min())}. `/v2/trades` serves a fixed window of about three years, so no core market is cut at the start.\n"
          f"- Largest gap between fills before T_dec: median {ok.max_gap_pre_dec_h.median():.1f} h; {int((ok.max_gap_pre_dec_h > 7 * 24).sum())} markets have a gap of more than 7 days. Thin markets trade rarely, so a gap is not by itself missing data.\n"
@@ -206,7 +206,7 @@ L.append(f"\np_a source (main): {src} (10min = fills in the 10 minutes after t_a
 # 4 power
 L.append("\n## 4. Power from p_a only (no outcomes)\n\nExcess per episode = outcome - p_a; under no edge its variance is p_a(1 - p_a). The unit's mean excess = the mean over its episodes; the cell estimate = the mean over units with at least one episode. MDE = 2.8 x SE (5% two-sided, 80% power). "
          "**indep.** treats a unit's episodes as independent (variance of the unit mean = sum p(1-p) / n^2). **corr.** treats them as fully dependent (variance = mean p(1-p)), because same-side episodes in one market share an outcome and markets in one event are linked. The truth lies between the two, near corr. for events. "
-         "Market unit = each market. Event unit = Gamma event id: all episodes of the event's markets in the cell are pooled, then averaged across events. Series = Gamma series where there is one (else the event), shown for the pooled row only.\n")
+         "Market unit = each market. Event unit = Gamma event id: all episodes of the event's markets in the cell are pooled, then averaged across events. Series = Gamma series where there is one (else the event), shown for the pooled row only (n/a in category rows).\n")
 pc = ["cat", "period", "nm", "ne", "n", "m_i", "m_c", "e_i", "e_c", "ns", "s_c"]
 ph = ["category", "period", "markets with ep.", "events with ep.", "episodes", "MDE market indep.", "MDE market corr.", "MDE event indep.", "MDE event corr.", "series with ep.", "MDE series corr."]
 for dn in DEFS:

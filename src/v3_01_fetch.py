@@ -102,6 +102,8 @@ if A.manifest:
 else:
     tg = pd.read_csv(OUT / "targets.csv").sort_values("volumeNum", ascending=False)  # biggest first: they run longest
     todo = tg[["conditionId", "max_pages"]].to_dict("records")
+if not todo:
+    print("nothing to fetch: the cache matches", flush=True); sys.exit(0)
 with ThreadPoolExecutor(A.workers) as ex: list(ex.map(work, todo))
 el = time.time() - T0
 name = "rebuild_log" if A.manifest else "fetch_log"
