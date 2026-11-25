@@ -10,14 +10,16 @@ chain into one episode while consecutive triggers are <= 24 h apart; t_a = first
 p_a = size-weighted price (in the episode's token) of all fills in (t_a, t_a + 10 min]; else last fill before t_a;
 else the trigger fill. Keep p_a < 0.50 and t_a < T_dec; second version also needs t_a < T_dec - 24 h.
 
-v2 markets: exact if data/raw/v2_fills/<conditionId>.csv.gz exists, else a PROXY from data/v2/positions.csv.gz."""
+Markets: data/v3/market_info.csv (core = v2's 165 + unfetched military/government + military/government over $12M + v1;
+plus FFIC markets, reported separately). Fills: exact, from the local cache data/raw/v2_fills/ (rebuild from
+data/v2/fills_manifest.csv with `python src/v3_01_fetch.py --manifest`). No proxy. Power by market and by Gamma event."""
 import json, math
 from pathlib import Path
 import numpy as np, pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]; DATA = ROOT / "data"; OUT = DATA / "results"
 DAY, TEN = 86400, 600
-P1_END = pd.Timestamp("2026-05-06", tz="UTC").timestamp()  # P1: resolved 2025-01-01 .. 2026-05-05; P2: 2026-05-06 .. 2026-10-31
+P1_END = pd.Timestamp("2026-05-06", tz="UTC").timestamp(); PRE2025 = pd.Timestamp("2025-01-01", tz="UTC").timestamp()  # P1: resolved 2025-01-01 .. 2026-05-05; P2: 2026-05-06 .. 2026-10-31
 CATS = ["military_gov", "company", "appointment", "award_committee", "central_bank"]
 CATNAME = dict(military_gov="military/government", company="company", appointment="appointment", award_committee="award", central_bank="central bank")
 DEFS = {"main ($2,500, cap 0.35)": (2500, .35), "$1,000, cap 0.35": (1000, .35), "$10,000, cap 0.35": (10000, .35), "$2,500, cap 0.20": (2500, .20)}
@@ -71,215 +73,171 @@ def episodes_from_fills(f, t_dec, T, cap):
                             keep=(pa < .5) and (ta < t_dec), keep24=(pa < .5) and (ta < t_dec - DAY)))
     return eps
 
-def episodes_proxy(p, t_dec, T, cap):
-    """PROXY from position aggregates up to T_dec (net-long-at-close units only; no fills). A unit counts if all its
-    pre-T_dec buys lie within 24 h, it did not sell before T_dec, USD bought >= T and its buy VWAP <= cap.
-    t_a ~ last pre-T_dec buy (t_a can only be earlier); p_a ~ the wallet's own buy VWAP (true p_a unknown)."""
-    q = p[(p.usd_bought_dec >= T) & (p.vwap_dec <= cap) & (p.last_buy_ts_dec - p.first_buy_ts_dec <= DAY)
-          & (p.net_shares_dec >= p.shares_bought_dec * (1 - 1e-6))]
-    eps = []
-    for s, g in q.groupby("side_name"):
-        g = g.sort_values("last_buy_ts_dec"); t = g.last_buy_ts_dec.values
-        start = np.r_[True, np.diff(t) > DAY]; gid = np.cumsum(start)
-        for k in np.unique(gid):
-            gg = g[gid == k]; ta = float(gg.last_buy_ts_dec.iloc[0])
-            pa = float((gg.usd_bought_dec.sum()) / gg.shares_bought_dec.sum())
-            eps.append(dict(side=s, t_a=ta, p_a=pa, pa_src="proxy_vwap", wallets=sorted(gg.proxy_wallet),
-                            keep=(pa < .5) and (ta < t_dec), keep24=(pa < .5) and (ta < t_dec - DAY)))
-    return eps
 
 # ---------------- load (blind) ----------------
-mi = pd.read_csv(DATA / "v2" / "market_info.csv", usecols=safe)
-rk = pd.read_csv(DATA / "v2" / "markets_ranked.csv", usecols=safe, dtype={"yes_token": str, "no_token": str})
-cand = pd.read_csv(DATA / "v2" / "markets_candidates.csv", usecols=safe)
-fl = pd.read_csv(DATA / "v2" / "fetch_log.csv", usecols=safe)
-dlog = json.load(open(DATA / "v2" / "data_log.json"))
-assert not (BANNED & (set(mi) | set(rk) | set(cand) | set(fl)))
-mi = mi.merge(rk[["conditionId", "end_ts", "closed_ts", "yes_token", "no_token"]], on="conditionId", how="left").merge(fl[["conditionId", "pages", "rows"]], on="conditionId", how="left")
-
 fill_dir = DATA / "raw" / "v2_fills"
-have_fills = {c for c in mi.conditionId if (fill_dir / f"{c}.csv.gz").exists()}
-pos = None
-if len(have_fills) < len(mi):
-    pos = pd.read_csv(DATA / "v2" / "positions.csv.gz", usecols=safe)
-    assert not (BANNED & set(pos))
-    pos = pos[pos.usd_bought_dec.notna()]
+mi = pd.read_csv(DATA / "v3" / "market_info.csv", usecols=safe, dtype={"event_id": str, "series_id": str})
+tg = pd.read_csv(DATA / "v3" / "targets.csv", usecols=["conditionId", "yes_token", "no_token"], dtype=str).set_index("conditionId")
+cand = pd.read_csv(DATA / "v2" / "markets_candidates.csv", usecols=safe)
+rk = pd.read_csv(DATA / "v2" / "markets_ranked.csv", usecols=safe)
+fm = pd.read_csv(DATA / "v3" / "ffic_match.csv", usecols=["case_id", "case_title", "prefix", "label", "conditionId", "matched_by"])
+assert not (BANNED & (set(mi) | set(cand) | set(rk) | set(fm)))
+CORE = ("v2_165", "mil_rest", "mil_over12m", "v1")
+mi["core"] = mi.source.map(lambda s: any(k in s for k in CORE))
+mi["ffic"] = mi.source.str.contains("ffic")
+mi["period"] = mi.res_ts.map(lambda t: "pre-2025" if t < PRE2025 else period(t))
+mi["event_unit"] = mi.event_id.fillna("m:" + mi.conditionId)
+mi["series_unit"] = np.where(mi.series_id.notna(), "s:" + mi.series_id.astype(str), "e:" + mi.event_unit)
 
-V1 = dict(iran="military_gov", maduro="military_gov", nobel="award_committee")
-v1m = pd.read_csv(DATA / "markets.csv", usecols=["market_key", "market_name", "condition_id", "open_utc", "end_date_utc", "closed_utc", "resolution_utc", "first_news_utc"]).set_index("market_key")
-ep = lambda s: pd.Timestamp(s).timestamp()
+def run_market(cid):
+    r = mi.set_index("conditionId").loc[cid]; tk = tg.loc[cid]
+    d = pd.read_csv(fill_dir / f"{cid}.csv.gz", dtype={"token_id": str}, usecols=["proxy_wallet", "token_id", "timestamp", "size", "price", "side"])
+    d["tok"] = np.where(d.token_id == tk.yes_token, "Yes", np.where(d.token_id == tk.no_token, "No", "?"))
+    f = d[d.tok != "?"].rename(columns=dict(proxy_wallet="wallet", timestamp="ts"))
+    return cid, {dn: episodes_from_fills(f, r.t_dec, T, cap) for dn, (T, cap) in DEFS.items()}
 
-markets, integ = [], []  # markets: dict(id, name, cat, period, source, t_dec, fills|pos)
-for r in mi.itertuples():
-    src = "exact" if r.conditionId in have_fills else "proxy"
-    markets.append(dict(id=r.conditionId, name=r.question, cat=r.category, period=period(r.res_ts), source=src, t_dec=r.t_dec))
-    integ.append(dict(market=r.question[:70], set="v2", cat=r.category, open="not saved", first_fill=r.first_fill_ts, last_fill=r.last_fill_ts,
-                      end=r.end_ts, closed=r.closed_ts, t_dec=r.t_dec, n_fills=r.n_fills, pages=r.pages, fills_here=src == "exact"))
-for k, cat in V1.items():
-    m = v1m.loc[k]
-    f = pd.read_csv(DATA / "clean" / f"v1_fills_{k}.csv", usecols=["proxy_wallet", "timestamp", "size", "price", "side", "outcome"])  # outcome = token label Yes/No, not the result
-    f = f.rename(columns=dict(proxy_wallet="wallet", timestamp="ts", outcome="tok"))
-    t_dec = ep(m.first_news_utc)
-    markets.append(dict(id=m.condition_id, name=m.market_name, cat=cat, period=period(ep(m.resolution_utc)), source="exact (v1)", t_dec=t_dec, fills=f))
-    pre = np.sort(f.ts[f.ts < t_dec].unique())
-    integ.append(dict(market=m.market_name[:70], set="v1", cat=cat, open=ep(m.open_utc), first_fill=f.ts.min(), last_fill=f.ts.max(), end=ep(m.end_date_utc),
-                      closed=ep(m.closed_utc), t_dec=t_dec, n_fills=len(f), pages=None, fills_here=True, max_gap_h=float(np.diff(pre).max() / 3600) if len(pre) > 1 else None))
-
-def load_v2_fills(m):
-    r = mi.set_index("conditionId").loc[m["id"]]
-    d = pd.read_csv(fill_dir / f"{m['id']}.csv.gz", dtype={"token_id": str}, usecols=["proxy_wallet", "token_id", "timestamp", "size", "price", "side"])
-    d["tok"] = np.where(d.token_id == r.yes_token, "Yes", np.where(d.token_id == r.no_token, "No", "?"))
-    return d[d.tok != "?"].rename(columns=dict(proxy_wallet="wallet", timestamp="ts"))
-
-# ---------------- run ----------------
+use = mi[(mi.core | mi.ffic) & ~mi.excluded]
+missing = [c for c in use.conditionId if not (fill_dir / f"{c}.csv.gz").exists()]
+assert not missing, f"{len(missing)} fill files missing: rebuild the cache with `python src/v3_01_fetch.py --manifest`"
 res = {}
-posg = dict(tuple(pos.groupby("conditionId"))) if pos is not None else {}
-for m in markets:
-    if m["source"] != "proxy":
-        f = m.get("fills")
-        if f is None:
-            f = load_v2_fills(m)
-            ii = next(i for i in integ if i["market"] == m["name"][:70]); pre = np.sort(f.ts[f.ts < m["t_dec"]].unique())
-            ii["max_gap_h"] = float(np.diff(pre).max() / 3600) if len(pre) > 1 else None
-        for dn, (T, cap) in DEFS.items(): res[(m["id"], dn)] = episodes_from_fills(f, m["t_dec"], T, cap)
-    else:
-        p = posg.get(m["id"], pos.iloc[:0])
-        for dn, (T, cap) in DEFS.items(): res[(m["id"], dn)] = episodes_proxy(p, m["t_dec"], T, cap)
+from concurrent.futures import ProcessPoolExecutor  # fork: workers inherit the loaded tables
+with ProcessPoolExecutor(4) as ex:
+    for cid, out in ex.map(run_market, use.conditionId.tolist(), chunksize=4):
+        for dn, eps in out.items(): res[(cid, dn)] = eps
 
-# ---------------- tables ----------------
-def cell_rows(dn, key, subset):
+mrec = use.set_index("conditionId")
+def M(subset): return [dict(id=c, cat=r.category, period=r.period, ev=r.event_unit, se=r.series_unit) for c, r in subset.iterrows()]
+core = M(mrec[mrec.core]); ffic = M(mrec[mrec.ffic])
+
+def var_parts(pas):
+    """pas: list of p_a lists, one per unit. Returns (SE indep, SE corr, n units)."""
+    pas = [v for v in pas if v]; U = len(pas)
+    if not U: return None, None, 0
+    si = math.sqrt(sum(sum(p * (1 - p) for p in v) / len(v) ** 2 for v in pas)) / U
+    sc = math.sqrt(sum(float(np.mean([p * (1 - p) for p in v])) for v in pas)) / U
+    return si, sc, U
+
+def units(ms, dn, key, unit):
+    g = {}
+    for m in ms:
+        g.setdefault(m[unit], []).extend(e["p_a"] for e in res[(m["id"], dn)] if e[key])
+    return list(g.values())
+
+def count_rows(dn, ms_all, cats, periods):
     rows = []
-    for c in CATS:
-        for per in ("P1", "P2"):
-            ms = [m for m in subset if m["cat"] == c and m["period"] == per]
-            E = {m["id"]: [e for e in res[(m["id"], dn)] if e[key]] for m in ms}
-            wal = {w for es in E.values() for e in es for w in e["wallets"]}
-            pas = {i: [e["p_a"] for e in es] for i, es in E.items() if es}
-            v_ind = [sum(p * (1 - p) for p in v) / len(v) ** 2 for v in pas.values()]     # episodes independent
-            v_cor = [float(np.mean([p * (1 - p) for p in v])) for v in pas.values()]       # episodes fully correlated within market
-            M = len(pas)
-            se_i = math.sqrt(sum(v_ind)) / M if M else None; se_c = math.sqrt(sum(v_cor)) / M if M else None
-            rows.append(dict(cat=CATNAME[c], period=per, markets=len(ms), mkts_ep=M, episodes=sum(len(v) for v in E.values()), wallets=len(wal),
-                             se_ind=se_i, mde_ind=2.8 * se_i if se_i else None, se_cor=se_c, mde_cor=2.8 * se_c if se_c else None))
+    for c in cats:
+        for per in periods:
+            ms = [m for m in ms_all if (c is None or m["cat"] == c) and m["period"] == per]
+            if not ms: continue
+            row = dict(cat=CATNAME.get(c, c) if c else "all", period=per, markets=len(ms), events=len({m["ev"] for m in ms}))
+            for key, sfx in (("keep", ""), ("keep24", "24")):
+                E = {m["id"]: [e for e in res[(m["id"], dn)] if e[key]] for m in ms}
+                row["mkts_ep" + sfx] = sum(1 for v in E.values() if v)
+                row["ev_ep" + sfx] = len({m["ev"] for m in ms if E[m["id"]]})
+                row["episodes" + sfx] = sum(map(len, E.values()))
+                row["wallets" + sfx] = len({w for v in E.values() for e in v for w in e["wallets"]})
+            rows.append(row)
+    return rows
+
+def power_rows(dn, key, ms_all):
+    rows = []
+    for c in CATS + [None]:
+        for per in ("P1", "P2", "both"):
+            ms = [m for m in ms_all if (c is None or m["cat"] == c) and (per == "both" or m["period"] == per)]
+            if not ms or (c is None and per != "both"): continue
+            mi_, mc, nm = var_parts(units(ms, dn, key, "id")); ei, ec, ne = var_parts(units(ms, dn, key, "ev"))
+            row = dict(cat=CATNAME[c] if c else "all categories", period=per, nm=nm, ne=ne, n=sum(len(v) for v in units(ms, dn, key, "id")),
+                       m_i=2.8 * mi_ if mi_ else None, m_c=2.8 * mc if mc else None, e_i=2.8 * ei if ei else None, e_c=2.8 * ec if ec else None)
+            if c is None:
+                si, sc, ns = var_parts(units(ms, dn, key, "se")); row.update(ns=ns, s_c=2.8 * sc if sc else None)
+            rows.append(row)
     return rows
 
 fmt = lambda x, d=3: "n/a" if x is None or (isinstance(x, float) and math.isnan(x)) else (f"{x:.{d}f}" if isinstance(x, float) else f"{x:,}" if isinstance(x, (int, np.integer)) else str(x))
 def md_table(rows, cols, heads):
     s = "| " + " | ".join(heads) + " |\n|" + "---|" * len(heads) + "\n"
-    return s + "".join("| " + " | ".join(fmt(r[c]) for c in cols) + " |\n" for r in rows)
+    return s + "".join("| " + " | ".join(fmt(r.get(c)) for c in cols) + " |\n" for r in rows)
 
-v2set = [m for m in markets if m["source"] != "exact (v1)"]; v1set = [m for m in markets if m["source"] == "exact (v1)"]
-n_exact_v2 = sum(m["source"] == "exact" for m in v2set)
+allm = mi[mi.core | mi.ffic]; coreall = mi[mi.core]
 L = []
-L.append(f"# Gate 1 feasibility check (draft episode definition)\n\nGenerated by `src/feasibility_gate1.py`. Feasibility only: counts, prices at alert and power. **No outcome was looked at**: no won/lost flag, outcome price, payout, PnL or win rate was loaded, joined, printed or computed. Outcome columns are dropped at load (`{', '.join(sorted(BANNED))}`). Resolution *dates* are used only to assign the period.\n")
-L.append("## 0. Read this first: what is exact and what is a proxy\n")
-L.append(f"- **v1 markets (Maduro, Nobel, Iran): exact.** Every maker and taker fill is in the repo (`data/clean/v1_fills_*.csv`). T_dec = the first public news time in `data/markets.csv` (the v1 decision time).\n"
-         f"- **v2 markets (165): {'exact' if n_exact_v2 == len(v2set) else 'PROXY'}.** {n_exact_v2} of {len(v2set)} have fills in this container. "
-         + ("" if n_exact_v2 == len(v2set) else "The v2 fill cache `data/raw/v2_fills/` is git-ignored and was never committed, so it is not in this container. The brief says fetch nothing new, so nothing was re-fetched. For those markets the episode counts below come from `data/v2/positions.csv.gz` (wallet x market x side aggregates up to T_dec). That proxy (a) only sees wallets still net long at close (244,312 sold-out units are missing), (b) only counts a wallet whose pre-T_dec buys all fall inside 24 h with no sells, (c) sets t_a to the wallet's last pre-T_dec buy (the true t_a can only be earlier) and (d) sets p_a to the wallet's own buy VWAP, because the market price in the 10 minutes after t_a needs the fills. **The proxy undercounts episodes and wallets, and its p_a is not the specified p_a.** Rerunning this script after re-pulling the 165 fill files gives the exact numbers without any code change. Section 5 gives the time estimate.")
-         + "\n- Main definition: $2,500 of net buys within 24 h at a buy VWAP <= 0.35. Variants: $1,000 and $10,000 at a cap of 0.35, and $2,500 at a cap of 0.20. Every count is shown twice: episodes with t_a < T_dec, and episodes with t_a < T_dec - 24 h.\n"
-         "- Definition choices made here (the draft did not fix them): net buys = buy USD minus sell USD of the same token by the same wallet in the window. VWAP = the wallet's buy VWAP in the window. A trigger is the buy fill where the condition first becomes true (it must turn false and then true again to trigger again). Episodes chain: same side, consecutive triggers <= 24 h apart. p_a uses fills strictly after t_a; 'last fill before t_a' means strictly earlier; if there is none, the trigger fill's price is used.\n")
+L.append(f"# Gate 1 feasibility check (draft episode definition), v2: exact fills, larger universe\n\nGenerated by `src/feasibility_gate1.py`. Feasibility only: counts, prices at alert and power. **No outcome was looked at**: no won/lost flag, outcome price, payout, PnL or win rate was loaded, joined, printed or computed. Outcome columns are dropped at load (`{', '.join(sorted(BANNED))}`). Resolution *dates* are used only to assign the period. Gate 1 itself was not run.\n")
+L.append("## 0. What changed since the first version\n")
+L.append(f"- **Exact fills everywhere; no proxy.** All maker and taker fills were fetched from `/v2/trades` into the local cache (see `data/v2/fills_manifest.csv`; rebuild with `python src/v3_01_fetch.py --manifest`). The episode code is unchanged.\n"
+         f"- **Universe ('core', {int(coreall.shape[0]):,} markets fetched or attempted):** the 165 v2 markets; every military/government market in v2's ranked list that v2 had not fetched (1,835); the 58 military/government markets over $12M that Amendment B excluded (no page cap); the v1 Maduro, Nobel and Iran markets. **FFIC markets** ({int(mi.ffic.sum())}) are reported in their own block (section 6) and enter the core tables only if they are also in the core set. Each market is counted once: the first version counted Nobel twice (it is both a v1 market and one of the 165).\n"
+         f"- **Exclusions.** A market is excluded if T_dec is within 24 h of its first fill (no usable pre-decision period), if the fetch failed or hit the 400-page cap (v2 rule sets only), or if it has no fills before the cutoff. {int((coreall.excluded).sum()):,} core markets are excluded; reasons in section 1.\n"
+         "- **Event unit.** Every market has Gamma's `event_id`. Power is reported with the market as the unit and with the event as the unit (episodes pooled within event, then averaged across events). Gamma often puts 'by Friday' and 'by Sunday' markets in *different* events that share a Gamma *series*. A series-level row (series id where Gamma has one, else the event) is added as a sensitivity check.\n"
+         "- T_dec: price-path rule from v2 (the rolling median Yes price leaves 0.05 to 0.95 for good, before resolution minus 1 h). v1 markets use the first news time.\n"
+         "- Definition details, unchanged from the first version: net buys = buy USD minus sell USD of the same token by the same wallet in the 24 h window. VWAP = the wallet's buy VWAP in that window. A trigger is a rising edge at a buy fill. Episodes chain same-side triggers that are <= 24 h apart. p_a is taken from fills strictly after t_a, then the last fill strictly before t_a, then the trigger fill.\n")
 
 # 1 integrity
-L.append("## 1. Data integrity per market\n")
-I = pd.DataFrame(integ)
-v1i = I[I.set == "v1"]
-L.append("**v1 (exact fills):**\n\n| market | open | first fill | last fill | end date | closed | T_dec | fills | largest gap before T_dec (h) |\n|---|---|---|---|---|---|---|---|---|\n" +
-         "".join(f"| {r.market} | {iso(r.open)} | {iso(r.first_fill)} | {iso(r.last_fill)} | {iso(r.end)} | {iso(r.closed)} | {iso(r.t_dec)} | {r.n_fills:,} | {fmt(r.max_gap_h, 1)} |\n" for r in v1i.itertuples()))
-v2i = I[I.set == "v2"].copy()
-v2i["life_d"] = (v2i.closed - v2i.first_fill) / DAY
-v2i["pre_dec_d"] = (v2i.t_dec - v2i.first_fill) / DAY
-v2i["tail_d"] = (v2i.closed - v2i.last_fill) / DAY
-probs = []
-for r in v2i.itertuples():
-    why = []
-    if pd.isna(r.t_dec): why.append("T_dec missing")
-    if r.pre_dec_d < 1: why.append(f"T_dec {r.pre_dec_d * 24:.0f} h after first fill (no usable pre-decision period)")
-    if r.t_dec >= r.closed - 3600 - 1: why.append("T_dec = cutoff (price never left 0.05-0.95 before close - 1 h)")
-    if r.tail_d > 2: why.append(f"last fill {r.tail_d:.1f} d before close")
-    if r.pages is not None and r.pages >= 400: why.append("hit 400-page cap")
-    if not r.fills_here: pass
-    if why: probs.append((r.market, iso(r.first_fill), iso(r.t_dec), "; ".join(why)))
-L.append(f"\n**v2 (165 markets).** Gamma open date (`startDate`) was not saved in the v2 files, so the first fill stands in for the open; first fill vs open cannot be checked without a new Gamma call. "
-         f"Fetch: all 165 'ok', max pages {int(v2i.pages.max())} (cap 400, none hit), 0 HTTP errors (v2 log). `/v2/trades` uses cursor pagination with no offset cap. T_dec present for {int(v2i.t_dec.notna().sum())}/165. "
-         f"Fill-level gap checks need the fills: {'done' if n_exact_v2 else 'not possible here'}. Markets with no fills before the cutoff: {len(dlog.get('markets_no_pre_cutoff_fills', []))}.\n\n"
-         f"- Life (first fill to close), days: median {v2i.life_d.median():.0f}, min {v2i.life_d.min():.1f}, max {v2i.life_d.max():.0f}.\n"
-         f"- First fill to T_dec, days: median {v2i.pre_dec_d.median():.1f}, min {v2i.pre_dec_d.min():.2f}.\n"
-         f"- Last fill to close, days: median {v2i.tail_d.median():.2f}, max {v2i.tail_d.max():.1f}.\n"
-         f"- Earliest first fill: {iso(v2i.first_fill.min())} (the `/v2/trades` three-year window starts about Nov 2023, so no market is cut at the start).\n\n"
-         f"**Problem markets ({len(probs)}):**\n\n| market | first fill | T_dec | problem |\n|---|---|---|---|\n" + "".join(f"| {a} | {b} | {c} | {d} |\n" for a, b, c, d in probs))
-if v1i.max_gap_h.max() > 48: L.append("\nv1 gap note: a gap of more than 48 h before T_dec is in the table above; on thin early markets this is quiet trading, not missing data (cursor pagination returned every page).\n")
+c = coreall
+ok = c[c.status == "ok"]
+L.append("## 1. Data integrity\n")
+L.append(f"- Fetch status (core): {c.status.value_counts().to_dict()}. Largest page count: {int(ok.pages.max()):,} (cursor pagination; no cap for the over-$12M set). Run totals are in the process log and `data/v3/fetch_run_log.json`.\n"
+         f"- Gamma start date vs first fill: median {((ok.first_fill_ts - ok.start_ts) / 3600).median():.1f} h after the start; {int(((ok.first_fill_ts - ok.start_ts) > 7 * DAY).sum())} markets have their first fill more than 7 days after the start; {int(((ok.first_fill_ts - ok.start_ts) < -DAY).sum())} have fills more than 1 day before the Gamma start date.\n"
+         f"- Last fill vs resolution: median {((ok.res_ts - ok.last_fill_ts) / 3600).median():.1f} h before; {int(((ok.res_ts - ok.last_fill_ts) > 2 * DAY).sum())} markets have their last fill more than 2 days before resolution.\n"
+         f"- Earliest first fill: {iso(ok.first_fill_ts.min())}. `/v2/trades` serves a fixed window of about three years, so no core market is cut at the start.\n"
+         f"- Largest gap between fills before T_dec: median {ok.max_gap_pre_dec_h.median():.1f} h; {int((ok.max_gap_pre_dec_h > 7 * 24).sum())} markets have a gap of more than 7 days. Thin markets trade rarely, so a gap is not by itself missing data.\n"
+         f"- T_dec present: {int(ok.t_dec.notna().sum()):,} of {len(ok):,} fetched. T_dec equal to the cutoff (price never left 0.05 to 0.95): {int((ok.t_dec >= ok.res_ts - 3600).sum())}.\n")
+ex = c[c.excluded]
+L.append(f"\n**Excluded core markets by reason ({len(ex):,}):**\n\n" + md_table([dict(reason=k, n=int(v)) for k, v in ex.exclude_reason.value_counts().items()], ["reason", "n"], ["reason", "markets"]))
+L.append("\nThe full list, with the reason for each market, is in `data/v2/fills_manifest.csv` (columns `excluded` and `exclude_reason`).\n")
 
-# 2 counts + 4 power
+# 2 counts
+heads = ["category", "period", "markets", "events", "markets with ep.", "events with ep.", "episodes", "wallets", "markets with ep. (24 h)", "events with ep. (24 h)", "episodes (24 h)", "wallets (24 h)"]
+cols = ["cat", "period", "markets", "events", "mkts_ep", "ev_ep", "episodes", "wallets", "mkts_ep24", "ev_ep24", "episodes24", "wallets24"]
 out_json = {}
 for dn in DEFS:
-    L.append(f"\n## 2. Counts: {dn}\n")
-    for title, subset in (("v2, 165 markets" + ("" if n_exact_v2 == len(v2set) else " (PROXY, undercount)"), v2set), ("v1, 3 markets (exact)", v1set)):
-        a = cell_rows(dn, "keep", subset); b = cell_rows(dn, "keep24", subset)
-        rows = [dict(**x, mkts_ep24=y["mkts_ep"], episodes24=y["episodes"], wallets24=y["wallets"]) for x, y in zip(a, b)]
-        rows = [r for r in rows if r["markets"]]
-        out_json[f"{dn} | {title}"] = dict(t_lt_dec=a, t_lt_dec_minus24h=b)
-        L.append(f"**{title}**\n\n" + md_table(rows, ["cat", "period", "markets", "mkts_ep", "episodes", "wallets", "mkts_ep24", "episodes24", "wallets24"],
-                 ["category", "period", "markets", "with episode", "episodes", "wallets", "with ep. (24 h)", "episodes (24 h)", "wallets (24 h)"]) + "\n")
+    rows = count_rows(dn, core, CATS, ("P1", "P2"))
+    out_json[dn] = rows
+    L.append(f"\n## 2. Counts, core universe: {dn}\n\n'(24 h)' = only episodes with t_a < T_dec - 24 h.\n\n" + md_table(rows, cols, heads))
 
-# 3 p_a distribution
-L.append(f"\n## 3. Distribution of p_a by category, main definition, t_a < T_dec\n")
-for title, subset in (("v2" + ("" if n_exact_v2 == len(v2set) else " (PROXY: wallet's own buy VWAP, not the market price after t_a)"), v2set), ("v1 (exact)", v1set)):
-    rows = []
-    for c in CATS:
-        ps = [e["p_a"] for m in subset if m["cat"] == c for e in res[(m["id"], MAIN)] if e["keep"]]
-        if ps:
-            q = np.quantile(ps, [0, .1, .25, .5, .75, .9, 1])
-            rows.append(dict(cat=CATNAME[c], n=len(ps), **{k: float(v) for k, v in zip(["min", "p10", "p25", "p50", "p75", "p90", "max"], q)}))
-    L.append(f"**{title}**\n\n" + (md_table(rows, ["cat", "n", "min", "p10", "p25", "p50", "p75", "p90", "max"], ["category", "episodes", "min", "10%", "25%", "median", "75%", "90%", "max"]) if rows else "No episodes.\n") + "\n")
-src_counts = pd.Series([e["pa_src"] for m in v1set for e in res[(m["id"], MAIN)] if e["keep"]]).value_counts().to_dict()
-L.append(f"v1 p_a source (main): {src_counts} (10min = fills in the 10 minutes after t_a; last_before = fallback).\n")
+# 3 p_a
+L.append("\n## 3. Distribution of p_a by category, main definition, t_a < T_dec\n")
+rows = []
+for cc in CATS:
+    ps = [e["p_a"] for m in core if m["cat"] == cc for e in res[(m["id"], MAIN)] if e["keep"]]
+    if ps:
+        q = np.quantile(ps, [0, .1, .25, .5, .75, .9, 1]); rows.append(dict(cat=CATNAME[cc], n=len(ps), **{k: float(v) for k, v in zip(["min", "p10", "p25", "p50", "p75", "p90", "max"], q)}))
+L.append(md_table(rows, ["cat", "n", "min", "p10", "p25", "p50", "p75", "p90", "max"], ["category", "episodes", "min", "10%", "25%", "median", "75%", "90%", "max"]))
+src = pd.Series([e["pa_src"] for m in core for e in res[(m["id"], MAIN)] if e["keep"]]).value_counts().to_dict()
+L.append(f"\np_a source (main): {src} (10min = fills in the 10 minutes after t_a; last_before / trigger = fallbacks).\n")
 
 # 4 power
-L.append("\n## 4. Power from p_a only (no outcomes)\n\nExcess per episode = outcome - p_a; under no edge its variance is p_a(1 - p_a). Market-level mean excess = mean over the market's episodes; cell estimate = mean over markets with at least one episode. "
-         "Two SEs: **independent** treats episodes in a market as independent (variance of the market mean = sum p(1-p) / n^2), as the brief specifies; **correlated** treats them as fully dependent, because all same-side episodes in a market share one outcome (variance = mean p(1-p)). The truth lies between and is near the correlated value when a market's episodes are on one side. "
-         "MDE = 2.8 x SE (5% two-sided, 80% power). v2 rows use the proxy p_a where the fills are missing; 'all' pools v2 and v1.\n")
+L.append("\n## 4. Power from p_a only (no outcomes)\n\nExcess per episode = outcome - p_a; under no edge its variance is p_a(1 - p_a). The unit's mean excess = the mean over its episodes; the cell estimate = the mean over units with at least one episode. MDE = 2.8 x SE (5% two-sided, 80% power). "
+         "**indep.** treats a unit's episodes as independent (variance of the unit mean = sum p(1-p) / n^2). **corr.** treats them as fully dependent (variance = mean p(1-p)), because same-side episodes in one market share an outcome and markets in one event are linked. The truth lies between the two, near corr. for events. "
+         "Market unit = each market. Event unit = Gamma event id: all episodes of the event's markets in the cell are pooled, then averaged across events. Series = Gamma series where there is one (else the event), shown for the pooled row only.\n")
+pc = ["cat", "period", "nm", "ne", "n", "m_i", "m_c", "e_i", "e_c", "ns", "s_c"]
+ph = ["category", "period", "markets with ep.", "events with ep.", "episodes", "MDE market indep.", "MDE market corr.", "MDE event indep.", "MDE event corr.", "series with ep.", "MDE series corr."]
 for dn in DEFS:
     for key, lab in (("keep", "t_a < T_dec"), ("keep24", "t_a < T_dec - 24 h")):
         if dn != MAIN and key == "keep24": continue
-        rows = []
-        for c in CATS:
-            for per in ("P1", "P2", "both"):
-                ms = [m for m in markets if m["cat"] == c and (per == "both" or m["period"] == per)]
-                if not ms: continue
-                pas = [[e["p_a"] for e in res[(m["id"], dn)] if e[key]] for m in ms]; pas = [v for v in pas if v]
-                M = len(pas)
-                si = math.sqrt(sum(sum(p * (1 - p) for p in v) / len(v) ** 2 for v in pas)) / M if M else None
-                sc = math.sqrt(sum(float(np.mean([p * (1 - p) for p in v])) for v in pas)) / M if M else None
-                rows.append(dict(cat=CATNAME[c], period=per, M=M, n=sum(map(len, pas)), si=si, mi=2.8 * si if si else None, sc=sc, mc=2.8 * sc if sc else None))
-        allp = [[e["p_a"] for e in res[(m["id"], dn)] if e[key]] for m in markets]; allp = [v for v in allp if v]; M = len(allp)
-        si = math.sqrt(sum(sum(p * (1 - p) for p in v) / len(v) ** 2 for v in allp)) / M if M else None
-        sc = math.sqrt(sum(float(np.mean([p * (1 - p) for p in v])) for v in allp)) / M if M else None
-        rows.append(dict(cat="all categories", period="both", M=M, n=sum(map(len, allp)), si=si, mi=2.8 * si if si else None, sc=sc, mc=2.8 * sc if sc else None))
-        L.append(f"\n**{dn}, {lab}**\n\n" + md_table(rows, ["cat", "period", "M", "n", "si", "mi", "sc", "mc"], ["category", "period", "markets with ep.", "episodes", "SE indep.", "MDE indep.", "SE corr.", "MDE corr."]))
+        L.append(f"\n**{dn}, {lab}**\n\n" + md_table(power_rows(dn, key, core), pc, ph))
 
 # 5 more markets
-L.append("\n## 5. Markets that could still be pulled\n")
-fetched = set(mi.conditionId)
-rest = rk[~rk.conditionId.isin(fetched)].copy()
-rest["period"] = rest.res_ts.map(period)
-f2 = fl.merge(rk[["conditionId", "volumeNum"]], on="conditionId")
-rows_per_usd = float((f2.rows / f2.volumeNum).median()); sec_per_page = float(f2.secs.sum() / f2.pages.sum())
-rest["est_pages"] = np.maximum(1, np.ceil(rest.volumeNum * rows_per_usd / 1000))
-tab = []
-for c in CATS:
-    g = rest[rest.category == c]
-    tab.append(dict(cat=CATNAME[c], n=len(g), p1=int((g.period == "P1").sum()), p2=int((g.period == "P2").sum()), ge100k=int((g.volumeNum >= 1e5).sum()), pages=int(g.est_pages.sum())))
-tab.append(dict(cat="total", n=len(rest), p1=int((rest.period == "P1").sum()), p2=int((rest.period == "P2").sum()), ge100k=int((rest.volumeNum >= 1e5).sum()), pages=int(rest.est_pages.sum())))
-L.append(f"Of the {len(rk):,} eligible candidates ranked by v2 (volume $20k to $12M, text screen, max 3 per event), {len(fetched)} were fetched; {len(rest):,} were not.\n\n" +
-         md_table(tab, ["cat", "n", "p1", "p2", "ge100k", "pages"], ["category", "not fetched", "resolved P1", "resolved P2", "volume >= $100k", "est. fill pages"]))
-tp = rest.est_pages.sum(); hrs1 = tp * sec_per_page / 3600
-big = cand[cand.volumeNum > 12e6].category.value_counts().reindex(CATS, fill_value=0)
-L.append(f"\nFetch-time estimate. On the 165 fetched markets: median {rows_per_usd * 1e6:,.0f} fill rows per $1M of volume and {sec_per_page:.2f} s per 1,000-row page per worker "
-         f"({int(f2.pages.sum()):,} pages, {int(f2.secs.sum()):,} worker-seconds). The unfetched markets are smaller (median volume ${rest.volumeNum.median():,.0f} vs ${f2.volumeNum.median():,.0f}), so the pages are estimated from volume: about {int(tp):,} pages, "
-         f"about {hrs1:.1f} worker-hours, about {hrs1 / 6 * 60:.0f} minutes with the 6 parallel workers v2 used if the API allows that rate (v2 saw no HTTP errors at 6). Rows per dollar may be higher in small markets, so treat this as a lower estimate and allow 2x. "
-         f"Re-pulling the 165 v2 fill files that are missing here: {int(f2.pages.sum()):,} pages, about {f2.secs.sum() / 60:.0f} worker-minutes.\n\n"
-         f"Not in the 4,192: {int(big.sum())} markets over $12M were excluded up front by Amendment B ({', '.join(f'{CATNAME[c]} {int(v)}' for c, v in big.items())}). Each may exceed the 400-page cap.\n")
-L.append("\n## Caveats\n\n- Category labels are v2's keyword screen. The v2 log says the screen is imperfect.\n- T_dec for v2 is the price-path marker (the rolling median Yes price leaves 0.05-0.95 for good). For v1 it is the first news time. Both are ex-post markers.\n- These numbers are for deciding whether a test is feasible. No hypothesis was tested.\n")
+L.append("\n## 5. Markets still not pulled\n")
+got = set(mi.conditionId)
+rest = rk[~rk.conditionId.isin(got)].copy(); rest["period"] = rest.res_ts.map(period)
+tab = [dict(cat=CATNAME[cc], n=int((rest.category == cc).sum()), p1=int(((rest.category == cc) & (rest.period == "P1")).sum()), p2=int(((rest.category == cc) & (rest.period == "P2")).sum())) for cc in CATS]
+tab.append(dict(cat="total", n=len(rest), p1=int((rest.period == "P1").sum()), p2=int((rest.period == "P2").sum())))
+big = cand[(cand.volumeNum > 12e6) & ~cand.conditionId.isin(got)].category.value_counts()
+L.append(f"Of v2's 4,192 ranked candidates, {len(rest):,} are still not fetched (none of them military/government):\n\n" + md_table(tab, ["cat", "n", "p1", "p2"], ["category", "not fetched", "resolved P1", "resolved P2"]) +
+         f"\nOver $12M and not fetched: {', '.join(f'{CATNAME.get(k, k)} {int(v)}' for k, v in big.items())}.\n")
+
+# 6 FFIC
+L.append("\n## 6. FFIC documented markets (ForesightFlow Insider Cases v1)\n")
+L.append(f"Source: `ForesightFlow/datasets`, `ffic-inventory/ffic-v1.csv` (CC-BY-4.0, companion to Nechepurenko 2026), commit 5ba4127. It lists 32 markets in 8 cases, given as 8-hex-digit condition-id prefixes. The `resolution_outcome` column was dropped at load. Matching, prefix to full id: v2 candidate list first, then Gamma `public-search`. All 32 matched; per-market detail is in `data/v3/ffic_match.csv`. "
+         "FFIC includes election markets (2024 US and Romanian presidential races), which the v2 universe rule excludes. They are fetched but kept out of the core tables.\n")
+fr = []
+for case, g in fm.groupby("case_id"):
+    ids = set(g.conditionId.dropna()); sub = mi[mi.conditionId.isin(ids)]
+    usable = [m for m in ffic if m["id"] in ids]
+    eps = sum(1 for m in usable for e in res[(m["id"], MAIN)] if e["keep"])
+    fr.append(dict(case=f"{case} {g.case_title.iloc[0]}", n=len(g), matched=len(ids), fetched=int((sub.status == "ok").sum()), usable=len(usable), in_core=int(sub.core.sum()),
+                   mkts_ep=sum(1 for m in usable if any(e["keep"] for e in res[(m["id"], MAIN)])), eps=eps,
+                   excl="; ".join(sorted(set(sub[sub.excluded].exclude_reason))) or ""))
+L.append(md_table(fr, ["case", "n", "matched", "fetched", "usable", "in_core", "mkts_ep", "eps", "excl"], ["case", "markets", "matched", "fetched", "usable (not excluded)", "also in core", "with episode (main)", "episodes (main)", "exclusion reasons"]))
+L.append("\n## Caveats\n\n- Category labels come from v2's keyword screen, which the v2 log calls imperfect. FFIC-only markets have no v2 category.\n- T_dec is an ex-post marker (price path, or news time for v1).\n- These numbers are for deciding whether a test is feasible. No hypothesis was tested and Gate 1 was not run.\n")
 (OUT / "feasibility_gate1.md").write_text("\n".join(L))
-json.dump(dict(defs={k: list(v) for k, v in DEFS.items()}, v2_exact_markets=n_exact_v2, counts=out_json), open(OUT / "feasibility_gate1.json", "w"), indent=1, default=str)
+json.dump(dict(defs={k: list(v) for k, v in DEFS.items()}, counts=out_json), open(OUT / "feasibility_gate1.json", "w"), indent=1, default=str)
 print("\n".join(L))

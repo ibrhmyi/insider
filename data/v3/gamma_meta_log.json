@@ -1,0 +1,18 @@
+{
+ "gamma_requests": 1635,
+ "http_events": [],
+ "n_targets": 2080,
+ "by_source": {
+  "mil_rest": 1832,
+  "v2_165": 161,
+  "mil_over12m": 52,
+  "ffic": 21,
+  "ffic+mil_over12m": 6,
+  "ffic+v2_165": 3,
+  "ffic+mil_rest": 2,
+  "v1": 1,
+  "mil_rest+v1": 1,
+  "v1+v2_165": 1
+ },
+ "not_in_gamma": []
+}
