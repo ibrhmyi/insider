@@ -114,3 +114,23 @@ n,date,source_class,query,engine,result
 113,2026-11-26,S3,Polymarket Israel election suspicious accounts names Bubblemaps 101 accounts wallets,"WebSearch (run 5, handle hunt)",none new (no names published)
 114,2026-11-26,S3,"Polymarket insider ""wallet address"" ""0x"" suspected insider 2026 report","WebSearch (run 5, handle hunt)",none new (addresses already in seed)
 115,2026-11-26,S3,OpenAI fired employee prediction market insider trading WIRED February 2026 Polymarket account,"WebSearch (run 5, handle hunt)",none new beyond the above; account not identified
+116,2026-11-26,S3,AP calls 2024 presidential election for Trump time,"WebSearch (run 7, A10 event times)",no row: gradual results through election night; day fallback kept
+117,2026-11-26,S3,white smoke conclave May 8 2025 time,"WebSearch (run 7, A10 event times)",led to balcony query
+118,2026-11-26,S3,Trump announces Vance running mate post time,"WebSearch (run 7, A10 event times)",none (no minute found)
+119,2026-11-26,S3,SEC approves spot bitcoin ETFs announcement time,"WebSearch (run 7, A10 event times)",row btc-etf-2024 (Fortune stamp)
+120,2026-11-26,S3,Iran missiles at Israel October 1 2024 time,"WebSearch (run 7, A10 event times)",led to warning query
+121,2026-11-26,S3,October 1 2024 Iran missile attack GMT,"WebSearch (run 7, A10 event times)",Novaya Gazeta launch time noted
+122,2026-11-26,S3,OpenAI GPT-5.2 release time,"WebSearch (run 7, A10 event times)",none
+123,2026-11-26,S3,CNN first reported Walz pick time,"WebSearch (run 7, A10 event times)",none (Fortune 9:12 ET is later than CNN's report)
+124,2026-11-26,S3,Arbitrum airdrop announcement time UTC,"WebSearch (run 7, A10 event times)",row arbitrum-airdrop-2023
+125,2026-11-26,S3,Khamenei killed announcement time,"WebSearch (run 7, A10 event times)",rows khamenei-removal and bubblemaps (strike start); death report time vague
+126,2026-11-26,S3,Trump pardons CZ first reported time,"WebSearch (run 7, A10 event times)",none
+127,2026-11-26,S3,OpenAI Atlas browser launch time,"WebSearch (run 7, A10 event times)","none (teaser earlier that day, time unknown; not used)"
+128,2026-11-26,S3,Spotify Wrapped 2025 release time,"WebSearch (run 7, A10 event times)",none
+129,2026-11-26,S3,Survivor 50 finale time,"WebSearch (run 7, A10 event times)",none (finale May 20 2026; case t_news is a claim date)
+130,2026-11-26,S3,Trump Zelenskyy meeting announced time,"WebSearch (run 7, A10 event times)","none (announced Dec 26, time unknown)"
+131,2026-11-26,S3,Habemus papam balcony time 2025,"WebSearch (run 7, A10 event times)",row pope-conclave-2025
+132,2026-11-26,S3,US warns imminent Iranian attack Oct 1 2024 time,"WebSearch (run 7, A10 event times)",row iran-strike-2024-10
+133,2026-11-26,S3,Super Bowl LX halftime start time,"WebSearch (run 7, A10 event times)",row super-bowl-halftime-2026
+134,2026-11-26,S3,Super Bowl LIX halftime start time,"WebSearch (run 7, A10 event times)",none
+135,2026-11-26,S3,Swift Kelce engagement post time,"WebSearch (run 7, A10 event times)",none (article stamps only)
