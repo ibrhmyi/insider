@@ -31,6 +31,8 @@ NEW = {  # case_id: (title, category)
  "us-iran-strike-2025-06": ("US strike on Iran, June 21 2025", "military_geopolitics"),
  "vance-vp-2024": ("Trump VP pick, July 2024 (tip allegation)", "political_decision"),
  "walz-vp-2024": ("Harris VP pick, August 2024", "political_decision"),
+ "nyt-siena-polls-2026": ("Bets before NYT/Siena Senate poll releases, 2026", "political_election"),
+ "kalshi-q2q3-2026-aggregate": ("Kalshi Q2-Q3 2026 enforcement statistics", "aggregate"),
  "world-cup-2026-06": ("FIFA World Cup 2026 match markets, three linked accounts", "sports"),
  "tweet-count-self-2026-03": ("Weekly post-count markets traded by accounts linked to the subject", "celebrity"),
 }

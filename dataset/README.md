@@ -8,12 +8,13 @@ An open, source-traced register of every publicly documented case of suspected i
 
 | File | Rows | One row is |
 |---|---|---|
-| `data/claims.csv` | 92 | One claim by one source: subject, paraphrase, evidence grade, amount, dates, URL |
-| `data/cases.csv` | 60 | One underlying event, derived from its claims: strongest grade, number of sources, whether amounts disagree |
+| `data/claims.csv` | 97 | One claim by one source: subject, paraphrase, evidence grade, amount, dates, URL |
+| `data/cases.csv` | 62 | One underlying event, derived from its claims: strongest grade, number of sources, whether amounts disagree |
 | `data/wallet_labels.csv` | 250 | One wallet address in one case, with role, label tier, polarity, source, and whether it traded its case market |
 | `data/wallet_edges.csv` | 416 | One money link between addresses (funding, Relay handoff, Safe owner, cash-out, transfer) |
 | `data/handles_to_resolve.csv` | 17 | A public username, its Gamma lookup result (`resolved_address`, `status`, `notes`) |
 | `data/markets.csv` | 870 | One Polymarket market attached to one case (761 markets, 38 cases), with its Gamma-event deadline ladder, outcome and t_news |
+| `data/event_times.csv` | 13 | A timestamped public moment for a case (official post, first report, scheduled release), with source; not yet used for t_news |
 | `data/contradictions.csv` | 1 | A place where the trades disagree with a recorded claim (the claim itself is never edited) |
 | `out/fills/case_market_legs.parquet` | 20,622,245 | One wallet's leg of one fill in a case market (not in git, 441 MB; see `out/MANIFEST.json`) |
 | `out/fills/label_wallet_legs.parquet` | 115,886 | One leg of a fill by a labelled wallet, all time |
@@ -22,7 +23,7 @@ An open, source-traced register of every publicly documented case of suspected i
 | `out/controls.parquet` | 7,669 | One matched control for a suspected episode |
 | `out/episodes.parquet` | 8,077 | One (wallet, market, token) episode with pre-news features: 408 suspected, the rest controls |
 | `out/hf_market_catalog.parquet` | 1,538,514 | One Polymarket-v1 market token (not in git) |
-| `logs/search_log.csv` | 75 | Every search query run, its source class, and what it produced |
+| `logs/search_log.csv` | 103 | Every search query run, its source class, and what it produced |
 | `logs/repos.csv` | 12 | Every code repository used, with the exact commit |
 | `build/*.py` | | Scripts that rebuild every table from the cloned sources and public APIs |
 
@@ -35,7 +36,7 @@ An open, source-traced register of every publicly documented case of suspected i
 - **Platforms:** Polymarket (most cases), Kalshi (official enforcement), both (pre-taped TV).
 - **Families:** informed trading; manipulation by the outcome maker or odds support; oracle and resolution attacks; public-data leaks; pre-taped show leaks; negative controls; rule-based screens.
 - **Topics:** military and geopolitical (Venezuela, the June 2025 and February 2026 Iran strikes, Khamenei, ceasefires), elections (US 2024 VP picks, 2026 midterms, Israel 2026), executive decisions (pardons, tariffs, a Trump–Zelenskyy meeting), awards (Nobel, Ballon d'Or, papal conclave), technology (Google, Gemini, OpenAI), corporate (earnings, MicroStrategy, DraftKings, Spotify), crypto (Arbitrum airdrop, the ZachXBT exposé), culture (Taylor Swift, Super Bowl halftime, Survivor, MrBeast), and speech mention markets.
-- **Case grades:** E1 = 4, E2 = 3, E3 = 8, E4 = 13, E5 = 24, E6 = 8 (unchanged in run 3, which added no claims; see `logs/run3_report.md`).
+- **Case grades:** E1 = 4, E2 = 3, E3 = 9, E4 = 13, E5 = 25, E6 = 8 (after run 4; see `logs/run4_report.md`).
 - **Trades:** Polymarket-v1 (746 million fills, to 2026-04-28) and the Data API v2 after that.
 
 ## Evidence grades (per claim; a case takes its strongest)

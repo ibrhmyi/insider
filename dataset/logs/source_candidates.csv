@@ -1,0 +1,7 @@
+source,kind,license,what_it_adds,status,notes
+https://huggingface.co/datasets/vgregoire/polymarket-users,dataset,CC-BY-4.0,per-user features and daily PnL for every Polymarket user (academic study),not_ingested,wallet-level features and PnL cross-check for weak_labels
+https://huggingface.co/datasets/TimeSeventeen/Kalshi,dataset,see card,Kalshi trades (no account ids),not_ingested,market-level price/volume before news for the Kalshi cases
+https://huggingface.co/datasets/TimeSeventeen/Polymarket-v1 (CTF/),dataset,CC-BY-4.0,splits merges redemptions resolutions,not_ingested,exact PnL (A6.9 ignores splits/merges/redemptions); exact redemption times for all wallets
+https://huggingface.co/datasets/Tommerzil00/polymarket-wallet-corpus-2026,dataset,CC-BY-4.0,1356 tracked wallets' fills and positions (2024-07 to 2026-04),not_ingested,small; tracked by a private trading system; no insider labels
+"Gomez-Cram, Guo, Jensen, Kung: Prediction Market Accuracy: Crowd Wisdom or Informed Minority?",paper,n/a,sign-randomisation skilled/lucky classification of every account,not_reproduced,could be re-run on Polymarket-v1 as another E6 rule label
+https://docs.bitquery.io/docs/examples/polymarket-api/polymarket-insider-detection-api/,paid API,commercial,USDC funding-source tracing and clustering,not_used,alternative to an archive RPC for the money graph (needs a token)

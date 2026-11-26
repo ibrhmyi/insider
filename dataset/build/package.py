@@ -66,6 +66,12 @@ DESC = {
  "data/contradictions.csv": {
   "contradiction_id": "CXnnn", "claim_id": "claim contradicted (never edited)", "case_id": "case", "field": "claim field", "claimed_value": "value in the claim",
   "observed_value": "value observed", "evidence": "how it was observed", "evidence_file": "raw file", "phase": "run-3 phase", "found_utc": "when recorded"},
+ "data/event_times.csv": {"case_id": "case", "event_label": "what happened at this time", "t_utc": "time (UTC) or date",
+  "t_precision": "minute, approx_15min, approx_hour, window_..., day, day_morning_ET, day_afternoon_ET",
+  "basis": "official_post, first_report, operation_start, scheduled_release, official_release", "source_name": "who reported the time",
+  "url": "source", "verified": "pending until the page is read", "notes": "notes"},
+ "logs/source_candidates.csv": {"source": "dataset, paper or API", "kind": "type", "license": "license", "what_it_adds": "content",
+  "status": "not_ingested, not_reproduced, not_used", "notes": "how it could be used"},
  "logs/handle_checks.csv": {
   "check_id": "HCnnn", "check_type": "handle_case_insensitive, market_check, cftc_complaint_match", "subject": "handle or account checked", "address": "proxy",
   "case_id": "case", "market_condition_id": "market", "market_question": "question", "side": "BUY / REDEEM", "outcome": "outcome checked",
@@ -159,6 +165,9 @@ for p in files:
                              in_git=("dataset/" + p) not in ign, over_50mb=os.path.getsize(p) > 50 * 1024 * 1024))
 json.dump(man, open("out/MANIFEST.json", "w"), indent=1)
 
+# the blind sample is drawn once (run 3, 92 claims) and never redrawn; later claims get their own sample when A4 is done
+if os.path.exists("logs/blind_check_sample.csv"):
+    print("blind sample kept (already drawn)"); raise SystemExit(0)
 claims = [r["claim_id"] for r in csv.DictReader(open("data/claims.csv"))]
 url = {r["claim_id"]: r["url"] for r in csv.DictReader(open("data/claims.csv"))}
 k = round(0.2 * len(claims))

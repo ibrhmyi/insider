@@ -74,3 +74,31 @@ n,date,source_class,query,engine,result
 73,2026-11-26,S4,Lookonchain polymarket suspected insider account netted,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
 74,2026-11-26,S4,polymarket tweet count market accounts controlled by subject onchain analysis,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; Andrey / tweet-count topic stopped
 75,2026-11-26,S4,Lookonchain polymarket whale insider 2025 Nobel OR Google OR election wallet,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; Lookonchain topic stopped
+76,2026-11-26,S3,polymarket insider trading suspicious bets November 2026,WebSearch (run 4),"new: nyt-siena-polls-2026 (lead); israel-election (exists); senators' letter (general risk, excluded)"
+77,2026-11-26,S3,polymarket insider wallet October 2026 analyst flagged,WebSearch (run 4),none new
+78,2026-11-26,S3,github polymarket insider wallets dataset labeled addresses,WebSearch (run 4),none new (no labelled list on GitHub; toolkits and unlabelled datasets only)
+79,2026-11-26,S3,dune analytics polymarket insider trading dashboard wallets,WebSearch (run 4),none new (no Dune insider dashboard found)
+80,2026-11-26,S3,arxiv polymarket informed trading wallets paper 2026,WebSearch (run 4),"none new as claims; context: Nechepurenko arXiv 2605.02286/02287 use FFIC cases; Gomez-Cram skilled-trader screen (1,950 heuristic insiders, list not public)"
+81,2026-11-26,S3,Kalshi insider trading enforcement action 2026 trader suspended,WebSearch (run 4),"none new (Feb, Apr, Aug notices already CL0063-CL0066)"
+82,2026-11-26,S3,NYT Siena poll release suspicious Polymarket Kalshi bets trader profit midterm,WebSearch (run 4),new: 2 claims nyt-siena-polls-2026 (claim + The Block counter-claim)
+83,2026-11-26,S3,Kalshi bans fines two traders inside information September 2026,WebSearch (run 4),none new (Feb 2026 notices; dates in results are page headers)
+84,2026-11-26,S3,Kalshi insider trading November 2026,WebSearch (run 4),"new: kalshi-q2q3-2026-aggregate; CFTC-ordered halt of speech markets (kalshi-teleprompter-2026); leads: House letter Aug 2026, Fortune 2026-08-09"
+85,2026-11-26,S3,arXiv 2605.02286 Information Leakage Score documented Polymarket insider cases,WebSearch (run 4),none new (uses FFIC inventory already in sources)
+86,2026-11-26,S3,"""polymarket"" ""privileged users"" made millions",WebSearch (run 4),none new; topic stopped
+87,2026-11-26,S3,February 28 2026 US strikes Iran first reported time UTC Trump announcement,"WebSearch (run 4, event times)","event time: strikes ~06:15Z, Trump video ~07:30Z"
+88,2026-11-26,S3,January 3 2026 Maduro captured announcement time Trump Truth Social post time,"WebSearch (run 4, event times)",event time: 09:21Z post
+89,2026-11-26,S3,Trump announces Iran ceasefire April 7 2026 Truth Social post time ET,"WebSearch (run 4, event times)",none (results about 2025)
+90,2026-11-26,S3,Nobel Peace Prize 2025 announcement time October 10 2025 11:00 Oslo Machado,"WebSearch (run 4, event times)",event time: 09:00Z scheduled
+91,2026-11-26,S3,ZachXBT Axiom investigation published time February 26 2026,"WebSearch (run 4, event times)",event time: first report 14:16Z
+92,2026-11-26,S3,Google Year in Search 2025 released December 4 2025 time d4vd most searched,"WebSearch (run 4, event times)",event date only
+93,2026-11-26,S3,Israel strikes Iran June 13 2025 Operation Rising Lion time explosions Tehran reported 3 a.m.,"WebSearch (run 4, event times)",event time: ~00:00Z
+94,2026-11-26,S3,Trump announces US strikes Fordow June 21 2025 Truth Social post time 7:50 pm ET,"WebSearch (run 4, event times)",event time: 23:50Z (APP log)
+95,2026-11-26,S3,Harris picks Walz August 6 2024 first reported time CNN,"WebSearch (run 4, event times)",event date + morning only
+96,2026-11-26,S3,US Iran two-week ceasefire April 7 2026 announced time Trump deadline 8 pm,"WebSearch (run 4, event times)",event time window 22:00-22:30Z
+97,2026-11-26,S3,Taylor Swift Travis Kelce engagement Instagram post August 26 2025 time posted,"WebSearch (run 4, event times)",event date + afternoon only
+98,2026-11-26,S3,Gemini 3 release November 18 2025 announced time Google blog,"WebSearch (run 4, event times)",event time: 16:00Z
+99,2026-11-26,S3,polymarket insider tracker github repository flagged wallets csv json list,WebSearch (run 4),"none new (no public flagged-wallet list beyond the 12 cloned repos; ACDC, Polysights and referral lists not public)"
+100,2026-11-26,S3,"""Polymarket Money"" insider trading posts flagged accounts Barron's",WebSearch (run 4),lead: Polymarket-run account flagged handle HD2 (article date unknown); CNN DOJ referral item found
+101,2026-11-26,S3,Gomez-Cram Guo Kung Jensen Polymarket skilled traders data replication,WebSearch (run 4),"none new (skilled-trader list not public; rule could be re-run as E6, see IDEAS.md)"
+102,2026-11-26,S3,Bitquery polymarket insider detection API example wallets,WebSearch (run 4),"none new (heuristics only; one example address unexplained, not recorded)"
+103,2026-11-26,S3,Polymarket refunds insider trading arrest money.com,WebSearch (run 4),none new (Maduro case); topic stopped

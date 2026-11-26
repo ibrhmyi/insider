@@ -4,17 +4,17 @@
  "files": [
   {
    "path": "data/cases.csv",
-   "rows": 60,
-   "bytes": 14602,
-   "sha256": "c0ba22fb5c358e5b48186bd9ce1ea7fbddcbf67cb09eef2a873463f128a8db73",
+   "rows": 62,
+   "bytes": 14976,
+   "sha256": "2755a29e83ccf24f1bebc7d2ed4320f3351d31aa1b634f4200d9a94402d86641",
    "in_git": true,
    "over_50mb": false
   },
   {
    "path": "data/claims.csv",
-   "rows": 92,
-   "bytes": 35788,
-   "sha256": "32bbccd0d3784c22dc37b1f6126675cc4610f2acd3c9bc98537d656b27ac6f3a",
+   "rows": 97,
+   "bytes": 38444,
+   "sha256": "ce4bcd878f7762c9cbd6f196f08f392ab0a007a6430f3b59f3a5a76cc9f7e857",
    "in_git": true,
    "over_50mb": false
   },
@@ -23,6 +23,14 @@
    "rows": 1,
    "bytes": 490,
    "sha256": "f30716005720d431dc22bd60d93e791a61916cb44adf951266bf34dda5283da4",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "data/event_times.csv",
+   "rows": 13,
+   "bytes": 3441,
+   "sha256": "46ddabb6e5470062f399fb118eda14aba172ccbd0fdd0b57e829a64f4bcad559",
    "in_git": true,
    "over_50mb": false
   },
@@ -84,9 +92,9 @@
   },
   {
    "path": "logs/needs_page_read.csv",
-   "rows": 14,
-   "bytes": 2657,
-   "sha256": "1555dbae6ec2101cb3562f7f6d757a6affe46e51f995e420d2ece880bd743ab6",
+   "rows": 20,
+   "bytes": 3876,
+   "sha256": "dbe7232365a368326f85288e21687a24fb54b29598ce81b44061333b4ae943ec",
    "in_git": true,
    "over_50mb": false
   },
@@ -100,9 +108,17 @@
   },
   {
    "path": "logs/search_log.csv",
-   "rows": 75,
-   "bytes": 12163,
-   "sha256": "2f50e6485d3be0b73ac9130656d3cc28907c7869811acd91a870bfce143ba4fb",
+   "rows": 103,
+   "bytes": 16777,
+   "sha256": "bdfc594e53c116b0486a693a0c534ab16f2e77a681208da97e471ab4951a5868",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "logs/source_candidates.csv",
+   "rows": 6,
+   "bytes": 1369,
+   "sha256": "bf7fa547bdfed3bf480abcb17964e41d690c01f6baf7a54bd15adfe06892714a",
    "in_git": true,
    "over_50mb": false
   },

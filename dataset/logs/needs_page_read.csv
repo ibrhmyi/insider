@@ -13,3 +13,9 @@ lead:ceasefire-fernandoinfante,https://beincrypto.com/polymarket-iran-ceasefire-
 lead:nothingeverfrickinhappens,https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears,account with $88.9k profit on US-strikes-Iran; who reported it,3
 lead:lookonchain-maduro-clear-case,https://www.mexc.com/news/402493,Lookonchain called a $33k to $400k Venezuela bet a clear case; find post URL,3
 lead:andrey-post,https://x.com/Andrey_10gwei/status/2007904168791454011,read post; check whether it is the source of CL0006,3
+nyt-siena-polls-2026 (run 4 claims),https://cointelegraph.com/news/suspicious-prediction-market-activity-seen-before-election-poll-release-nyt,"read; get proxy address/handle, poll release times, market ids; find the NYT article and the Vanderbilt research",4
+kalshi-q2q3-2026-aggregate,https://www.financemagnates.com/fintech/kalshi-flags-50-insider-trading-cases-as-surveillance-closes-in-on-leaked-events/,read; confirm counts and the date,4
+lead:house-letter-kalshi-2026-08,https://whitesides.house.gov/wp-content/uploads/2026/08/Letter-to-Kalshi-re-Insider-Trading-Activities.pdf,congressional letter; does it name specific markets or cases?,4
+lead:fortune-kalshi-truth-social,https://fortune.com/2026/08/09/kalshi-insider-trump-truth-social-prediction-markets-polymarket/,what case does it describe?,4
+lead:vanderbilt-poll-research,https://www.theblock.co/news/defi/2026-11-08-onchain-data-casts-doubt-on-insider-trading-theory-in-nyt-s-suspicious-election-betting-story-436034,find the trader address the on-chain review used,4
+lead:polymarket-money-HD2,https://www.itiger.com/news/2614645958,"Barron's: Polymarket Money asked 'Who is @HD2?'; get article date, market, then resolve the handle via Gamma",4
