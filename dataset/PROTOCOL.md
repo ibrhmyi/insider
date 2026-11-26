@@ -239,3 +239,8 @@ Minutes with no fills are left out. The table covers the outcome token of each m
 - Splits are grouped by case. `test` = cases whose `first_claim_date_earliest` is on or after **2026-03-01**; all other cases are `train`. Model selection uses case-grouped cross-validation inside `train` (5 folds, seed 192). A placebo market takes the split of the case market it was matched to (A14 makes this unique).
 - T1 (within-market ranking), T2 (episode classification, documented vs matched controls) and T3 (case vs placebo market from pre-news flow) are defined in `benchmarks/README.md`. Each is run on both t_news versions; `precise` is the headline.
 - Baselines: logistic regression (standardised features, L2, C = 1) and gradient boosting (scikit-learn `HistGradientBoostingClassifier`, default parameters), seed 192. No tuning on `test`.
+
+**A14.1 (2026-11-26, run 7, after a first placebo selection attempt and before the selection that is used).** The first attempt was discarded for three reasons, none of which looks at case-market trades or outcomes:
+1. All 33,504 weather-reading markets have no `resolved_at` in the catalog, so none entered the pool. For placebo markets, the end of the market is `resolved_at`, else `close_at` (the same fallback A14 gives case markets: resolved, else deadline). Resolution month and `t_ref` use that end.
+2. Coin names were matched as substrings (for example `ada` inside `canada`, `eth` inside `methane`). A coin must be a whole hyphen-separated slug token. The price patterns keep their hyphens as written in A14.
+3. A code error in the last relaxation step (operator precedence) ignored the decile condition. Fixed.
