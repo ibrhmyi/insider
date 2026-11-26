@@ -1,0 +1,17 @@
+{
+  "frozen_utc": "2026-11-26",
+  "inputs_sha256": {
+    "data/v3/gate2_episodes.csv.gz": "8f998d6ba58f61c0ba645ee7411ea5f3a0da2374a434b32f62047a3f45542bcf",
+    "data/v3/gate2_ladders.csv": "c82530ff89beafc7aa80cda4f5e1a589a5b9ac79b006c3e1ce794bc36a8a0fe5",
+    "data/v3/market_info.csv": "6e97cd770b3378a164c1e24a06018996faf9f596ab6690768fdfe01eaa9d62c5",
+    "data/v3/episodes.csv.gz": "8bb993915eb7cb2c47a3a2e9bb70f7035fc541d5fdeaefd1c117672dcd9e1b1c",
+    "src/gate2_signals.py": "406dc96cafaaf6d8f6d62ee28562ad720a80b174f993e1d1ce0cd21677b59f05"
+  },
+  "outcome_source": "data/v2/markets_candidates.csv:yes_won",
+  "primary": {"threshold": 2500, "mode": "std", "universe": "core", "unit": "event_id (else conditionId)",
+              "bootstrap": {"resamples": 10000, "seed": 192, "interval": [1.25, 98.75]},
+              "pass": "estimate > 0 and interval lower bound > 0"},
+  "signals": ["A", "B"],
+  "descriptive": ["B_last"],
+  "examples": "top 5 kept primary episodes by n_wallets, ties earliest t_a"
+}

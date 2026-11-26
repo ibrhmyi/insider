@@ -329,3 +329,21 @@ more than equally large trades by established wallets? BTC controls are dropped 
 - **Secondary (decide nothing).** Every CI includes zero: market unit, series unit, 24 h-before-T_dec, the three variants, every category and both periods. Markets new in v3 (out of sample): -0.021 (CI -0.055 to +0.014). v2's 165 markets: +0.034 (CI -0.022 to +0.093); these were seen in the v2 work. Calibration bands 0.2-0.4 show +0.05; descriptive only.
 - **FFIC (descriptive only).** The 2026 US-Iran cluster shows +0.69 mean excess (5 markets, 33 episodes with outcome). Venezuela/Maduro cluster: -0.12 (30 episodes); SBF/FTX: -0.05 (9). These are hindsight-selected documented cases, not a test. FFIC markets outside v2's candidate list have no outcome in this data and were not looked up.
 - **Output.** `data/results/gate1_result.md`/`.json`.
+
+### 2026-11-26 - Gate 2 frozen (two behavioural signals; no Gate 2 outcome loaded)
+- **Blind step.** `src/gate2_signals.py` builds the ladders and the Signal A, Signal B and B_last episodes for $1,000, $2,500 and $10,000 in std and live modes. It then computes counts and power from p_a only; no outcome is loaded. It writes `data/v3/gate2_ladders.csv`, `data/v3/gate2_episodes.csv.gz` and `data/results/gate2_power.md`/`.json`. The cache was intact (2,080 files); no fetch.
+- **Ladders.** 73 ladders, 311 markets. Only "by/before" questions count; "in <month>", "on <day>" and "between" are separate periods. A ladder is one Gamma series (else event) with the same question stem, overlapping lives and >= 3 deadlines. **Limitation:** only cached rungs; v2's 3-per-event cap hides some later deadlines.
+- **Blind power ($2,500, std, event unit, MDE at 97.5% two-sided / 80%).**
+  - A: 242 events, 537 episodes, MDE 0.073 to 0.087.
+  - B: 110 events, 645 episodes, MDE 0.078 to 0.114.
+  - B_last: 26 events, MDE 0.18 to 0.26.
+- **Definition choices (the brief left these open).**
+  - "Before the trigger" sums use fills with a strictly earlier timestamp, and the higher-price buy must have a timestamp strictly after the first buy. This keeps one order sweeping the book from triggering itself.
+  - Sells < 10% and net buys are in USD.
+  - The B trigger is a rising edge.
+  - p_a fallback as in Gate 1.
+  - "Live-realistic" = fills up to resolution - 1 h, excluded markets included, no t_a < T_dec rule.
+  - Gate 1 overlap = same market and side within 24 h.
+  - Examples are picked by wallet count before outcomes.
+- **PASS rule.** Estimate > 0 and lower bound of the 97.5% interval (percentiles 1.25 and 98.75, seed 192) > 0.
+- **Stated.** These signals were proposed after the Gate 1 NULL on the same markets.
