@@ -134,3 +134,13 @@ n,date,source_class,query,engine,result
 133,2026-11-26,S3,Super Bowl LX halftime start time,"WebSearch (run 7, A10 event times)",row super-bowl-halftime-2026
 134,2026-11-26,S3,Super Bowl LIX halftime start time,"WebSearch (run 7, A10 event times)",none
 135,2026-11-26,S3,Swift Kelce engagement post time,"WebSearch (run 7, A10 event times)",none (article stamps only)
+136,2026-11-26,S1,Kalshi regulatory notice disciplinary action insider trading 2026,WebSearch (run 7),"led to the public notice bucket kalshi-public-docs (S3 listing, 674 files, 11 disciplinary notices): 10 claims CL0108-CL0117; KDA-2026-0010 excluded (account misuse, not an informed-trading family)"
+137,2026-11-26,S1,CFTC press release event contracts insider trading 2026,WebSearch (run 7),"new: CFTC 9276-26 (CL0122); 9217-26, 9237-26 already held; cftc.gov 403"
+138,2026-11-26,S1,Justice Department prediction market charged,WebSearch (run 7),none new (both SDNY cases already held); justice.gov API keyword filter not honoured
+139,2026-11-26,S1,site:justice.gov prediction market insider charged 2026,WebSearch (run 7),none new
+140,2026-11-26,S1,site:cftc.gov prediction market insider settlement 2026,WebSearch (run 7),"teleprompter CFTC settlement (covered by KDA-2026-0011 claim); mention-market advisory (general, excluded)"
+141,2026-11-26,S1,Polymarket statement integrity insider accounts referred 2026,WebSearch (run 7),new: Polymarket X statement (CL0121); referral aggregates already held
+142,2026-11-26,S1,senators letter Polymarket insider trading CFTC 2026,WebSearch (run 7),new: Reed/Hickenlooper letter (CL0120); other letters general (excluded)
+143,2026-11-26,S3,Polymarket suspected insider wallet November 2026,WebSearch (run 7),new case nvidia-ceo-return-2026-11 (CL0118)
+144,2026-11-26,S3,Bubblemaps Polymarket Nvidia return accounts,WebSearch (run 7),CL0118 page read (CryptoSlate); CL0119
+145,2026-11-26,S3,prediction market insider trading accounts flagged this week,WebSearch (run 7),new: Kalshi side of the Nvidia case (CL0123); topic stopped after this query
