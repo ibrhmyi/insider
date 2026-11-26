@@ -14,7 +14,7 @@ D = os.path.join(os.path.dirname(__file__), "..")
 WORK, APIT = sys.argv[1], sys.argv[2]
 OUT = os.path.join(D, "out", "fills"); os.makedirs(OUT, exist_ok=True)
 HF_END = 1777374040  # last block_timestamp in Polymarket-v1 (2026-04-28 11:00:40 UTC)
-c = duckdb.connect(); c.sql("SET memory_limit='8GB'; SET enable_progress_bar=false")
+c = duckdb.connect(); c.sql("SET memory_limit='6GB'; SET temp_directory='/tmp/claude-0/-home-user-insider/9861bbc3-9b17-563e-99b6-69eb4194d07f/scratchpad/proc/tmp'; SET enable_progress_bar=false")
 
 LEG = """
   SELECT 'hf_polymarket_v1' source, hf_file || ':' || hf_row fill_id, '' tx_hash, block_timestamp ts, condition_id, asset_id,
@@ -27,7 +27,7 @@ LEG = """
          CASE taker_direction WHEN 'BUY' THEN 'SELL' ELSE 'BUY' END, taker_direction, maker, taker, market_slug
   FROM {src}"""
 
-import pyarrow as pa
+import pyarrow as pa, pyarrow.parquet as pq
 
 
 def insert_rows(table, rows):
@@ -46,19 +46,27 @@ TYPES = dict(source="VARCHAR", fill_id="VARCHAR", tx_hash="VARCHAR", ts="BIGINT"
              outcome_label="VARCHAR", outcome_seq="BIGINT", price="DOUBLE", usdc="DOUBLE", shares="DOUBLE", fee_usdc="DOUBLE",
              wallet="VARCHAR", wallet_role="VARCHAR", wallet_side="VARCHAR", aggressor_side="VARCHAR", maker="VARCHAR", taker="VARCHAR",
              market_slug="VARCHAR")
+PT = dict(source=pa.string(), fill_id=pa.string(), tx_hash=pa.string(), ts=pa.int64(), condition_id=pa.string(), asset_id=pa.string(),
+          outcome_label=pa.string(), outcome_seq=pa.int64(), price=pa.float64(), usdc=pa.float64(), shares=pa.float64(), fee_usdc=pa.float64(),
+          wallet=pa.string(), wallet_role=pa.string(), wallet_side=pa.string(), aggressor_side=pa.string(), maker=pa.string(), taker=pa.string(),
+          market_slug=pa.string())
 labels = sorted({r["address"] for r in csv.DictReader(open(os.path.join(D, "data", "wallet_labels.csv")))})
 c.execute("CREATE TABLE lab(a VARCHAR)"); c.executemany("INSERT INTO lab VALUES (?)", [(a,) for a in labels])
 
 # --- label wallets
 c.sql(f"CREATE TEMP VIEW a AS SELECT * FROM read_parquet('{WORK}/A/*.parquet', union_by_name=true)")
-c.sql(f"CREATE TABLE hf_lab AS SELECT * FROM ({LEG.format(src='a')}) WHERE wallet IN (SELECT a FROM lab)")
+hf_pass = sorted({x.strip() for x in open(os.path.join(D, "logs", "hf_pass_label_addresses.txt")) if x.strip()})
+c.execute("CREATE TABLE hfp(a VARCHAR)"); c.executemany("INSERT INTO hfp VALUES (?)", [(a,) for a in hf_pass])
+# only wallets the HF pass filtered on are complete in the HF output; later labels come from the Data API (below)
+c.sql(f"CREATE TABLE hf_lab AS SELECT * FROM ({LEG.format(src='a')}) WHERE wallet IN (SELECT a FROM lab) AND wallet IN (SELECT a FROM hfp)")
 api = []
+hf_wallets = {x.strip() for x in open(os.path.join(D, "logs", "hf_pass_label_addresses.txt")) if x.strip()}  # label list the HF pass filtered on
 for a in labels:
     p = os.path.join(D, "logs", "gamma_raw", f"activity_{a}.json.gz")
     if not os.path.exists(p):
         continue
     for i, x in enumerate(json.load(gzip.open(p, "rt"))):
-        if x["type"] == "TRADE" and x["timestamp"] > HF_END:
+        if x["type"] == "TRADE" and (x["timestamp"] > HF_END or a not in hf_wallets):  # wallets added after the HF pass: API for all time
             api.append(("data_api_v2", f"{x.get('transaction_hash', '')}:{i}", x.get("transaction_hash", ""), x["timestamp"],
                         x["condition_id"].lower(), str(x.get("token_id") or x.get("asset") or ""), x.get("outcome"), x.get("outcome_index"),
                         x["price"], x["usdc_size"], x["size"], None, a, "unknown", x.get("side"), None, None, None, x.get("slug")))
@@ -72,16 +80,26 @@ mk = list(csv.DictReader(open(os.path.join(D, "data", "markets.csv"))))
 c.sql(f"CREATE TEMP VIEW b AS SELECT * FROM read_parquet('{WORK}/B/*.parquet', union_by_name=true)")
 c.sql(f"CREATE TABLE hf_mkt AS {LEG.format(src='b')}")
 hf_cids = {r[0] for r in c.sql("SELECT DISTINCT condition_id FROM hf_mkt").fetchall()}
-api = []
+# Data API market trades: one parquet per market file (bounded memory), then read by DuckDB
+TMP = os.path.join(WORK, "api_legs"); os.makedirs(TMP, exist_ok=True)
+names = [x.strip() for x in cols.split(",")]
 for p in glob.glob(os.path.join(APIT, "trades_*.json.gz")):
     cid = os.path.basename(p)[7:-8].lower()
+    outp = os.path.join(TMP, cid + ".parquet")
+    if os.path.exists(outp) and os.path.getmtime(outp) > os.path.getmtime(p):
+        continue
+    rows = []
     for i, x in enumerate(json.load(gzip.open(p, "rt"))):
         if x["timestamp"] > HF_END or cid not in hf_cids:   # no double counting with HF
-            api.append(("data_api_v2", f"{x.get('transaction_hash', '')}:{i}", x.get("transaction_hash", ""), x["timestamp"], cid,
-                        str(x.get("token_id") or ""), x.get("outcome"), x.get("outcome_index"), x["price"], x["size"] * x["price"], x["size"],
-                        None, (x.get("proxy_wallet") or "").lower(), "unknown", x.get("side"), None, None, None, x.get("slug")))
+            rows.append(("data_api_v2", f"{x.get('transaction_hash', '')}:{i}", x.get("transaction_hash", ""), x["timestamp"], cid,
+                         str(x.get("token_id") or ""), x.get("outcome"), x.get("outcome_index"), float(x["price"]), float(x["size"]) * float(x["price"]),
+                         float(x["size"]), None, (x.get("proxy_wallet") or "").lower(), "unknown", x.get("side"), None, None, None, x.get("slug")))
+    t = pa.table({n: pa.array([r[i] for r in rows], type=PT[n]) for i, n in enumerate(names)})
+    pq.write_table(t, outp)
+    del rows, t
 c.sql("CREATE TABLE api_mkt AS SELECT * FROM hf_mkt WHERE false")
-insert_rows("api_mkt", api)
+if glob.glob(os.path.join(TMP, "*.parquet")):
+    c.sql(f"INSERT INTO api_mkt SELECT {', '.join(names)} FROM read_parquet('{TMP}/*.parquet')")
 c.sql(f"COPY (SELECT * FROM hf_mkt UNION ALL SELECT * FROM api_mkt ORDER BY condition_id, ts) TO '{OUT}/case_market_legs.parquet' (FORMAT parquet, COMPRESSION zstd)")
 
 # --- counts per case

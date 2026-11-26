@@ -102,3 +102,15 @@ n,date,source_class,query,engine,result
 101,2026-11-26,S3,Gomez-Cram Guo Kung Jensen Polymarket skilled traders data replication,WebSearch (run 4),"none new (skilled-trader list not public; rule could be re-run as E6, see IDEAS.md)"
 102,2026-11-26,S3,Bitquery polymarket insider detection API example wallets,WebSearch (run 4),"none new (heuristics only; one example address unexplained, not recorded)"
 103,2026-11-26,S3,Polymarket refunds insider trading arrest money.com,WebSearch (run 4),none new (Maduro case); topic stopped
+104,2026-11-26,S3,"Polymarket ""Fernandoinfante"" ceasefire bet","WebSearch (run 5, handle hunt)",none (handle not found in any source); lead closed
+105,2026-11-26,S3,"Polymarket ""NOTHINGEVERFRICKINHAPPENS"" Iran strike account","WebSearch (run 5, handle hunt)",none (handle not found); lead closed
+106,2026-11-26,S3,"Polymarket ""HD2"" account insider bet","WebSearch (run 5, handle hunt)",new case fed-chair-nomination-2026: HD2 + second new account (Barron's)
+107,2026-11-26,S3,Polymarket OpenAI new model December 13 GPT-5.2 four accounts names insider,"WebSearch (run 5, handle hunt)","new: OpenAI employee fired (WIRED); $16,872 claim; Unusual Whales 60 wallets (new aggregate)"
+108,2026-11-26,S3,Polymarket Trump Zelenskyy meeting five new users account names insider,"WebSearch (run 5, handle hunt)",none (no names published)
+109,2026-11-26,S3,Polymarket Khamenei out bet suspicious account username,"WebSearch (run 5, handle hunt)",none new (Magamyman already in)
+110,2026-11-26,S3,Nobel Peace Prize 2025 Polymarket accounts Machado bets usernames investigation Norway,"WebSearch (run 5, handle hunt)",new: dirtycup handle; Norway espionage suspicion (E3)
+111,2026-11-26,S3,"Polymarket Biden pardons trader $300,000 analysis account name NPR","WebSearch (run 5, handle hunt)",none new (no handle published; Kraken link already in)
+112,2026-11-26,S3,Polymarket Super Bowl halftime performer bets account 17 of 20 username,"WebSearch (run 5, handle hunt)","new case super-bowl-halftime-2026: $16,995 account + setlist wallet; CL0049 year in doubt"
+113,2026-11-26,S3,Polymarket Israel election suspicious accounts names Bubblemaps 101 accounts wallets,"WebSearch (run 5, handle hunt)",none new (no names published)
+114,2026-11-26,S3,"Polymarket insider ""wallet address"" ""0x"" suspected insider 2026 report","WebSearch (run 5, handle hunt)",none new (addresses already in seed)
+115,2026-11-26,S3,OpenAI fired employee prediction market insider trading WIRED February 2026 Polymarket account,"WebSearch (run 5, handle hunt)",none new beyond the above; account not identified

@@ -4,17 +4,17 @@
  "files": [
   {
    "path": "data/cases.csv",
-   "rows": 62,
-   "bytes": 14976,
-   "sha256": "2755a29e83ccf24f1bebc7d2ed4320f3351d31aa1b634f4200d9a94402d86641",
+   "rows": 65,
+   "bytes": 16391,
+   "sha256": "f880ee4fa082843359daa6c4d270c94392d940e55eb39cda4841c52997bce1d8",
    "in_git": true,
    "over_50mb": false
   },
   {
    "path": "data/claims.csv",
-   "rows": 97,
-   "bytes": 38444,
-   "sha256": "ce4bcd878f7762c9cbd6f196f08f392ab0a007a6430f3b59f3a5a76cc9f7e857",
+   "rows": 106,
+   "bytes": 43605,
+   "sha256": "7e0db8508c90f286d03ea56537631164f6baf7285697559ba04c92db1770c3cc",
    "in_git": true,
    "over_50mb": false
   },
@@ -22,7 +22,7 @@
    "path": "data/contradictions.csv",
    "rows": 1,
    "bytes": 490,
-   "sha256": "f30716005720d431dc22bd60d93e791a61916cb44adf951266bf34dda5283da4",
+   "sha256": "b15ed20e0f52d0f7f4d1f416bbb7010fb884bc5f5cb72bfb3e3fa5cbde97d268",
    "in_git": true,
    "over_50mb": false
   },
@@ -36,17 +36,17 @@
   },
   {
    "path": "data/handles_to_resolve.csv",
-   "rows": 17,
-   "bytes": 5132,
-   "sha256": "190e96d65fc3548c609620e00e331cb482b5b201b2494706ce16d89d24050a9d",
+   "rows": 19,
+   "bytes": 5732,
+   "sha256": "f7f34a89dafa78ebf5f928c9a532a73d4cf0ae02ff6c41a3b6889ec9f0f01ac2",
    "in_git": true,
    "over_50mb": false
   },
   {
    "path": "data/markets.csv",
-   "rows": 870,
-   "bytes": 550022,
-   "sha256": "955565d7e21e6feed67b5019e1c5934c645b32454268e04d1f1b4438df1eac9e",
+   "rows": 982,
+   "bytes": 627428,
+   "sha256": "1fdc22d2678722808d8a85dd3a0a677b154d2e402bcf315d1d2b16e1f4d3ed0e",
    "in_git": true,
    "over_50mb": false
   },
@@ -60,17 +60,17 @@
   },
   {
    "path": "data/wallet_labels.csv",
-   "rows": 250,
-   "bytes": 96256,
-   "sha256": "49883af0702fe0695c9c89a7b74854f8a53b31c89967b29f97fd0f59c7ab6724",
+   "rows": 251,
+   "bytes": 96642,
+   "sha256": "5a615b43d40a9179c51943092ebb1842ee3c7e4c6024f0fc506522f3d8ed32e3",
    "in_git": true,
    "over_50mb": false
   },
   {
    "path": "logs/fills_counts_by_case.csv",
-   "rows": 42,
-   "bytes": 2861,
-   "sha256": "489f1b3f6f46b877ae5503a83e6ce2466f79a2401bb543ac0db33eeedf086196",
+   "rows": 44,
+   "bytes": 3001,
+   "sha256": "cd584599bafb23b7440f473e954d79b792fbe5fdf261985810fd9e7b89eabbec",
    "in_git": true,
    "over_50mb": false
   },
@@ -84,17 +84,17 @@
   },
   {
    "path": "logs/markets_not_found.csv",
-   "rows": 22,
-   "bytes": 1734,
-   "sha256": "e11baf8a83febf02e011f7a8272aeebf64dccdc5a656e864427b4ad0ab59ba13",
+   "rows": 25,
+   "bytes": 2009,
+   "sha256": "7a42f27afc726e0046a5975d1bc27269d05922c1bf0a9d6fc23e6248f2f2ee4e",
    "in_git": true,
    "over_50mb": false
   },
   {
    "path": "logs/needs_page_read.csv",
-   "rows": 20,
-   "bytes": 3876,
-   "sha256": "dbe7232365a368326f85288e21687a24fb54b29598ce81b44061333b4ae943ec",
+   "rows": 22,
+   "bytes": 4245,
+   "sha256": "e1d4b9aa5be02b9cb57dc61cf40d1108017ebb29ea3752c9a546e46102613f37",
    "in_git": true,
    "over_50mb": false
   },
@@ -108,9 +108,9 @@
   },
   {
    "path": "logs/search_log.csv",
-   "rows": 103,
-   "bytes": 16777,
-   "sha256": "bdfc594e53c116b0486a693a0c534ab16f2e77a681208da97e471ab4951a5868",
+   "rows": 115,
+   "bytes": 18872,
+   "sha256": "15fe7fbd279a17aa84c57f1773e6a590507ef5f98dc5ef4adc32b630e443dcb8",
    "in_git": true,
    "over_50mb": false
   },
@@ -132,33 +132,33 @@
   },
   {
    "path": "out/controls.parquet",
-   "rows": 7669,
-   "bytes": 225598,
-   "sha256": "81aaa90efebb14ebbda58450bf3e8a4b682a86637363b36d50e9319b5ce6de68",
+   "rows": 7686,
+   "bytes": 226472,
+   "sha256": "86ee8e4a2479e9fa2ffde254ef9ac10fb4cb742ed3823510dc5721f35ef480cf",
    "in_git": true,
    "over_50mb": false
   },
   {
    "path": "out/episodes.parquet",
-   "rows": 8077,
-   "bytes": 821144,
-   "sha256": "64060eab4f0cab667f557bd0638065970a4f3f7c1f2b5854df489b1a03f9666a",
+   "rows": 8095,
+   "bytes": 827213,
+   "sha256": "b3203a1eb1d4407b097ccf4352f4ca26fd6973a0c9183f4affcbb23075c95784",
    "in_git": true,
    "over_50mb": false
   },
   {
    "path": "out/fills/case_market_legs.parquet",
-   "rows": 20622245,
-   "bytes": 440829303,
-   "sha256": "073de6104dd3c2299b60ade901e8b18434a4757dcb766702387bcbc6bfff9c5a",
+   "rows": 22588620,
+   "bytes": 530608344,
+   "sha256": "6075487eb25322ce6487c9635460333cf66770fa90a56b56ee9ed0e5b1ac4664",
    "in_git": false,
    "over_50mb": true
   },
   {
    "path": "out/fills/label_wallet_legs.parquet",
-   "rows": 115886,
-   "bytes": 3696710,
-   "sha256": "a1e8d5d62027843819f1557eb84037ff1aa6021e3e6b0479c48589d69f1747dd",
+   "rows": 116787,
+   "bytes": 3775170,
+   "sha256": "3d9af7630ddd65ba287226607cd210b4ae28c3c539ed4ce13ccd0f96a720e104",
    "in_git": true,
    "over_50mb": false
   },
@@ -169,6 +169,14 @@
    "sha256": "91366dfb70b8dfcf33edf6a726f0b339b5ef42c0fc5e35effa6f9978d9211614",
    "in_git": false,
    "over_50mb": true
+  },
+  {
+   "path": "out/market_minutes.parquet",
+   "rows": 216552,
+   "bytes": 4934379,
+   "sha256": "5b8406e03c3071f22fe6f581a79808a646acb23ee242adf06531732842dc7eb8",
+   "in_git": true,
+   "over_50mb": false
   },
   {
    "path": "out/weak_labels.parquet",

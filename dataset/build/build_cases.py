@@ -31,6 +31,9 @@ NEW = {  # case_id: (title, category)
  "us-iran-strike-2025-06": ("US strike on Iran, June 21 2025", "military_geopolitics"),
  "vance-vp-2024": ("Trump VP pick, July 2024 (tip allegation)", "political_decision"),
  "walz-vp-2024": ("Harris VP pick, August 2024", "political_decision"),
+ "fed-chair-nomination-2026": ("Trump's Fed chair nomination, January 2026", "political_decision"),
+ "super-bowl-halftime-2026": ("Super Bowl LX halftime show performers and setlist, Feb 2026", "celebrity"),
+ "openai-markets-aggregate": ("OpenAI release markets: Unusual Whales flags", "aggregate"),
  "nyt-siena-polls-2026": ("Bets before NYT/Siena Senate poll releases, 2026", "political_election"),
  "kalshi-q2q3-2026-aggregate": ("Kalshi Q2-Q3 2026 enforcement statistics", "aggregate"),
  "world-cup-2026-06": ("FIFA World Cup 2026 match markets, three linked accounts", "sports"),
@@ -51,6 +54,19 @@ for r in wallets:
     if r["polarity"] in ("suspected", "ambiguous", "negative_control", "manipulation"):
         wal[r["case_id"]].add(r["address"])
 
+def outcome(cl):
+    """PROTOCOL A9.2, in priority order."""
+    g = {x["evidence_grade"] for x in cl}
+    st = [(x.get("stance", "alleges"), x.get("notes", "")) for x in cl]
+    if "E1" in g: return "sanctioned"
+    if "E2" in g: return "charged"
+    if any(s == "clears" and ("clearing_party=official" in n or "clearing_party=platform" in n) for s, n in st): return "cleared_official"
+    if any(s == "clears" for s, _ in st): return "cleared_analyst"
+    if any(s == "disputes" for s, _ in st): return "disputed"
+    if "E3" in g: return "under_investigation"
+    return "unresolved"
+
+
 out = []
 for cid in sorted(by):
     cl = by[cid]
@@ -70,6 +86,7 @@ for cid in sorted(by):
         n_wallet_addresses=len(wal.get(cid, ())),
         max_amount_claimed_usd=max((float(x["amount_claimed_usd"]) for x in cl if x["amount_claimed_usd"]), default=""),
         amounts_disagree=len({x["amount_claimed_usd"] for x in cl if x["amount_claimed_usd"]}) > 1,
+        investigation_outcome=outcome(cl),
         status_note=o.get("notes", o.get("status_note", ""))))
 f = list(out[0])
 with open(os.path.join(D, "cases.csv"), "w", newline="") as h:

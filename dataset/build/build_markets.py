@@ -73,10 +73,15 @@ CASE_MARKETS = {
  "world-cup-2026-06": [(E, s, "claimed_wallets", "case wallets traded (Data API v2)") for s in
                        ("fifwc-irn-nzl-2026-06-15", "fifwc-cze-rsa-2026-06-18", "fifwc-uzb-col-2026-06-17",
                         "fifwc-ksa-ury-2026-06-15", "fifwc-ksa-ury-2026-06-15-more-markets", "fifwc-usa-par-2026-06-12", "fifwc-kr-cze-2026-06-11")],
+ "fed-chair-nomination-2026": [(E, "who-will-trump-nominate-as-fed-chair", "gamma_search+claimed_wallets", "claim: nomination bets; HD2 traded this event")],
+ "super-bowl-halftime-2026": [(E, "who-will-perform-at-super-bowl-halftime-show", "gamma_search", "claim: Super Bowl LX halftime performer markets"),
+                              (E, "what-songs-will-be-played-at-the-super-bowl-halftime-show", "gamma_search", "claim: setlist song markets")],
  "kpmg-earnings-2025-26": "WALLET_EARNINGS",  # every *quarterly-earnings* event traded by any of the 22 case wallets (A6.5)
 }
 NO_MARKET = {
- "acdc-orcas": "aggregate (rule-defined wallets)", "inca-digital-39": "aggregate", "nyt-80-accounts": "aggregate; accounts not public",
+ "acdc-orcas": "aggregate (rule-defined wallets)", "openai-markets-aggregate": "aggregate (60 wallets not public)",
+ "nyt-siena-polls-2026": "markets not yet identified (Senate race markets; trader address not public); see needs_page_read",
+ "kalshi-q2q3-2026-aggregate": "Kalshi aggregate", "inca-digital-39": "aggregate", "nyt-80-accounts": "aggregate; accounts not public",
  "polymarket-referrals-aggregate": "aggregate", "polysights-flags-aggregate": "aggregate", "solidus-multichain": "aggregate",
  "mitts-ofir-composite": "aggregate (rule-defined pairs)", "kalshi-q1-2026-aggregate": "Kalshi aggregate",
  "kalshi-candidate-own-race": "Kalshi; no public account or trade IDs", "kalshi-mrbeast-2025": "Kalshi; no public account or trade IDs",

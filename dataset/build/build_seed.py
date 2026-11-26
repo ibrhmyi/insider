@@ -180,6 +180,9 @@ for h, case, url in [
     ("GRIMDRIP", "world-cup-2026-06", "https://crypto.news/polymarket-world-cup-bets-raise-questions-after-24m-wallet-profits/"),
     ("endlessFate", "world-cup-2026-06", "https://crypto.news/polymarket-world-cup-bets-raise-questions-after-24m-wallet-profits/"),
     ("BlueHorseshoe86", "us-iran-ceasefire-2026-04-07", "https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears"),
+    # run 5
+    ("HD2", "fed-chair-nomination-2026", "https://www.itiger.com/news/2614645958"),
+    ("dirtycup", "nobel-peace-2025", "https://cointelegraph.com/news/nobel-peace-prize-polymarket-investigation"),
 ]:
     handles.append(dict(handle=h, case_id=case, source_url=url, resolved_address="", resolved_via="", status="", notes=""))
 
@@ -204,6 +207,8 @@ RES = {  # handle: (address or "", status, notes)
     "mintblade": ("0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb", "resolved", "trades on fifwc-* World Cup match markets, June 2026"),
     "GRIMDRIP": ("0x3f87d51f27ba6e19ec52aaeebb68559a839c742c", "resolved", "trades on fifwc-* World Cup match markets, June 2026"),
     "endlessFate": ("0x5e4c3b5b81171e2ca4ab776ac0d6bba787f9dba2", "resolved", "trades on fifwc-* World Cup match markets, June 2026"),
+    "HD2": ("0x1138c6c14b9f3b6edd719d0b7b471bd896afe410", "resolved", "run 5: 703 Yes buys ($96,621) on the claimed candidate's Fed chair nomination, 2025-12-19 to 2026-01-21; profile created 2025-11-28"),
+    "dirtycup": ("0x234cc49e43dff8b3207bbd3a8a2579f339cb9867", "resolved", "run 5: same address as the seed's Nobel cluster member (searadacunha list)"),
     "BlueHorseshoe86": ("0x44de2a52d8d2d3ddcf39d58e315a10df53ba9c08", "resolved", "1768 trades, 626 on US-Iran ceasefire markets"),
 }
 for r in handles:

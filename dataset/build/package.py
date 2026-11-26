@@ -30,7 +30,8 @@ DESC = {
   "claim_date": "date of the claim (partial dates allowed)", "source_class": "S1 official, S2 research, S3 press, S4 X analysts, S5 code/data",
   "source_name": "outlet or author; 'X via Y' when the post reached us through Y", "url": "source URL (for S4 via search engine: the quoting page until the post URL is recovered)",
   "accessed_date": "date the source was accessed", "extractor": "who extracted the row", "notes": "free notes (via=search_engine etc.)",
-  "run": "collection run that added the row (A6.2)", "verified": "true / pending / false (A6.1)"},
+  "run": "collection run that added the row (A6.2)", "verified": "true / pending / false (A6.1)",
+  "stance": "alleges, disputes, clears or context (A9.1); clearing party in notes"},
  "data/cases.csv": {
   "case_id": "case key", "title": "short title (no personal names)", "category": "topic category", "platform": "platforms in the case's claims",
   "family": "families in the case's claims", "case_grade": "strongest evidence grade among its claims", "grades_present": "all grades present",
@@ -38,7 +39,8 @@ DESC = {
   "event_date_precision": "day, month, quarter, year or range", "first_claim_date": "earliest claim_date as written",
   "first_claim_date_earliest": "its earliest possible day", "first_claim_date_precision": "precision of first_claim_date",
   "n_claims": "number of claims", "n_sources": "distinct URLs", "n_wallet_addresses": "addresses in wallet_labels for the case (suspected, ambiguous, controls, manipulation)",
-  "max_amount_claimed_usd": "largest amount claimed", "amounts_disagree": "true if claims state different amounts", "status_note": "free note"},
+  "max_amount_claimed_usd": "largest amount claimed", "amounts_disagree": "true if claims state different amounts",
+  "investigation_outcome": "sanctioned, charged, cleared_official, cleared_analyst, disputed, under_investigation, unresolved (A9.2)", "status_note": "free note"},
  "data/wallet_labels.csv": {
   "address": "Polymarket proxy (or owner key) address, lower-case", "handle": "public label or username as the source gives it",
   "case_id": "case", "role": "trader, owner_key, ...", "label_tier": "L2 official-case wallet, L3 analyst full address / handle resolved, L4 cluster member, A ambiguous, NC negative control, M manipulation",
@@ -101,6 +103,12 @@ DESC = {
   "wallet": "wallet", "asset_id": "token", "condition_id": "market", "hour": "UTC clock hour (Unix s // 3600)", "usdc": "BUY USDC in the hour",
   "shares": "shares", "vwap": "usdc / shares", "n_fills": "fills", "outcome_label": "token label", "winning_outcome_label": "winner",
   "won": "token won", "category_refined": "market type", "market_slug": "slug", "military_market": "slug matches the A6.9 military pattern"},
+ "out/market_minutes.parquet": {
+  "case_id": "case", "condition_id": "market", "minute_ts": "minute start (Unix s)", "minute_utc": "minute start", "minutes_from_tnews": "minutes relative to t_news",
+  "t_news_precision": "precision of t_news", "source": "hf_polymarket_v1 and/or data_api_v2", "n_fills_hf": "fills (HF, counted once)",
+  "n_legs_api": "Data API legs (maker and taker rows; not fills)", "usdc": "volume (HF taker legs + API legs)", "vwap": "volume-weighted price",
+  "last_price": "last trade price in the minute", "taker_buy_usdc": "aggressor BUY volume (HF only)", "taker_sell_usdc": "aggressor SELL volume (HF only)",
+  "n_wallets": "distinct wallets", "n_new_wallets": "wallets whose first Polymarket-v1 fill was within 7 days", "n_wallets_age_unknown": "wallets absent from Polymarket-v1"},
  "out/controls.parquet": {
   "episode_id": "suspected episode the control belongs to", "control_type": "same_side or other_side_large_buyer (A6.10)",
   "relaxation": "base, window_72h, price_0.10, size_0.25_4x, none_available", "n_eligible": "eligible wallets before sampling",

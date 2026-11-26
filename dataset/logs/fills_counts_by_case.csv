@@ -7,6 +7,7 @@ btc-etf-2024,hf_polymarket_v1,16780,8390,1974,5821278.0
 bubblemaps-military-cluster,hf_polymarket_v1,3595302,1797651,148928,446178529.0
 draftkings-pm-launch,hf_polymarket_v1,30920,15460,2748,1049095.0
 election-2024,hf_polymarket_v1,9945590,4972795,257099,1301061958.0
+fed-chair-nomination-2026,data_api_v2,1830855,1830855,69643,154421887.0
 ftx-sbf,hf_polymarket_v1,228794,114397,24995,15017972.0
 gemini3-release-2025,hf_polymarket_v1,261640,130820,18265,14236763.0
 google-yis-2025,hf_polymarket_v1,313954,156977,21059,26507719.0
@@ -26,6 +27,7 @@ railgun-venezuela-control,hf_polymarket_v1,802906,401453,49010,81552351.0
 romania-2024,hf_polymarket_v1,471044,235522,36076,14169933.0
 spotify-wrapped-2025,hf_polymarket_v1,32614,16307,5002,369820.0
 super-bowl-halftime-2025,hf_polymarket_v1,4120,2060,517,62095.0
+super-bowl-halftime-2026,data_api_v2,135520,135520,8898,5913136.0
 survivor-50-2026,data_api_v2,7983,7983,950,193422.0
 survivor-50-2026,hf_polymarket_v1,45638,22819,1538,490770.0
 taylor-swift-engagement,hf_polymarket_v1,2566,1283,462,182805.0

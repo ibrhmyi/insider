@@ -10,7 +10,7 @@ import csv, os
 ACC = "2026-11-26"
 F = ["claim_id", "case_id", "platform", "family", "subject_type", "subject", "claim_text", "evidence_grade",
      "amount_claimed_usd", "n_accounts_claimed", "event_date", "claim_date", "source_class", "source_name",
-     "url", "accessed_date", "extractor", "notes", "run", "verified"]
+     "url", "accessed_date", "extractor", "notes", "run", "verified", "stance"]
 
 C = []
 RUN, VERIFIED = 1, "true"  # PROTOCOL A6.1/A6.2: set per collection run below
@@ -149,8 +149,30 @@ c("kalshi-teleprompter-2026", K, IT, "market", "Trump speech mention markets", "
 
 c("polymarket-referrals-aggregate", PM, IT, "aggregate", "dozens of military-market accounts", "Polymarket referred dozens of accounts showing signs of military insider trading to the Justice Department, a source told CNN.", "E3", "", "", "2026", "2026-08-21", "S3", "CNN via KEYT", "https://keyt.com/politics/cnn-us-politics/2026/08/21/polymarket-referred-dozens-of-possible-military-insider-trading-cases-to-doj-source-says/", R4)
 
+# --- Run 5: handle hunt across cases (2026-11-26). Search-result text; pages not read (A6.1: pending).
+RUN, VERIFIED = 5, "pending"
+R5 = "via=search_engine; extracted from search-result text, page not read"
+c("fed-chair-nomination-2026", PM, IT, "handle", "HD2", "New account HD2 bet nearly $100k that a named candidate would be nominated Fed chair; Polymarket's own X account highlighted the trade.", "E5", 100000, 1, "2026-01", "2026-02", "S3", "Barron's (via iTiger)", "https://www.itiger.com/news/2614645958", R5 + "; Gamma exact match HD2 = 0x1138c6c1...; Data API: 703 Yes buys, $96,621, 2025-12-19 to 2026-01-21")
+c("fed-chair-nomination-2026", PM, IT, "account", "unnamed new account", "Another new account bet about $68k on a different candidate's Fed chair nomination.", "E5", 68000, 1, "2026-01", "2026-02", "S3", "Barron's (via iTiger)", "https://www.itiger.com/news/2614645958", R5)
+c("nobel-peace-2025", PM, IT, "handle", "dirtycup", "Recently opened account dirtycup put about $70k on the eventual winner and made over $30k, betting only on her.", "E5", 30000, 1, "2025-10-10", "2025-10-10", "S3", "Bloomberg via Cointelegraph", "https://cointelegraph.com/news/nobel-peace-prize-polymarket-investigation", R5 + "; Gamma exact match dirtycup = 0x234cc49e..., already in the seed for this case")
+c("nobel-peace-2025", PM, IT, "market", "Nobel Peace Prize 2025 winner market", "Norwegian officials said cyber espionage was the most likely cause of the leak behind the betting surge.", "E3", "", "", "2025-10-10", "2025-10-13", "S3", "Bloomberg", "https://www.bloomberg.com/news/articles/2025-10-13/norway-suspects-espionage-in-nobel-peace-prize-winner-breach", R5)
+c("super-bowl-halftime-2026", PM, IT, "account", "new account (halftime markets only)", "A new account traded only Super Bowl LX halftime-show markets and made $16,995, its largest bet on a guest appearing.", "E5", 16995, 1, "2026-02-08", "2026-02-09", "S3", "Covers", "https://www.covers.com/industry/polymarket-user-wins-nearly-all-super-bowl-halftime-wagers-and-profits-about-17k-feb-9-2026", R5)
+c("super-bowl-halftime-2026", PM, IT, "account", "setlist wallet", "A wallet bet on individual songs of the halftime set and appeared to know the setlist in advance.", "E5", "", 1, "2026-02-08", "2026-02", "S3", "DeFi Rate", "https://defirate.com/news/insider-trading-claims-hit-super-bowl-prediction-markets/", R5)
+c("openai-gpt52-2025-12", PM, IT, "account", "unnamed OpenAI employee", "OpenAI fired an employee for using confidential company information in prediction markets such as Polymarket.", "E3", "", 1, "2025-12", "2026-02-27", "S3", "WIRED via TechCrunch", "https://techcrunch.com/?p=3098116", R5 + "; employer finding: PROTOCOL 5 has no grade for employer action (E3 used; see run 5 decisions)")
+c("openai-gpt52-2025-12", PM, IT, "account", "the fired employee's account", "Blockchain records reportedly show $16,872 made on a frontier-model launch market between Dec 10 and 13, 2025.", "E5", 16872, 1, "2025-12-11", "2026-02", "S3", "UC Strategies", "https://ucstrategies.com/news/openai-fired-an-employee-for-16k-in-insider-bets-77-others-still-trading/", R5 + "; secondary site; not confirmed by WIRED")
+c("openai-markets-aggregate", PM, IT, "aggregate", "60 wallets, 77 positions", "Unusual Whales flagged 60 wallets holding 77 positions on OpenAI markets that suggested knowledge from inside the company.", "E5", "", 60, "2025-2026", "2026-02", "S3", "Unusual Whales via UC Strategies", "https://ucstrategies.com/news/openai-fired-an-employee-for-16k-in-insider-bets-77-others-still-trading/", R5)
+
 for i, r in enumerate(C, 1):
     r["claim_id"] = f"CL{i:04d}"
+
+# PROTOCOL A9.1: stance, read from the claim text (claim ids are stable, so they key the mapping)
+STANCE = {"CL0008": ("clears", "analyst"), "CL0060": ("clears", "analyst"), "CL0061": ("clears", "platform"),
+          "CL0080": ("disputes", ""), "CL0083": ("context", ""), "CL0086": ("disputes", ""), "CL0094": ("disputes", "")}
+for r in C:
+    st, party = STANCE.get(r["claim_id"], ("alleges", ""))
+    r["stance"] = st
+    if party and "clearing_party=" not in r["notes"]:
+        r["notes"] = (r["notes"] + "; " if r["notes"] else "") + f"clearing_party={party}"
 
 out = os.path.join(os.path.dirname(__file__), "..", "data", "claims.csv")
 with open(out, "w", newline="") as f:

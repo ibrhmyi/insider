@@ -5,3 +5,5 @@ dataset/out/hf_market_catalog.parquet
 dataset/out/fills/case_market_legs.parquet
 dataset/out/transfers_raw.parquet
 dataset/out/weak_labels.parquet
+dataset/.tmp/
+*.tmp
