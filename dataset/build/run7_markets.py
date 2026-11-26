@@ -81,6 +81,20 @@ mk["t_news_precise_utc"] = [best.loc[c, "t"].strftime("%Y-%m-%dT%H:%M:%SZ") if c
 mk["t_news_precise_precision"] = [pp(best.loc[c, "t_precision"]) if c in best.index else "day_fallback" for c in mk.case_id]
 mk["t_news_precise_source"] = [best.loc[c, "url"] if c in best.index else "day_fallback" for c in mk.case_id]
 mk["t_news_precise_verified"] = [best.loc[c, "verified"] if c in best.index else "" for c in mk.case_id]
+# A12.7: withhold any title that names a person on the name-test list (hashes of lower-cased 1-3 word n-grams)
+import hashlib, re
+NH = {x.strip() for x in open(os.path.join(D, "tests", "name_hashes.txt")) if x.strip() and not x.startswith("#")}
+def names_person(*vals):
+    for v in vals:
+        w = re.findall(r"[a-z]+", (v or "").lower())
+        if any(hashlib.sha256(" ".join(w[i:i + n]).encode()).hexdigest() in NH for n in (1, 2, 3) for i in range(len(w) - n + 1)):
+            return True
+    return False
+hit = [names_person(q, s_, e) for q, s_, e in zip(mk.question, mk.slug, mk.event_slug)]
+mk.loc[hit, "title_withheld"] = "true"
+for col in ["question", "slug", "event_slug"]:
+    mk.loc[mk.title_withheld == "true", col] = ""
+print("A12.7 titles withheld:", sum(hit))
 mk = mk.sort_values(["case_id", "condition_id"]).reset_index(drop=True)
 mk.to_csv(os.path.join(D, "data", "markets.csv"), index=False)
 print(mk.groupby("case_id")[["t_news_utc", "t_news_precise_utc", "t_news_precise_precision"]].first().query("t_news_precise_precision != 'day_fallback'").to_string())

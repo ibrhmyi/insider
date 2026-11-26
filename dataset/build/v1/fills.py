@@ -71,7 +71,7 @@ for a in labels:
     for i, x in enumerate(json.load(gzip.open(p, "rt"))):
         if x["type"] == "TRADE" and (x["timestamp"] > HF_END or a not in hfp_set):
             h = x.get("transaction_hash") or ""
-            rows.append(("data_api_v2", f"{h}:w{i}", f"{h}:w{i}", h or None, int(x["timestamp"]), x["condition_id"].lower(),
+            rows.append(("data_api_v2", f"{h}:w{i}:{a}", f"{h}:w{i}:{a}", h or None, int(x["timestamp"]), x["condition_id"].lower(),
                          str(x.get("token_id") or x.get("asset") or "") or None, x.get("outcome"), x.get("outcome_index"), float(x["price"]),
                          float(x["usdc_size"]), float(x["size"]), None, a, "unknown", x.get("side"), None, None, None, x.get("slug")))
     write(rows, outp)
