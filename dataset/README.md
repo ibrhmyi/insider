@@ -8,20 +8,20 @@ An open, source-traced register of every publicly documented case of suspected i
 
 | File | Rows | One row is |
 |---|---|---|
-| `data/claims.csv` | 106 | One claim by one source: subject, paraphrase, evidence grade, amount, dates, URL |
+| `data/claims.csv` | 107 | One claim by one source: subject, paraphrase, evidence grade, amount, dates, URL |
 | `data/cases.csv` | 65 | One underlying event, derived from its claims: strongest grade, number of sources, whether amounts disagree |
-| `data/wallet_labels.csv` | 251 | One wallet address in one case, with role, label tier, polarity, source, and whether it traded its case market |
+| `data/wallet_labels.csv` | 260 | One wallet address in one case, with role, label tier, polarity, source, and whether it traded its case market |
 | `data/wallet_edges.csv` | 416 | One money link between addresses (funding, Relay handoff, Safe owner, cash-out, transfer) |
 | `data/handles_to_resolve.csv` | 19 | A public username, its Gamma lookup result (`resolved_address`, `status`, `notes`) |
 | `data/markets.csv` | 982 | One Polymarket market attached to one case (873 markets, 40 cases), with its Gamma-event deadline ladder, outcome and t_news |
 | `data/event_times.csv` | 13 | A timestamped public moment for a case (official post, first report, scheduled release), with source; not yet used for t_news |
-| `data/contradictions.csv` | 1 | A place where the trades disagree with a recorded claim (the claim itself is never edited) |
+| `data/contradictions.csv` | 3 | A place where the trades disagree with a recorded claim (the claim itself is never edited) |
 | `out/fills/case_market_legs.parquet` | 22,588,620 | One wallet's leg of one fill in a case market (not in git; size in `out/MANIFEST.json`) |
 | `out/fills/label_wallet_legs.parquet` | 116,787 | One leg of a fill by a labelled wallet, all time |
 | `out/weak_labels.parquet` | 2,651,672 | One Polymarket-v1 wallet with ACDC and Inca rule labels (E6; not in git) |
 | `out/acdc_longshots.parquet` | 90,843 | One ACDC longshot bet (reconstruction) |
-| `out/controls.parquet` | 7,686 | One matched control for a suspected episode |
-| `out/episodes.parquet` | 8,095 | One (wallet, market, token) episode with pre-news features: 409 suspected, the rest controls |
+| `out/controls.parquet` | 7,898 | One matched control for a suspected episode |
+| `out/episodes.parquet` | 8,323 | One (wallet, market, token) episode with pre-news features: 425 suspected, the rest controls |
 | `out/market_minutes.parquet` | 216,552 | One case market per minute, t_news - 48 h to + 24 h (A9.3) |
 | `out/hf_market_catalog.parquet` | 1,538,514 | One Polymarket-v1 market token (not in git) |
 | `logs/search_log.csv` | 115 | Every search query run, its source class, and what it produced |

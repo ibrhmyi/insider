@@ -160,6 +160,17 @@ for r in rows(os.path.join(SDC, CE + "transactions.csv")):
         e(a, b, r["kind"], "us-iran-strike-2026-02-28", r["route"], r["amount"] if r["symbol"].upper().startswith("USD") else "",
           r["evidence"][:80], r["utc"], "searadacunha iran-cluster-e transactions.csv", SDC_URL + CE + "transactions.csv")
 
+# 10c. Run 6: full addresses printed in claim sources read in run 6 (page text in the run-6 page archive)
+for a in ["0xe56526b27b96f009b31ddb46558a134047bfce48", "0x054ec2f0ccfdae941886a3ed306635068c716639", "0x6d6affce1ed04a0e9611484daf1cef5cbcf3fb40",
+          "0x581f34349babaf03b2d3c8f5f60cf44ffbe19a3a", "0x5e524f43357198fa815e6766f02fe686b444b064", "0x572c8005aa033237175f16de725969b044cd0383",
+          "0xaab29084bcc42daff9e11b4a5a4cc55cda3eb306", "0x98a96619e482700e83e8486e4f3727dba17f5381"]:
+    w(a, "zachxbt-axiom-2026-02", "trader", "L3_analyst_full_address", "suspected", "", "Lookonchain list via KuCoin (claim CL0056)",
+      "https://www.kucoin.com/news/flash/12-suspected-insider-wallets-earn-over-1m-on-polymarket-predicting-zachxbt-s-leak", "page_read_run6",
+      "9 of the 12 Lookonchain addresses are printed; 0x054ec2f... and 0xe56526b... match the DefiOasis prefixes in CL0090")
+w("0x40d9ac81a425f14d2c490c41ac8969c0cbcfd472", "super-bowl-halftime-2026", "trader", "L3_analyst_full_address", "suspected", "",
+  "Futurism and Covers profile links (claims CL0102, CL0107)", "https://futurism.com/future-society/polymarket-half-time-show", "page_read_run6",
+  "day-old account, halftime markets only")
+
 # 11. Handles only (need resolving through the Gamma public-search API)
 for h, case, url in [
     ("djijaij83jdo4jdlwjflsg", "us-iran-ceasefire-2026-04-07", "https://finance.yahoo.com/markets/crypto/articles/potential-insiders-made-600k-predicting-171731685.html"),

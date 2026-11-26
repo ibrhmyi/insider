@@ -1,0 +1,40 @@
+url,claims_or_leads,http_status,read,n_full_addresses,x_post_urls,read_utc
+https://www.justice.gov/opa/pr/us-soldier-charged-using-classified-information-profit-prediction-market-bets,CL0001,200,True,0,,2026-11-26
+https://www.cftc.gov/PressRoom/PressReleases/9217-26,CL0002,200,True,0,,2026-11-26
+https://www.justice.gov/usao-sdny/pr/google-employee-charged-insider-trading,CL0009,200,True,0,,2026-11-26
+https://www.cftc.gov/PressRoom/PressReleases/9237-26,CL0010,200,True,0,,2026-11-26
+https://beincrypto.com/alleged-google-insider-trade-polymarket,CL0011,403,False,0,,2026-11-26
+https://gizmodo.com/polymarket-user-accused-of-1-million-insider-trade-on-google-search-markets-2000696258,CL0013,403,False,0,,2026-11-26
+https://cointelegraph.com/magazine/fix-insider-trading-polymarket-kalshi,CL0015,200,True,0,,2026-11-26
+https://acdatacollective.org/wp-content/uploads/2026/04/Insider_Risks_in_Polymarket_Political_Markets_ACDC.pdf,CL0019;ACDC report,200,True,0,,2026-11-26
+https://www.theblock.co/post/391650/fresh-accounts-netted-1-million-on-polymarket-hours-before-us-airstrikes-on-iran-bubblemaps,CL0022,403,False,0,,2026-11-26
+https://cointelegraph.com/news/bubblemaps-polymarket-cluster-win-military-bets,CL0028,200,True,0,https://x.com/bubblemaps/status/2056315247775125913,2026-11-26
+https://www.kucoin.com/news/flash/nine-polymarket-accounts-allegedly-profit-2-4m-from-u-s-iran-war-predictions,CL0029,200,True,1,,2026-11-26
+https://www.theblock.co/news/web3/2025-10-10-officials-probe-polymarket-over-suspicious-trades-predicting-nobel-peace-prize-winner-reports-374199,CL0046,403,False,0,,2026-11-26
+https://futurism.com/future-society/polymarket-half-time-show,CL0049;CL0049,200,True,1,,2026-11-26
+https://gizmodo.com/tracking-insider-trading-on-polymarket-is-turning-into-a-business-of-its-own-2000709286,CL0054,403,False,0,,2026-11-26
+https://www.itiger.com/news/1128153844,CL0055,200,True,0,,2026-11-26
+https://www.kucoin.com/news/flash/12-suspected-insider-wallets-earn-over-1m-on-polymarket-predicting-zachxbt-s-leak,CL0056,200,True,9,,2026-11-26
+https://beincrypto.com/polymarket-insiders-axiom-zachxbt-profit,CL0057,403,False,0,,2026-11-26
+https://defirate.com/news/kalshi-halts-trump-mention-markets/,CL0068,200,True,0,,2026-11-26
+https://defirate.com/?p=18128,CL0070,200,True,0,,2026-11-26
+https://crypto.news/polymarket-refers-nearly-100-wallets-amid-200m-insider-trade-concerns/,CL0072,200,True,0,https://x.com/WuBlockchain/status/2079389757231251823,2026-11-26
+https://acdatacollective.org/?p=1688,CL0075,200,True,0,,2026-11-26
+https://stocktwits.com/news-articles/markets/cryptocurrency/polymarket-wallets-profit-before-maduro-arrest/cmxA4w6R4Gr,CL0085;CL0085,200,True,0,https://x.com/PressSec/status/2007382016321364308;https://x.com/lookonchain/status/2007639475497881625,2026-11-26
+https://crypto.news/bubblemaps-polymarket-maduro-bet-wlfi-claims-2026/,CL0086;CL0086,200,True,0,https://x.com/bubblemaps/status/2008161924014366901,2026-11-26
+https://blockchain.news/flashnews/polymarket-insider-trading-allegations-highlight-onchain-connections,CL0087;CL0087,200,True,0,https://x.com/bubblemaps/status/2029603160332062767,2026-11-26
+https://blockchain.news/flashnews/insiders-pocket-663k-on-us-iran-ceasefire-bet-via-polymarket,CL0088;CL0088,200,True,0,https://x.com/lookonchain/status/2041716601863688506,2026-11-26
+https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears,CL0089;CL0089;lead:ceasefire-fernandoinfante;lead:nothingeverfrickinhappens,403,False,0,,2026-11-26
+https://cointelegraph.com/news/suspected-insider-1-2m-zachxbt-axiom-expose,CL0090;CL0090,200,True,0,https://x.com/AxiomExchange/status/2027018976929423583;https://x.com/defioasis/status/2027250246582227341;https://x.com/zachxbt/status/2027016064534757659,2026-11-26
+https://crypto.news/polymarket-world-cup-bets-raise-questions-after-24m-wallet-profits/,CL0091;CL0091,200,True,0,https://x.com/LBank_Exchange/status/2068589899318444226;https://x.com/lookonchain/status/2066359946531492282;https://x.com/lookonchain/status/2067041895742853274;https://x.com/lookonchain/status/2067074246485168129;https://x.com/lookonchain/status/2067452531471741077;https://x.com/lookonchain/status/2068581320197021801,2026-11-26
+https://www.cryptotimes.io/2026/03/11/insiders-game-on-polymarket-andrew-tates-x-bets-spark-fresh-debate/,CL0092;CL0092,403,False,0,,2026-11-26
+https://cointelegraph.com/news/suspicious-prediction-market-activity-seen-before-election-poll-release-nyt,CL0093;nyt-siena-polls-2026 (run 4 claims),200,True,0,,2026-11-26
+https://www.theblock.co/news/defi/2026-11-08-onchain-data-casts-doubt-on-insider-trading-theory-in-nyt-s-suspicious-election-betting-story-436034,CL0094;lead:vanderbilt-poll-research,403,False,0,,2026-11-26
+https://www.financemagnates.com/fintech/kalshi-flags-50-insider-trading-cases-as-surveillance-closes-in-on-leaked-events/,CL0095;kalshi-q2q3-2026-aggregate,200,True,0,,2026-11-26
+https://www.itiger.com/news/2614645958,CL0098;CL0099;lead:polymarket-money-25-posts;lead:polymarket-money-HD2,200,True,0,,2026-11-26
+https://cointelegraph.com/news/nobel-peace-prize-polymarket-investigation,CL0100,200,True,0,,2026-11-26
+https://www.covers.com/industry/polymarket-user-wins-nearly-all-super-bowl-halftime-wagers-and-profits-about-17k-feb-9-2026,CL0102,200,True,1,https://x.com/JeongHaeju/status/2020383268957286578;https://x.com/JeongHaeju/status/2020681715761451382,2026-11-26
+https://defirate.com/news/insider-trading-claims-hit-super-bowl-prediction-markets/,CL0103,200,True,0,https://x.com/JeongHaeju/status/2020383268957286578;https://x.com/JeongHaeju/status/2020714492850491441;https://x.com/NathanMeininger/status/2020735992609874335;https://x.com/PolymarketStory/status/2020806262825385996;https://x.com/catboyautist/status/2019923200423968797,2026-11-26
+https://beincrypto.com/zachxbt-investigation-polymarket-betting-crypto-insider-trading,lead:zachxbt-70k-deposit,403,False,0,,2026-11-26
+https://acdatacollective.org/wp-content/uploads/2026/08/ACDC-Classifying-Insider-Trading-Risk.pdf,ACDC report,200,True,0,,2026-11-26
+https://acdatacollective.org/wp-content/uploads/2026/04/ACDC-Insider_Risks_in_Polymarket_Political_Markets.pdf,ACDC report,200,True,0,,2026-11-26

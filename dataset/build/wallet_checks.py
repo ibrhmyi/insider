@@ -141,7 +141,7 @@ p = os.path.join(D, "data", "contradictions.csv")
 old = list(csv.DictReader(open(p)))
 keep = [c for c in old if c["phase"] != "1"]
 now = datetime.datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-allc = keep + [dict(c, found_utc=now) for c in contra]
+allc = [dict(c, found_utc=now) for c in contra] + keep  # phase-1 rows first: stable ids (CX001 = Walz)
 FC = ["contradiction_id", "claim_id", "case_id", "field", "claimed_value", "observed_value", "evidence", "evidence_file", "phase", "found_utc"]
 for i, c in enumerate(allc, 1):
     c["contradiction_id"] = f"CX{i:03d}"

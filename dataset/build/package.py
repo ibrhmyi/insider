@@ -74,6 +74,8 @@ DESC = {
   "url": "source", "verified": "pending until the page is read", "notes": "notes"},
  "logs/source_candidates.csv": {"source": "dataset, paper or API", "kind": "type", "license": "license", "what_it_adds": "content",
   "status": "not_ingested, not_reproduced, not_used", "notes": "how it could be used"},
+ "logs/page_reads_run6.csv": {"url": "page fetched", "claims_or_leads": "claims or leads it serves", "http_status": "HTTP status (403 = site bot block)",
+  "read": "page text was read", "n_full_addresses": "full 0x addresses found in the page", "x_post_urls": "X post links found in the page", "read_utc": "date"},
  "logs/handle_checks.csv": {
   "check_id": "HCnnn", "check_type": "handle_case_insensitive, market_check, cftc_complaint_match", "subject": "handle or account checked", "address": "proxy",
   "case_id": "case", "market_condition_id": "market", "market_question": "question", "side": "BUY / REDEEM", "outcome": "outcome checked",

@@ -162,12 +162,37 @@ c("openai-gpt52-2025-12", PM, IT, "account", "unnamed OpenAI employee", "OpenAI 
 c("openai-gpt52-2025-12", PM, IT, "account", "the fired employee's account", "Blockchain records reportedly show $16,872 made on a frontier-model launch market between Dec 10 and 13, 2025.", "E5", 16872, 1, "2025-12-11", "2026-02", "S3", "UC Strategies", "https://ucstrategies.com/news/openai-fired-an-employee-for-16k-in-insider-bets-77-others-still-trading/", R5 + "; secondary site; not confirmed by WIRED")
 c("openai-markets-aggregate", PM, IT, "aggregate", "60 wallets, 77 positions", "Unusual Whales flagged 60 wallets holding 77 positions on OpenAI markets that suggested knowledge from inside the company.", "E5", "", 60, "2025-2026", "2026-02", "S3", "Unusual Whales via UC Strategies", "https://ucstrategies.com/news/openai-fired-an-employee-for-16k-in-insider-bets-77-others-still-trading/", R5)
 
+# --- Run 6: pages read (press hosts allowlisted 2026-11-26). Page text read by the extractor -> verified true.
+RUN, VERIFIED = 6, "true"
+c("super-bowl-halftime-2026", PM, IT, "address", "0x40d9ac81a425f14d2c490c41ac8969c0cbcfd472", "A day-old account went about 17 of 20 on Super Bowl LX halftime bets, correctly calling three surprise guest performers.", "E5", "", 1, "2026-02-08", "2026-02-11", "S3", "Futurism (via Reddit)", "https://futurism.com/future-society/polymarket-half-time-show", "page read; profile link to this address in the article and in Covers (CL0102); supersedes the year of CL0049, see contradictions")
+
 for i, r in enumerate(C, 1):
     r["claim_id"] = f"CL{i:04d}"
 
 # PROTOCOL A9.1: stance, read from the claim text (claim ids are stable, so they key the mapping)
 STANCE = {"CL0008": ("clears", "analyst"), "CL0060": ("clears", "analyst"), "CL0061": ("clears", "platform"),
           "CL0080": ("disputes", ""), "CL0083": ("context", ""), "CL0086": ("disputes", ""), "CL0094": ("disputes", "")}
+# Run 6: pages read. Verification updates for earlier rows (A6.1); post URLs of S4 rows go to notes as post_url=
+VERIFY = {
+ "CL0085": ("true", "https://x.com/lookonchain/status/2007639475497881625", "page read: Lookonchain, three wallets created and funded days earlier, $630k"),
+ "CL0086": ("true", "https://x.com/bubblemaps/status/2008161924014366901", "page read"),
+ "CL0087": ("true", "https://x.com/bubblemaps/status/2029603160332062767", "page read: tweet of 2026-03-05"),
+ "CL0088": ("pending", "https://x.com/lookonchain/status/2041716601863688506", "page read: $663k and Lookonchain confirmed; 'created and funded the same day' not found in the page"),
+ "CL0090": ("pending", "https://x.com/defioasis/status/2027250246582227341", "page read: 8 of top 10 and over $1.2M confirmed; 'top three traded only this market' not found in this page"),
+ "CL0091": ("true", "https://x.com/lookonchain/status/2066359946531492282", "page read: $24.25M, three named wallets, one Binance deposit address"),
+ "CL0093": ("true", "", "page read: bet of almost $200,000 placed 2026-10-31; won more than $77,000"),
+ "CL0095": ("true", "", "page read (2026-11-17)"),
+ "CL0098": ("true", "", "page read"),
+ "CL0099": ("true", "", "page read: the bet was placed 2025-12-16 (contradiction CX003 on event_date)"),
+ "CL0100": ("true", "", "page read"),
+ "CL0102": ("true", "", "page read: about $17,000 profit, about $70,000 wagered; profile link 0x40d9ac81a425f14d2c490c41ac8969c0cbcfd472"),
+ "CL0103": ("true", "", "page read: alleged by X account PolymarketHistory; wallet under 24 h old"),
+}
+for r in C:
+    if r["claim_id"] in VERIFY:
+        v, post, note = VERIFY[r["claim_id"]]
+        r["verified"] = v
+        r["notes"] = r["notes"] + "; run6: " + note + (f"; post_url={post}" if post else "")
 for r in C:
     st, party = STANCE.get(r["claim_id"], ("alleges", ""))
     r["stance"] = st
