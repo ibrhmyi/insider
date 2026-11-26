@@ -347,3 +347,16 @@ more than equally large trades by established wallets? BTC controls are dropped 
   - Examples are picked by wallet count before outcomes.
 - **PASS rule.** Estimate > 0 and lower bound of the 97.5% interval (percentiles 1.25 and 98.75, seed 192) > 0.
 - **Stated.** These signals were proposed after the Gate 1 NULL on the same markets.
+
+### 2026-11-26 - Gate 2 run (once, as frozen)
+- **Run.** `src/gate2_run.py` ran once after freeze commit 48fa175 was pushed. Hashes matched. Nothing was changed after outcomes were loaded.
+- **Signal A (price-insensitive accumulation): NULL.** 242 events, 286 markets, 537 episodes. Mean excess -0.005; 97.5% interval -0.064 to +0.054. Won 0.300 vs mean p_a 0.292.
+- **Signal B (deadline choice): NULL.** 110 events, 124 markets, 645 episodes. Mean excess -0.009; 97.5% interval -0.091 to +0.079. Won 0.191 vs mean p_a 0.218.
+- **Robustness (decides nothing).** No interval excludes zero:
+  - market unit, series unit, live-realistic, $1,000, $10,000, category, period;
+  - Gate 1 overlap: A 51% overlap, B 79%;
+  - new-in-v3 markets: A -0.027, B -0.038.
+  Two descriptive rows stand out. B episodes that do not overlap Gate 1: -0.124 (interval -0.244 to +0.014). The B_last comparison (concentration on the last deadline): +0.102 (-0.079 to +0.301, 26 events).
+- **Stated.** Episode chaining (triggers <= 24 h apart) makes some B episodes in busy ladders span weeks and hundreds of wallets (top example: 351 wallets). That is the frozen rule, reported as is.
+- **FFIC (descriptive).** 2026 US-Iran cluster: A +0.52 (16 episodes), B +0.84 (29). Venezuela/Maduro: A -0.30 (9), B -0.33 (14). These cases were selected in hindsight; this is not a test.
+- **Output.** `data/results/gate2_result.md`/`.json`, `data/v3/gate2_episodes_scored.csv.gz`. The blind episode file `data/v3/gate2_episodes.csv.gz` is kept unchanged (hashed in the freeze).
