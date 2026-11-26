@@ -149,3 +149,38 @@ Coarse (month, quarter, year, range) claim dates are ignored. Precision is kept.
 - *Polymarket contracts:* the addresses listed in Polymarket's developer documentation (docs.polymarket.com) are tagged `polymarket_contract` and are never hubs or candidates.
 - *One hop:* every other address that transacted with a non-hub funder or cash-out address in that window, and has at least one Data API v2 activity row, is a candidate (`L4_graph_expanded`, `polarity=candidate`). Addresses already in `wallet_labels.csv` are not candidates.
 - *Edges:* every edge records the transaction hash, block, token, amount and direction.
+
+**A9 (2026-11-26, run 5, before computing the fields below).** Stance, investigation outcome, and minute-level market paths.
+
+*A9.1 Stance.* `claims.csv` gets `stance`, one of:
+- `alleges` (the default);
+- `disputes`: argues against the inference of informed trading or against a wallet attribution;
+- `clears`: says an investigation found no inside information, or the case is a declared negative control;
+- `context`: describes the market or the event without alleging anything.
+
+`clears` also records `clearing_party` in `notes`: `official`, `platform` or `analyst`. Stance is read from the claim text; it never changes the claim or its grade.
+
+*A9.2 Investigation outcome.* `cases.csv` gets `investigation_outcome`, taken in this order of priority:
+1. `sanctioned`: any E1 claim.
+2. `charged`: any E2 claim.
+3. `cleared_official`: a `clears` claim whose clearing party is an official body or the platform.
+4. `cleared_analyst`: a `clears` claim from an analyst or repository, including negative controls.
+5. `disputed`: any `disputes` claim.
+6. `under_investigation`: any E3 claim.
+7. `unresolved`: otherwise.
+
+The order puts adjudication above everything else and a clearing statement above a mere dispute. Cleared and disputed cases are the closest thing to negatives in the collection; they are labels, not findings.
+
+*A9.3 Minute-level market paths.* `out/market_minutes.parquet` has one row per case market per UTC minute, from 48 hours before t_news (A6.6 and A7, as in `markets.csv`) to 24 hours after.
+
+| Column | Meaning |
+|---|---|
+| `n_fills` | fills in the minute |
+| `usdc` | volume |
+| `vwap` | volume-weighted price |
+| `last_price` | last trade price |
+| `taker_buy_usdc`, `taker_sell_usdc` | aggressor buy and sell volume (HF fills only; Data API fills have no aggressor) |
+| `n_wallets` | distinct wallets |
+| `n_new_wallets` | wallets whose first Polymarket-v1 fill was within the previous 7 days |
+
+Minutes with no fills are left out. The table covers the outcome token of each market whose label is `Yes` (or the first outcome where no `Yes` exists).
