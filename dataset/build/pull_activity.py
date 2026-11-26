@@ -25,7 +25,7 @@ def get(url, tries=6):
 def activity(addr):
     out, cur = [], None
     while True:
-        q = {"user": addr, "limit": 500}
+        q = {"user": addr, "limit": 500, "start": 1}  # start=1: full history (default floors to 3 years back)
         if cur:
             q["cursor"] = cur
         d = get("https://data-api.polymarket.com/v2/activity?" + urllib.parse.urlencode(q))

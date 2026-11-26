@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 insider.bundle
 dataset/out/hf_market_catalog.parquet
+dataset/out/fills/case_market_legs.parquet
+dataset/out/transfers_raw.parquet
+dataset/out/acdc_longshots.parquet
+dataset/out/weak_labels.parquet
+dataset/out/controls.parquet
+dataset/out/episodes.parquet
