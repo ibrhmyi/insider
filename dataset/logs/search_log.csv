@@ -1,0 +1,76 @@
+n,date,source_class,query,engine,result
+1,2026-11-26,S3,Polymarket insider wallets dataset labeled,WebSearch,acdc-orcas; bubblemaps-military-cluster; zachxbt-axiom
+2,2026-11-26,S5,Polymarket suspected insider wallet addresses list github,WebSearch,iran 9-cluster address; axiom address
+3,2026-11-26,S1,Polymarket insider trading charged wallet address prosecutors 2026,WebSearch,maduro; google-yis
+4,2026-11-26,S3,Polymarket Nobel Peace Prize Machado insider wallet address,WebSearch,nobel-peace-2025
+5,2026-11-26,S3,"Polymarket Maduro insider wallet 0x address won $400,000",WebSearch,"maduro (3 wallets, Lookonchain)"
+6,2026-11-26,S1,Israel reservist Polymarket indictment Iran strike bets,WebSearch,israel-rising-lion-2025-06; israel-iaf-officer-2
+7,2026-11-26,S1,Kalshi insider trading enforcement case 2026 MrBeast editor,WebSearch,kalshi-mrbeast-2025; kalshi-candidate-own-race
+8,2026-11-26,S3,Polymarket US Iran ceasefire new accounts bets before Trump announcement AP,WebSearch,us-iran-ceasefire-2026-03; -04-07
+9,2026-11-26,S3,Polymarket suspected insider Time Person of the Year OR Gemini release OR OpenAI launch wallet,WebSearch,gemini3; openai-browser; openai-gpt52
+10,2026-11-26,S1,Kalshi enforcement notices list insider trading cases 2026 fines,WebSearch,kalshi notices Apr/Aug 2026
+11,2026-11-26,S4,Bubblemaps Polymarket insider wallets Khamenei OR Venezuela OR strike cluster,WebSearch,us-iran-strike-2026-02-28; khamenei
+12,2026-11-26,S5,github polymarket insider detection dataset suspicious wallets csv,WebSearch,"repos: Vedant-29, dipsylala, corbettbw, searadacunha, klixq, pselamy, gabrielseow"
+13,2026-11-26,S5,huggingface polymarket insider trading labeled dataset,WebSearch,none new (trade datasets only)
+14,2026-11-26,S2,ForesightFlow datasets FFIC insider cases polymarket github,WebSearch,"FFIC (8 cases, markets only)"
+15,2026-11-26,S5,Dune dashboard polymarket insider wallets fresh wallet longshot,WebSearch,none new
+16,2026-11-26,S5,"github ""polymarket"" ""insider"" wallets list known cases repository",WebSearch,repos (as above)
+17,2026-11-26,S2,Mitts Ofir From Iran to Taylor Swift informed trading data replication,WebSearch,mitts-ofir-composite; taylor-swift
+18,2026-11-26,S3,Hammerhead Intelligence Iran strike wallets Polymarket addresses six wallets,WebSearch,us-iran-strike-2026-02-28
+19,2026-11-26,S3,timeline of Polymarket insider trading allegations 2025 2026 list of cases,WebSearch,Wikipedia aggregator; nextpredict; polymarkets.co.il
+20,2026-11-26,S3,Polymarket insider tariff decision bets suspicious accounts,WebSearch,tariff-decisions; trump-zelensky; nyt context
+21,2026-11-26,S3,"CNN Bubblemaps Polymarket account $967,000 Iran military bets 93% accuracy",WebSearch,iran-military-trader-967k; magamyman
+22,2026-11-26,S3,Polymarket suspicious bets Time Person of the Year 2025,WebSearch,none (resolution dispute only)
+23,2026-11-26,S3,Polymarket insider Pope conclave 2025 bets Leo XIV suspicious,WebSearch,pope-conclave-2025 (weak)
+24,2026-11-26,S1,Polymarket midterm 2026 insider referral CFTC election accounts,WebSearch,midterms-2026; kalshi-q1-2026-aggregate
+25,2026-11-26,S3,"Magamyman Polymarket Khamenei $553,000 NPR",WebSearch,magamyman claim
+26,2026-11-26,S3,Guardian Polymarket accounts hallmarks insider trading $2.17m Zelenskyy meeting,WebSearch,trump-zelensky-meeting-2025-12; biden-pardons NPR
+27,2026-11-26,S3,New York Times 80 Polymarket accounts insider trading military seven won $1.4 million,WebSearch,nyt-80-accounts; israel-strike-2025-06-week
+28,2026-11-26,S1,Kalshi mention markets insider earnings call words suspicious trader banned,WebSearch,kalshi-teleprompter-2026; coinbase-earnings-mentions; kalshi-sotu-attendance
+29,2026-11-26,S3,Polymarket insider reality TV Survivor OR Big Brother OR Love Island OR Bachelor leak bets,WebSearch,survivor-50-2026
+30,2026-11-26,S3,Polymarket insider bet Walz vice president pick 2024 suspicious,WebSearch,walz-vp-2024; vance-vp-2024
+31,2026-11-26,S3,Polymarket insider token airdrop launch date bets suspicious wallet crypto project team,WebSearch,arbitrum-airdrop-2023
+32,2026-11-26,S3,Polymarket Taylor Swift engagement bet insider wallet,WebSearch,taylor-swift-engagement
+33,2026-11-26,S3,Polymarket insider Apple OR Nvidia OR Tesla OR Anthropic product launch bet suspicious account 2026,WebSearch,"none new (one automated-bot alert, excluded)"
+34,2026-11-26,S3,Polymarket sports insider trading injury bet NBA NFL suspicious account prediction market,WebSearch,super-bowl-halftime-2025; israel-election-2026-10 lead
+35,2026-11-26,S3,Polymarket probes suspicious Israel election bets OnlyBibi2026 Polysights Bubblemaps,WebSearch,israel-election-2026-10; netanyahu-odds-support-2026
+36,2026-11-26,S3,Wall Street Journal JD Vance running mate tip bets Polymarket insider investigated Republican,WebSearch,vance-vp-2024
+37,2026-11-26,S2,Solidus Labs Polymarket under the polygraph report findings insider,WebSearch,solidus-multichain
+38,2026-11-26,S4,Polysights Insider Finder flagged wallet Polymarket list 2026,WebSearch,polysights-flags-aggregate; polymarket-referrals-aggregate
+39,2026-11-26,S5,github polymarket insider known_insiders OR known insiders OR ground truth wallets json,WebSearch,"repos: Ha1o, aidensandler"
+40,2026-11-26,S5,github polymarket insider detector Magamyman Burdensome-Mix ricosuave666 wallet,WebSearch,none new
+41,2026-11-26,S4,site:x.com Bubblemaps polymarket,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",new: maduro-2026-01 (Bubblemaps disputes ownership link); us-iran-strike-2026-02-28 (Skoobidoobnj linked to two accounts)
+42,2026-11-26,S4,site:x.com lookonchain polymarket insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",new: maduro-2026-01 (Lookonchain 3 wallets); world-cup-2026 (3 wallets)
+43,2026-11-26,S4,site:x.com Polysights polymarket insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+44,2026-11-26,S4,site:x.com PolymarketStory insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","none recorded (lead: Polymarket-run account posted 25 insider-signal posts, via Barron's; no claim date recoverable, fails inclusion rule 4); nothing from PolymarketStory itself"
+45,2026-11-26,S4,site:x.com DefiOasis polymarket,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+46,2026-11-26,S4,site:x.com zachxbt polymarket insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","none new (lead: ZachXBT $70k deposit, source URL not pinned)"
+47,2026-11-26,S4,site:x.com Andrey_10gwei polymarket,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","none new (post x.com/Andrey_10gwei/status/2007904168791454011 seen via stacker.news, content unread; lead: tweet-count case)"
+48,2026-11-26,S4,site:x.com unusual_whales polymarket insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+49,2026-11-26,S4,"site:x.com ""polymarket"" ""fresh wallet""","WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+50,2026-11-26,S4,site:x.com polymarket insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+51,2026-11-26,S4,site:x.com polymarket suspicious wallet,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","none new (top-up wallet exploit: security incident, out of scope)"
+52,2026-11-26,S4,"""x.com/lookonchain/status"" polymarket","WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new (World Cup handles named: same claim)
+53,2026-11-26,S4,"""x.com/bubblemaps/status"" polymarket","WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; Bubblemaps topic stopped
+54,2026-11-26,S4,"""x.com/Polysights/status"" polymarket","WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; Polysights topic stopped
+55,2026-11-26,S4,"""x.com/PolymarketStory/status""","WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; PolymarketStory topic stopped
+56,2026-11-26,S4,DefiOasis polymarket insider wallet analysis,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",new: zachxbt-axiom-2026-02 (DefiOasis 8 of top 10)
+57,2026-11-26,S4,Unusual Whales flagged polymarket trade insider account,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; Unusual Whales topic stopped
+58,2026-11-26,S4,PolymarketStory flagged wallet insider polymarket,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+59,2026-11-26,S4,Polysights Insider Finder flagged account polymarket 2026,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+60,2026-11-26,S4,Andrew 10 GWEI polymarket wallets insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","none new (personal-name speculation, not recorded); Andrey topic pending tweet-count lead"
+61,2026-11-26,S4,ZachXBT polymarket wallet insider bets exposed accounts,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; ZachXBT topic stopped
+62,2026-11-26,S4,Lookonchain polymarket wallets profit suspected insider 2026,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",new: us-iran-ceasefire-2026-04-07 (Lookonchain 4 wallets $663k)
+63,2026-11-26,S4,Bubblemaps polymarket accounts linked onchain insider 2025,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+64,2026-11-26,S4,defioasis.eth polymarket addresses insider,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","none new (prefixes 0x054ec2f, 0xe56526b for same claim)"
+65,2026-11-26,S4,"polymarket ""fresh wallet"" bet insider 2025","WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; fresh-wallet topic stopped
+66,2026-11-26,S4,polymarket suspicious bet new account before announcement,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; suspicious topic stopped
+67,2026-11-26,S4,Lookonchain polymarket insider wallet created funded hours before bet,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+68,2026-11-26,S4,defioasis polymarket insider pattern wallets onchain researcher,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; DefiOasis topic stopped
+69,2026-11-26,S4,polymarket insider trading X post analyst flags account 2025,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","none new (lead: $13.2k to $463k ceasefire trade, attribution unclear); insider topic stopped"
+70,2026-11-26,S4,polymarket scrutiny Andrew Tate X bet profits,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","new: tweet-count-self-2026-03 (Euanker, 7 accounts)"
+71,2026-11-26,S4,Lookonchain polymarket trader turned bet into profit insider ceasefire OR strike OR election,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)","new: us-iran-ceasefire-2026-04-07 (BlueHorseshoe86); leads not recorded: Fernandoinfante, NOTHINGEVERFRICKINHAPPENS (attribution unclear)"
+72,2026-11-26,S4,Euanker polymarket onchain analysis accounts,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+73,2026-11-26,S4,Lookonchain polymarket suspected insider account netted,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new
+74,2026-11-26,S4,polymarket tweet count market accounts controlled by subject onchain analysis,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; Andrey / tweet-count topic stopped
+75,2026-11-26,S4,Lookonchain polymarket whale insider 2025 Nobel OR Google OR election wallet,"WebSearch (A5; site: operator not honoured, results are pages quoting posts)",none new; Lookonchain topic stopped

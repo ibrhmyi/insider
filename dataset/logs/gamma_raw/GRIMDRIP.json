@@ -1,0 +1,14 @@
+{
+ "profiles": [
+  {
+   "name": "GRIMDRIP",
+   "pseudonym": "Dismal-Volunteering-Graph",
+   "displayUsernamePublic": true,
+   "proxyWallet": "0x3f87d51f27ba6e19ec52aaeebb68559a839c742c"
+  }
+ ],
+ "pagination": {
+  "hasMore": false,
+  "totalResults": 0
+ }
+}
