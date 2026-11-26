@@ -1,0 +1,32 @@
+{
+ "rule": "PROTOCOL A13",
+ "seed": 192,
+ "day": {
+  "n_triggers": 10644,
+  "n_placebo_windows": 53220,
+  "candidate_pairs_real": 3694,
+  "candidate_pairs_placebo": 5441,
+  "candidates_per_trigger": 0.347,
+  "candidates_per_placebo_window": 0.1022,
+  "share_triggers_with_candidate": 0.2096,
+  "share_placebo_windows_with_candidate": 0.0793,
+  "distinct_candidate_wallets": 1090,
+  "distinct_placebo_hit_wallets": 2808,
+  "profile_missing_real": 490,
+  "placebo_to_real_ratio": 0.2945
+ },
+ "precise": {
+  "n_triggers": 13107,
+  "n_placebo_windows": 65535,
+  "candidate_pairs_real": 5842,
+  "candidate_pairs_placebo": 9483,
+  "candidates_per_trigger": 0.4457,
+  "candidates_per_placebo_window": 0.1447,
+  "share_triggers_with_candidate": 0.2576,
+  "share_placebo_windows_with_candidate": 0.1026,
+  "distinct_candidate_wallets": 1313,
+  "distinct_placebo_hit_wallets": 3525,
+  "profile_missing_real": 883,
+  "placebo_to_real_ratio": 0.3247
+ }
+}
