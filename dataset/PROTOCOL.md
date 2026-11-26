@@ -184,3 +184,28 @@ The order puts adjudication above everything else and a clearing statement above
 | `n_new_wallets` | wallets whose first Polymarket-v1 fill was within the previous 7 days |
 
 Minutes with no fills are left out. The table covers the outcome token of each market whose label is `Yes` (or the first outcome where no `Yes` exists).
+
+**A10 (2026-11-26, run 7, before any run-7 table is computed). Exact news times (decision D1).**
+
+*A10.1 Two news times.* Every market keeps the day-level `t_news` of A6.6/A7 unchanged. It also gets `t_news_precise`:
+- the earliest `t_utc` among the case's rows in `data/event_times.csv` whose `t_precision` is `minute`, `approx_15min`, `approx_hour` or `window_<start>-<end>` (the window start is used), and whose `url` is not empty;
+- if the case has no such row, `t_news_precise` = `t_news`, with `t_news_precise_source = day_fallback`. A day-start time is never later than a same-day exact time, so the fallback can only count fewer trades as pre-news.
+- `t_news_precise_precision` is `minute`, `quarter_hour`, `hour`, `window` or `day_fallback`. `t_news_precise_verified` copies the row's `verified` value (`pending` rows are used, and flagged).
+- If the exact time falls before the day-level `t_news` (for example a first report the evening before), it is used as is; it is a better estimate of the first public moment and makes the pre-news set smaller.
+
+*A10.2 Every time-dependent table carries both.* Positions, episodes, controls, minute paths, coordinated-buyer candidates and the benchmark features are computed once per version. They carry `t_news_version` (`day` or `precise`), `t_news_utc`, `t_news_precise_utc` and `t_news_precision`. Neither version replaces the other.
+
+*A10.3 Provenance of the times.* `data/event_times.csv` was compiled in run 4 (commit 6c68ee5) from search-result text, before any episode, control or feature under `t_news_precise` was computed (none had been). Run-7 rows are added and committed in a separate commit before the run-7 rebuild; each records `added_run`. A time is never chosen by looking at the trades: the source states it, or it is not added.
+
+**A11 (2026-11-26, run 7, before re-checking any handle). Pseudonym matches (decision D6).**
+- A handle from a claim resolves to a proxy address when (a) the Gamma profile's `name` matches exactly (as before), or (b) its `pseudonym` matches the handle exactly (same characters and case), **and** in case (b) the wallet's own fills confirm the claimed market (a market attached to the case), the claimed side (the outcome the claim says was bought, where it says one) and the window (at least one such BUY between the market's creation and the end of the case's `event_date`).
+- Every handle in any claim is re-checked under this rule; every lookup, match and fill check goes to `logs/handle_checks.csv`. A pseudonym match that fails the fill check is logged as `rejected_pseudonym_no_fills` and resolves nothing.
+- Case-insensitive name matches remain under A6.7.
+
+**A12 (2026-11-26, run 7). Grade for employer findings, and run-7 decisions D2 to D7.**
+- *A12.1 (D8).* E3 also covers disciplinary action by the trader's employer (dismissal, suspension, formal finding) when a named outlet reports it. The run-5 provisional E3 on the OpenAI firing claim stands under this rule; no claim text changes.
+- *A12.2 (D2) Money graph.* Out of scope for v0.3/v1.0 unless `POLYGON_RPC` or an explorer key is set in the environment. At the start of run 7 neither was set (checked), so `build/money_graph.py` is not run; `edges` ships the seed links only.
+- *A12.3 (D3) ACDC.* The A6.9 reconstruction is published exactly as computed, with its gap. No parameter is tuned after seeing the gap. It is not a label under A6.9 (`acdc_class` is shipped as a reconstruction column, not as a target).
+- *A12.4 (D4) Inca.* `inca_flag` stays, described as "published rule only; broader than Inca's list (9,285 vs 39)".
+- *A12.5 (D5) Trade confirmation.* `wallet_labels.csv` gets `trade_confirmed`: true when the address has at least one fill (either side, either source) in a market attached to its case in `markets.csv`; false otherwise. It is computed from the fills table, never from the claim. The label `is_documented` = `polarity == suspected` and `trade_confirmed`. Default analyses use `is_documented`; unconfirmed suspected wallets stay in the table.
+- *A12.6 (D7) tweet-count-self-2026-03.* Its markets are attached by `condition_id` only. Every stored text field that would name the subject (question, slug, event slug, outcome labels taken from titles, fill `market_slug`) is NULL for these markets, and the market carries `title_withheld = true`. Selection: the subject's weekly post-count events on Gamma whose end date falls between the earliest day of the case's `event_date` and its claim date (2026-02-01 to 2026-03-10). The lookup query is not stored.
