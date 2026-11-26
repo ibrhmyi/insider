@@ -189,14 +189,14 @@ for h, case, url in [
 GAMMA = "gamma public-search exact unique name match, 2026-11-26"
 RES = {  # handle: (address or "", status, notes)
     "djijaij83jdo4jdlwjflsg": ("0xa4eb52229991c074bc560f825bf2776d77acd010", "resolved", "326 trades, 236 on US-Iran ceasefire markets"),
-    "Elonfax89678": ("", "failed_no_exact_match", "only profile is 'ElonfaX89678' (case differs); not accepted"),
+    "Elonfax89678": ("0x1fa1be3eab546e06e4290839bf4c1d7abfbf1fa9", "resolved_case_insensitive_with_fills", "run 3 (A6.7): profile 'ElonfaX89678' (case differs) bought Yes in 'US x Iran ceasefire by April 7?' before the event; logs/handle_checks.csv HC001"),
     "Skoobidoobnj": ("0xfe6eee00d36717359578ddb4d6e091d56bc9074e", "resolved", "3690 trades, 464 on Iran/ceasefire markets"),
     "ricosuave666": ("", "rejected_exact_match_no_fills", "exact match 0x0002682ddf86736b89736659733d557e1749ec24 has zero activity (name reused after deletion); seed trader 0x0afc7ce5... now displays as 'Rundeep'"),
     "rundeep": ("", "failed_no_exact_match", "only case-insensitive match 'Rundeep' = 0x0afc7ce56285bde1fbe3a75efaffdfc86d6530b2, already in the seed for this case; not accepted as a lookup result"),
     "AlphaRaccoon": ("", "failed_no_exact_match", "Gamma returns only alpharaccoon2 and AlphaRaccoonn; account renamed. Address settled from fills instead: 0xee50a31c3f5a7c77824b12a941a54388a2827ed6 (see wallet_labels note)"),
     "Burdensome-Mix": ("", "failed_no_exact_match", "one unrelated profile returned"),
     "Magamyman": ("0x4dfd481c16d9995b809780fd8a9808e8689f6e4a", "resolved", "721 trades, 553 on Iran/Khamenei markets"),
-    "Bama124": ("", "failed_no_exact_match", "only profile is 'bama124' (case differs); not accepted"),
+    "Bama124": ("0xe5c8026239919339b988fdb150a7ef4ea196d3e7", "resolved_case_insensitive_with_fills", "run 3 (A6.7): profile 'bama124' (case differs) bought Walz Yes ($206,970) 2024-07-29 to 08-06 before the pick; logs/handle_checks.csv HC002"),
     "romanticpaul": ("0xf5cfe6f998d597085e366f915b140e82e0869fc6", "resolved", "18205 trades; 85 on Taylor Swift markets (engagement market title not matched by keyword; check)"),
     "OnlyBibi2026": ("", "failed_no_profiles", "zero profiles returned"),
     "whopperlover": ("0x607fec58640fcea5cb837adb09d658747720592c", "resolved", "1443 trades, 1394 on Iran military markets"),
@@ -208,7 +208,7 @@ RES = {  # handle: (address or "", status, notes)
 }
 for r in handles:
     a, st, note = RES[r["handle"]]
-    r.update(resolved_address=a, resolved_via=GAMMA if a else "", status=st, notes=note)
+    r.update(resolved_address=a, resolved_via=(GAMMA if st == "resolved" else "gamma public-search case-insensitive + Data API v2 fills (A6.7)") if a else "", status=st, notes=note)
     if a:
         w(a, r["case_id"], "trader", "L3_handle_resolved", "suspected", r["handle"], "Gamma public-search (handle named by source)",
           r["source_url"], "gamma_exact_handle", note)
