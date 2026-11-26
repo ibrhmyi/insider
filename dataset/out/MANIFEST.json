@@ -1,0 +1,166 @@
+{
+ "generated_by": "build/package.py",
+ "hf_source": "TimeSeventeen/Polymarket-v1 @ 6d1bcd5279cbbd8e833feaeba9a56a0aee139144",
+ "files": [
+  {
+   "path": "data/cases.csv",
+   "rows": 60,
+   "bytes": 14602,
+   "sha256": "c0ba22fb5c358e5b48186bd9ce1ea7fbddcbf67cb09eef2a873463f128a8db73",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "data/claims.csv",
+   "rows": 92,
+   "bytes": 35788,
+   "sha256": "32bbccd0d3784c22dc37b1f6126675cc4610f2acd3c9bc98537d656b27ac6f3a",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "data/contradictions.csv",
+   "rows": 1,
+   "bytes": 490,
+   "sha256": "f30716005720d431dc22bd60d93e791a61916cb44adf951266bf34dda5283da4",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "data/handles_to_resolve.csv",
+   "rows": 17,
+   "bytes": 5132,
+   "sha256": "190e96d65fc3548c609620e00e331cb482b5b201b2494706ce16d89d24050a9d",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "data/markets.csv",
+   "rows": 870,
+   "bytes": 550022,
+   "sha256": "955565d7e21e6feed67b5019e1c5934c645b32454268e04d1f1b4438df1eac9e",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "data/wallet_edges.csv",
+   "rows": 416,
+   "bytes": 175633,
+   "sha256": "3778c71d314fc12dc15a30e93dc1df39d99abb50f25578901960a848b1633d2f",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "data/wallet_labels.csv",
+   "rows": 250,
+   "bytes": 96256,
+   "sha256": "49883af0702fe0695c9c89a7b74854f8a53b31c89967b29f97fd0f59c7ab6724",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "logs/fills_counts_by_case.csv",
+   "rows": 42,
+   "bytes": 2861,
+   "sha256": "489f1b3f6f46b877ae5503a83e6ce2466f79a2401bb543ac0db33eeedf086196",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "logs/handle_checks.csv",
+   "rows": 6,
+   "bytes": 3370,
+   "sha256": "a2027fc0e8a9339c7db3609b90196ad9a2de967c0f51ab8b51da65461813bea0",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "logs/markets_not_found.csv",
+   "rows": 22,
+   "bytes": 1734,
+   "sha256": "e11baf8a83febf02e011f7a8272aeebf64dccdc5a656e864427b4ad0ab59ba13",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "logs/needs_page_read.csv",
+   "rows": 14,
+   "bytes": 2657,
+   "sha256": "1555dbae6ec2101cb3562f7f6d757a6affe46e51f995e420d2ece880bd743ab6",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "logs/repos.csv",
+   "rows": 12,
+   "bytes": 1126,
+   "sha256": "30666d62cc575f1318c5e1c8c02f432e3590073c09d50dc855ab0af21dc2156c",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "logs/search_log.csv",
+   "rows": 75,
+   "bytes": 12163,
+   "sha256": "2f50e6485d3be0b73ac9130656d3cc28907c7869811acd91a870bfce143ba4fb",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "out/acdc_longshots.parquet",
+   "rows": 90843,
+   "bytes": 5222165,
+   "sha256": "0d4a6821f3526d0767f3493ace703f0571233a6d1c089efa729c0e980a885fd6",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "out/controls.parquet",
+   "rows": 7669,
+   "bytes": 225598,
+   "sha256": "81aaa90efebb14ebbda58450bf3e8a4b682a86637363b36d50e9319b5ce6de68",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "out/episodes.parquet",
+   "rows": 8077,
+   "bytes": 821144,
+   "sha256": "64060eab4f0cab667f557bd0638065970a4f3f7c1f2b5854df489b1a03f9666a",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "out/fills/case_market_legs.parquet",
+   "rows": 20622245,
+   "bytes": 440829303,
+   "sha256": "073de6104dd3c2299b60ade901e8b18434a4757dcb766702387bcbc6bfff9c5a",
+   "in_git": false,
+   "over_50mb": true
+  },
+  {
+   "path": "out/fills/label_wallet_legs.parquet",
+   "rows": 115886,
+   "bytes": 3696710,
+   "sha256": "a1e8d5d62027843819f1557eb84037ff1aa6021e3e6b0479c48589d69f1747dd",
+   "in_git": true,
+   "over_50mb": false
+  },
+  {
+   "path": "out/hf_market_catalog.parquet",
+   "rows": 1538514,
+   "bytes": 182856491,
+   "sha256": "91366dfb70b8dfcf33edf6a726f0b339b5ef42c0fc5e35effa6f9978d9211614",
+   "in_git": false,
+   "over_50mb": true
+  },
+  {
+   "path": "out/weak_labels.parquet",
+   "rows": 2651672,
+   "bytes": 129264923,
+   "sha256": "abf1bf1a77e1b0b46fa9efa50303dabb2c07e5a437b2bd9ccd421f5c34652126",
+   "in_git": false,
+   "over_50mb": true
+  }
+ ]
+}
