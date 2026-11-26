@@ -80,3 +80,52 @@ No personal names in data tables. Court records are referenced by URL and case n
 **A4 (2026-11-26).** The 20% blind re-extraction in section 7 has not been done yet; it needs a second extractor who did not do the first pass. `verified_by` is empty until then.
 
 **A5 (2026-11-26, before run 2).** Run 2 has no X API either. X posts are searched through web search engines (queries of the form `site:x.com <account> polymarket` and `site:x.com polymarket insider`) and through pages that quote them. Each such claim is recorded as source class S4 with `via=search_engine` in `notes`, and the post URL as `url`. This is a partial sweep: A1 stays open until X is searched directly.
+
+**A6 (2026-11-26, before run 3; written before any run-3 data was pulled).** Verification status, provenance columns, partial dates, and the rules for the run-3 data build (markets, fills, money graph, rule labels, controls, episodes). Run 3 is the first run to build trade-level tables.
+
+*A6.1 Claim status.* Run 2's X sweep reached posts only through search-result snippets: the quoting pages could not be opened and no post URL was recovered. `claims.csv` gets a column `verified`:
+- `true`: the extractor read the source text (all run-1 rows, as recorded by the run-1 extractor; not re-checked, and not the same as the A4 blind re-extraction, which stays open);
+- `pending`: snippet-only (CL0085 to CL0092). It becomes `true` only after the page is read and, for S4 rows, the post URL is recovered;
+- `false`: the page was read and does not support the row.
+Pages to read are listed in `logs/needs_page_read.csv`.
+
+*A6.2 Run column.* `claims.csv` gets `run` (1, 2, 3, ...): the collection run in which the row was added. Run 1 = CL0001 to CL0084; run 2 = CL0085 to CL0092.
+
+*A6.3 Partial dates.* `event_date` and `claim_date` may be `YYYY`, `YYYY-MM`, `YYYY-MM-DD`, or a range `A/B`. They are compared by their earliest possible day (a range by the earliest day of `A`). `cases.csv` reports a `*_precision` column (`year`, `month`, `day`, `range`).
+
+*A6.4 Trade source.* Fills come from Polymarket-v1 on Hugging Face (`TimeSeventeen/Polymarket-v1`, commit recorded in the manifest), cleaned layers `daily_aligned/` and `daily_aligned_multi/` (relayer records removed), up to the last timestamp in that dataset (2026-04-28). After that, the Polymarket Data API v2 is used. Every row records `source` (`hf_polymarket_v1` or `data_api_v2`). The raw `OrderFilled/` layer is not used.
+- Side convention: the taker is the aggressor. The taker's side is `taker_direction` on the traded token. The maker's side is the opposite on the same token.
+- Because of mint and merge matching, a taker SELL of one outcome can economically be a BUY of the other; this is recorded, not corrected.
+
+*A6.5 Case markets.* A case's markets are found by Gamma search (question text and dates), FFIC market-ID prefixes, and the markets that the case's own claimed wallets traded. Each market row records its `found_via`. The deadline ladder is every market in the same Gamma event. No market is attached to a case by guess: if the claims do not identify the market, the case is logged as `no_market_found`.
+
+*A6.6 t_news.*
+- If ForesightFlow `polymarket-tnews-tevent-recovery` has the market at tier 1 or tier 3, use it (`method=ff_tier1` or `ff_tier3`).
+- Otherwise use `claim_min`: 00:00 UTC on the earliest possible day among the case's claims' `event_date` and `claim_date` (the event itself is the first public report for event markets). Precision is kept.
+- ForesightFlow tier 2 (`resolved_at - 24h`, which its own README says is unsuitable for single cases) is stored in a separate column and not used.
+
+*A6.7 Wallet checks.* A wallet "traded its case market" if it has at least one fill in any market attached to its case in `markets.csv`. Failing wallets are flagged, never deleted. A case-insensitive handle match (a run-2 failure) is accepted only if that profile bought the claimed outcome in a case market between the market's creation and the case `event_date` (inclusive). The evidence goes to `logs/handle_checks.csv`.
+
+*A6.8 Money graph.*
+- Polygon USDC.e (`0x2791bca1f2de4661ed88a30c99a7a9449aa84174`) and native USDC (`0x3c499c542cef5e3811e1192ce70d8cc03d5c3359`) `Transfer` logs to and from each suspected address, from a public Polygon RPC.
+- Counterparty tags come only from listed sources: Polymarket contract addresses published in Polymarket's documentation, the seed `wallet_edges.csv` kinds, and the source repositories. Anything else is `unknown`.
+- A counterparty with more than 500 distinct USDC counterparties is a `hub` and is not expanded. Counting stops at 501.
+- One hop: a non-hub address that funded (sent to) or received cash-out from a suspected wallet links it to any other address it transacted with that has Polymarket trading activity (Data API v2 activity not empty). Such an address becomes `L4_graph_expanded`, `polarity=candidate`, never `suspected`.
+
+*A6.9 Rule labels (E6, never merged with claims).*
+- **ACDC longshot:** one wallet's BUY fills on one token within one clock hour (UTC), summing to $2,500 or more at a volume-weighted price of 0.35 or less, on a market resolved in the Hugging Face metadata. Clock hours replace a rolling window so the computation is exact per day file.
+- **ACDC market type:** `category_refined`.
+- **Orca:** longshots in 1 or 2 market types and a longshot win rate of 75% or more.
+- **Military Orca:** an Orca with at least half of its longshots on markets whose slug matches `strike|military|attack|invade|invasion|ceasefire|missile|troops|war|bomb|airstrike|nuclear|drone|army|navy|forces|khamenei|regime`.
+- **Validation:** compared with the published counts (78,496 longshot bets, 12,355 wallets, 556 Orcas, 152 military Orcas, data to 2026-05-05). Our data end 2026-04-28; the gap is reported. If any count differs by more than 5%, the reconstruction is published as a reconstruction but not used as a label.
+- **Inca Digital:** 10 or fewer distinct markets and realised PnL of $30,000 or more. PnL = sell proceeds − buy cost + winning shares held at resolution, on resolved markets only. Splits, merges, redemptions and fees are ignored; the bias this causes is reported.
+
+*A6.10 Controls.*
+- An episode is (wallet, condition_id, outcome token) with at least one BUY before t_news. First buy = its first BUY fill. Size = BUY USDC on that token before t_news.
+- Controls come from the same market and token, with first buy within 24 h of the episode's first buy, first-buy price within ±0.05, and size within 0.5× to 2×.
+- Excluded: any address in `wallet_labels`, `wallet_labels_expanded`, or flagged Orca or Inca in `weak_labels`.
+- If fewer than 10 qualify, relax in this order and record which relaxation was used: window 72 h, then price ±0.10, then size 0.25× to 4×.
+- Plus up to 10 of the largest pre-t_news buyers of the other outcome token whose first buy is within 24 h.
+- Sampling uses seed 192.
+
+*A6.11 Episode features* follow `build/PIPELINE.md` step 7, computed from fills before t_news, except columns ending in `_post`.
