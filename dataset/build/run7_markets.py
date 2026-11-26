@@ -9,6 +9,7 @@ Idempotent: withheld rows are rebuilt each run. Usage: python3 build/run7_market
 """
 import os, sys
 import duckdb, pandas as pd
+sys.path.insert(0, os.path.dirname(__file__))
 
 D = os.path.join(os.path.dirname(__file__), "..")
 CASE = "tweet-count-self-2026-03"
@@ -18,7 +19,8 @@ for col in ["title_withheld", "t_news_precise_utc", "t_news_precise_precision", 
     if col in mk.columns:
         mk = mk.drop(columns=col)
 mk["title_withheld"] = "false"
-if len(sys.argv) > 1:
+PATTERN = sys.argv[1] if len(sys.argv) > 1 else None
+if PATTERN:
     c = duckdb.connect()
     cat = c.execute(f"""SELECT condition_id, string_agg(asset_id, ';' ORDER BY outcome_seq) token_ids,
                                string_agg(outcome_label, ';' ORDER BY outcome_seq) outcomes, any_value(winning_outcome_label) outcome,
@@ -26,7 +28,7 @@ if len(sys.argv) > 1:
                                sum(usdc_volume) vol
                         FROM '{D}/out/hf_market_catalog.parquet'
                         WHERE market_slug LIKE ? AND close_at BETWEEN '2026-02-01' AND '2026-03-10 23:59:59+00'
-                        GROUP BY condition_id ORDER BY close_at, condition_id""", [sys.argv[1]]).df()
+                        GROUP BY condition_id ORDER BY close_at, condition_id""", [PATTERN]).df()
     f = lambda t: pd.Timestamp(t).tz_convert("UTC").strftime("%Y-%m-%dT%H:%M:%SZ") if pd.notna(t) else ""
     rows = [dict(case_id=CASE, condition_id=r.condition_id.lower(), question="", slug="", event_id="withheld-week-" + f(r.close_at)[:10],
                  event_slug="", series_id="", selected_as="withheld_pattern:A12.6", found_via="hf_slug_withheld",
@@ -38,6 +40,35 @@ if len(sys.argv) > 1:
             for r in cat.itertuples()]
     mk = pd.concat([mk, pd.DataFrame(rows)], ignore_index=True)
     print("withheld markets attached:", len(rows))
+# --- run-7 new cases (A6.5): Gamma events named by the claims
+NEW_EVENTS = {"nvidia-ceo-return-2026-11": [("jensen-huang-rejoins-nvidia-byptptpt", "gamma_search",
+              "claims name the CEO-return markets ('a Dec. 31 return', 'the November contract')")]}
+import json, csv as _csv
+sys.argv = sys.argv[:1] + ["/nonexistent"]  # build_markets reads argv[1] only for its ForesightFlow path
+import build_markets as BM
+from dates import parse_date
+claims = list(_csv.DictReader(open(os.path.join(D, "data", "claims.csv"))))
+mk = mk[~mk.case_id.isin(NEW_EVENTS)]
+new = []
+for case, specs in NEW_EVENTS.items():
+    cl = [x for x in claims if x["case_id"] == case]
+    ev = [parse_date(x["event_date"]) for x in cl]; cd = [parse_date(x["claim_date"]) for x in cl]
+    cand = sorted([d for d in ev + cd if d[0] and d[1] == "day"] + ([d for d in ev if d[0]] if not any(d[1] == "day" for d in ev) else []))
+    tn_day, tn_prec = cand[0] if cand else ("", "")
+    for slug, via, why in specs:
+        e = BM.event_by_slug(slug)
+        ms = e.get("markets") or []; ends = sorted({(m.get("endDate") or "") for m in ms})
+        for m in ms:
+            outs, prices = json.loads(m.get("outcomes") or "[]"), json.loads(m.get("outcomePrices") or "[]")
+            new.append(dict(case_id=case, condition_id=m["conditionId"].lower(), question=m.get("question", ""), slug=m.get("slug", ""),
+                event_id=e.get("id", ""), event_slug=e.get("slug", ""), series_id="", selected_as=f"event:{slug}", found_via=via, reason=why,
+                selection_level="event", created_utc=m.get("createdAt", ""), deadline_utc=m.get("endDate", ""), resolved_utc=m.get("closedTime") or "",
+                outcome=(outs[prices.index("1")] if "1" in prices and m.get("closed") else ""), outcomes=";".join(outs),
+                token_ids=";".join(json.loads(m.get("clobTokenIds") or "[]")), neg_risk=str(m.get("negRisk", "")), volume_gamma=str(m.get("volume", "")),
+                volume_hf_usdc="", in_hf="False", ladder_rank=str(ends.index(m.get("endDate") or "") + 1) if len(ends) > 1 else "",
+                t_news_utc=tn_day + "T00:00:00Z", t_news_method="claim_min", t_news_precision=tn_prec, ff_tier="", ff_tier2_tnews="", title_withheld="false"))
+mk = pd.concat([mk, pd.DataFrame(new)], ignore_index=True)
+print("new-case markets:", len(new))
 # --- A10 precise times
 et = pd.read_csv(os.path.join(D, "data", "event_times.csv"), dtype=str, keep_default_na=False)
 ok = et[et.t_precision.isin(["minute", "approx_15min", "approx_hour"]) | et.t_precision.str.startswith("window_")]

@@ -244,3 +244,5 @@ Minutes with no fills are left out. The table covers the outcome token of each m
 1. All 33,504 weather-reading markets have no `resolved_at` in the catalog, so none entered the pool. For placebo markets, the end of the market is `resolved_at`, else `close_at` (the same fallback A14 gives case markets: resolved, else deadline). Resolution month and `t_ref` use that end.
 2. Coin names were matched as substrings (for example `ada` inside `canada`, `eth` inside `methane`). A coin must be a whole hyphen-separated slug token. The price patterns keep their hyphens as written in A14.
 3. A code error in the last relaxation step (operator precedence) ignored the decile condition. Fixed.
+
+**A14.2 (2026-11-26, run 7).** Case markets attached after the placebo selection and the start of the Polymarket-v1 pass (the 4 markets of the new case `nvidia-ceo-return-2026-11`, all after the Polymarket-v1 end date) are not matched to placebos in v1.0; they are listed in `data/placebo_markets.csv` with `relaxation = not_matched_added_after_selection`. Re-sampling would have changed every later match.

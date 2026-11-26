@@ -8,6 +8,7 @@ wallets = list(csv.DictReader(open(os.path.join(D, "wallet_labels.csv"))))
 old = {r["case_id"]: r for r in csv.DictReader(open(os.path.join(D, "cases.csv")))}
 
 NEW = {  # case_id: (title, category)
+ "nvidia-ceo-return-2026-11": ("Nvidia CEO return markets, November 2026 (16 new accounts)", "corporate_disclosure"),
  "arbitrum-airdrop-2023": ("Arbitrum airdrop timing, March 2023", "crypto"),
  "campaign-staff-bets": ("Campaign staffers betting on own candidates", "political_election"),
  "coinbase-earnings-mentions": ("Earnings-call mention markets read aloud by a CEO", "corporate_disclosure"),
