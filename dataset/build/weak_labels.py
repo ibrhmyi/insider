@@ -30,15 +30,20 @@ c.sql("ALTER TABLE acdc ADD COLUMN military_orca BOOLEAN; UPDATE acdc SET milita
 # Inca: <= 10 markets and realised PnL >= $30,000 (resolved markets only; splits, merges, redemptions, fees ignored)
 c.sql(f"""CREATE TABLE res AS SELECT asset_id, condition_id, any_value(outcome_label) outcome_label, any_value(winning_outcome_label) winning,
           any_value(resolution_status) status FROM '{OUT}/hf_market_catalog.parquet' GROUP BY 1, 2""")
-c.sql(f"""CREATE TABLE pos AS SELECT wallet, condition_id, asset_id, sum(buy_usdc) buy_usdc, sum(buy_shares) buy_shares,
-          sum(sell_usdc) sell_usdc, sum(sell_shares) sell_shares, sum(n_fills) n_fills, min(first_ts) first_ts, max(last_ts) last_ts
-          FROM read_parquet('{WORK}/P/*.parquet') GROUP BY 1, 2, 3""")
-c.sql("""CREATE TABLE inca AS SELECT p.wallet, count(DISTINCT p.condition_id) n_markets, sum(p.n_fills) n_fills,
-          sum(p.buy_usdc) buy_usdc, sum(p.sell_usdc) sell_usdc, min(p.first_ts) first_ts, max(p.last_ts) last_ts,
-          sum(CASE WHEN r.status = 'resolved' AND r.winning IS NOT NULL THEN
-                p.sell_usdc - p.buy_usdc + CASE WHEN r.outcome_label = r.winning THEN greatest(p.buy_shares - p.sell_shares, 0) ELSE 0 END
-              ELSE 0 END) realised_pnl
-          FROM pos p LEFT JOIN res r USING (asset_id, condition_id) GROUP BY p.wallet""")
+# positions aggregated across day files, processed in 16 wallet-hash buckets to bound memory and temp disk
+c.sql("""CREATE TABLE inca (wallet VARCHAR, n_markets BIGINT, n_fills HUGEINT, buy_usdc DOUBLE, sell_usdc DOUBLE,
+          first_ts BIGINT, last_ts BIGINT, realised_pnl DOUBLE)""")
+for k in range(16):
+    c.sql(f"""INSERT INTO inca
+      WITH pos AS (SELECT wallet, condition_id, asset_id, sum(buy_usdc) buy_usdc, sum(buy_shares) buy_shares,
+                   sum(sell_usdc) sell_usdc, sum(sell_shares) sell_shares, sum(n_fills) n_fills, min(first_ts) first_ts, max(last_ts) last_ts
+                   FROM read_parquet('{WORK}/P/*.parquet') WHERE hash(wallet) % 16 = {k} GROUP BY 1, 2, 3)
+      SELECT p.wallet, count(DISTINCT p.condition_id), sum(p.n_fills), sum(p.buy_usdc), sum(p.sell_usdc), min(p.first_ts), max(p.last_ts),
+             sum(CASE WHEN r.status = 'resolved' AND r.winning IS NOT NULL THEN
+                   p.sell_usdc - p.buy_usdc + CASE WHEN r.outcome_label = r.winning THEN greatest(p.buy_shares - p.sell_shares, 0) ELSE 0 END
+                 ELSE 0 END)
+      FROM pos p LEFT JOIN res r USING (asset_id, condition_id) GROUP BY p.wallet""")
+    print("bucket", k, flush=True)
 c.sql("ALTER TABLE inca ADD COLUMN inca_flag BOOLEAN; UPDATE inca SET inca_flag = n_markets <= 10 AND realised_pnl >= 30000")
 
 c.sql(f"""COPY (SELECT i.wallet address, i.n_markets, i.n_fills, round(i.buy_usdc, 2) buy_usdc, round(i.sell_usdc, 2) sell_usdc,

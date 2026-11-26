@@ -1,0 +1,27 @@
+{
+ "published": {
+  "longshot_bets": 78496,
+  "wallets": 12355,
+  "orcas": 556,
+  "military_orcas": 152
+ },
+ "published_data_end": "2026-05-05",
+ "ours": {
+  "longshot_bets": 90843,
+  "wallets": 13045,
+  "orcas": 1599,
+  "military_orcas": 294
+ },
+ "our_data_end": "2026-04-28T11:00:40Z",
+ "gap_percent": {
+  "longshot_bets": 15.7,
+  "wallets": 5.6,
+  "orcas": 187.6,
+  "military_orcas": 93.4
+ },
+ "used_as_label": false,
+ "rule": "PROTOCOL A6.9",
+ "inca_flagged_wallets": 9285,
+ "inca_published_wallets": 39,
+ "wallets_total": 2651672
+}
