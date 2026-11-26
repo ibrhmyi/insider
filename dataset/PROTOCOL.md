@@ -129,3 +129,14 @@ Pages to read are listed in `logs/needs_page_read.csv`.
 - Sampling uses seed 192.
 
 *A6.11 Episode features* follow `build/PIPELINE.md` step 7, computed from fills before t_news, except columns ending in `_post`.
+
+**A7 (2026-11-26, run 3, after building `markets.csv` and before computing any feature, control or episode that uses t_news).** A6.6's `claim_min` changes to: t_news is the earliest of
+- every day-precision `event_date` of the case's claims;
+- every day-precision `claim_date`;
+- if the case has no day-precision `event_date`, the earliest possible day of its coarser event dates.
+
+Coarse (month, quarter, year, range) claim dates are ignored. Precision is kept.
+
+*Reason:* a report cannot precede the event it describes, so the event date is the anchor, and a claim date can only move t_news earlier. Under A6.6, a month-only claim date put t_news on the first of the month. In the Maduro case that was 2026-01-01, two days before the operation, so the trades at issue would have counted as post-news.
+
+*A rejected first draft* ("earliest day-precision date of either kind, else the earliest coarse date") was tried on `markets.csv` and not adopted. Where the event date is coarse, it moved t_news to a much later claim date: ftx-sbf, romania-2024 and biden-pardons to 2026, and kpmg-earnings to 2026-11. The changes are listed in `logs/run3_report.md`. No other part of A6 changes.
