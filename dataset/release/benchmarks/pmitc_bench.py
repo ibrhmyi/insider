@@ -22,8 +22,8 @@ T1_LEAKAGE = ["is_documented", "doc_grade", "is_candidate_coordinated", "is_cont
               "asset_id", "t_cut_ts (absolute time)", "first_buy_ts / last_buy_ts (absolute time)", "source_pre", "vol_to_day (includes the rest of the cut's day)"]
 T2_FEATURES = ["account_age_days_at_first_buy", "prior_markets", "prior_net_long_win_rate", "first_price", "vwap", "max_price_paid", "n_buy_fills",
                "median_fill_usdc", "fill_size_cv", "taker_share", "hour_of_day_first_buy", "pre_buy_usdc", "signal_a_rebuy_1_5x", "size_price_slope",
-               "hours_last_buy_to_tnews", "ladder_rank", "share_on_this_ladder_market", "hours_first_buy_to_tnews"]
-T2_LEAKAGE = ["role", "episode_id", "control_of", "wallet", "case_share_of_lifetime_volume (lifetime denominator)", "is_shortest_sufficient",
+               "hours_last_buy_to_tnews", "ladder_rank", "hours_first_buy_to_tnews"]
+T2_LEAKAGE = ["share_on_this_ladder_market (construction artifact: controls are drawn one market at a time, so their share is 1; AUC 0.97 alone)", "role", "episode_id", "control_of", "wallet", "case_share_of_lifetime_volume (lifetime denominator)", "is_shortest_sufficient",
               "follower_wallets_60m / follower_buy_usdc_60m (window can pass t_news)", "share_sold_before_resolution_post", "won_post", "pnl_post",
               "redemption_delay_hours_post", "hours_funding_to_first_trade / funding_source_type / funder_shared_with_labelled (empty)"]
 T3_FEATURES = ["log_usdc_48h", "log_usdc_24h", "log_usdc_1h", "usdc_share_last_6h", "log_n_wallets_48h", "new_wallet_share_48h", "price_change_24h",
@@ -65,7 +65,7 @@ def t1(data, splits, version):
     p["y"] = p.is_documented.astype(int)
     p["log_buy_usdc_pre"] = np.log1p(p.buy_usdc_pre); p["log_n_buy_fills_pre"] = np.log1p(p.n_buy_fills_pre)
     p["log_account_age_days"] = np.log1p(p.account_age_days_at_first_buy.clip(lower=0)); p["log_market_usdc_pre"] = np.log1p(p.market_usdc_pre)
-    p["log_lifetime_markets"] = np.log1p(p.markets_to_day); p["gate2a_int"] = p.gate2a.astype(float)
+    p["log_lifetime_markets"] = np.log1p(p.lifetime_markets_v1); p["gate2a_int"] = p.gate2a.astype(float)
     p["sell_share_pre"] = p.sell_shares_pre / p.buy_shares_pre
     p["hours_first_buy_to_cut"] = (p.t_cut_ts - p.first_buy_ts) / 3600; p["hours_last_buy_to_cut"] = (p.t_cut_ts - p.last_buy_ts) / 3600
     X = p[T1_FEATURES].astype(float)

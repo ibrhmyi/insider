@@ -1,3 +1,5 @@
+> **v1.0 (run 7):** this file describes the v0.3 tables in `data/` and `out/`. The release tables are documented in [`release/docs/DATASHEET.md`](release/docs/DATASHEET.md).
+
 # Datasheet: Prediction-Market Informed-Trading Casebook (PMITC), v0.3
 
 Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules: [PROTOCOL.md](PROTOCOL.md) v1.0 with amendments A1 to A8. Column meanings: [CODEBOOK.md](CODEBOOK.md). Run history: `logs/run2_report.md`, `logs/run3_report.md`.

@@ -134,7 +134,7 @@ EPI = [col("row_id", S, "row id within version"), col("episode_id", S, "stable i
     col("hour_of_day_first_buy", I, "UTC hour of first buy", leak="pre"), col("pre_buy_usdc", FL, "pre-news buy USDC", unit="USDC", leak="pre"),
     col("pre_buy_shares", FL, "pre-news buy shares", leak="pre"), col("signal_a_rebuy_1_5x", B, "Signal A", leak="pre"), col("size_price_slope", FL, "slope of buy size on price", leak="pre"),
     col("hours_last_buy_to_tnews", FL, "hours from last pre-news buy to t_news", unit="hours", leak="pre"), col("ladder_rank", I, "deadline rank", leak="static"),
-    col("is_shortest_sufficient", B, "market is the event's shortest deadline that resolved Yes", leak="post"), col("share_on_this_ladder_market", FL, "share of event buys on this market", leak="pre"),
+    col("is_shortest_sufficient", B, "market is the event's shortest deadline that resolved Yes", leak="post"), col("share_on_this_ladder_market", FL, "share of event buys on this market. LEAKY for suspected-vs-control tasks: controls are matched one market at a time, so it is 1 for every control", leak="label"),
     col("hours_first_buy_to_tnews", FL, "hours from first buy to t_news", unit="hours", leak="pre"),
     col("hours_funding_to_first_trade", FL, "empty: money graph not run (A12.2)", leak="pre"), col("funding_source_type", S, "empty (A12.2)", leak="pre"),
     col("funder_shared_with_labelled", B, "empty (A12.2)", leak="pre"), col("follower_wallets_60m", I, "other wallets buying the token within 60 min after a pre-news buy (may extend past t_news)", leak="post"),
@@ -173,4 +173,5 @@ TABLES["contradictions"] = dict(desc="Places where the trades disagree with a cl
     col("phase", S, "run / phase"), col("found_utc", T, "when recorded")])
 TABLES["edges"] = dict(desc="Money links between addresses from the seed sources (funding, Relay handoff, Safe owner, cash-out). Not expanded (A12.2).", cols=[
     col("src", S, "sender"), col("dst", S, "receiver"), col("kind", S, "link type"), col("case_id", S, "case"), col("chain", S, "chain or route"),
-    col("amount_usd", FL, "amount", unit="USD"), col("tx", S, "transaction hash or evidence"), col("utc", T, "time"), col("source", S, "source file"), col("source_url", S, "source URL")])
+    col("amount_usd", FL, "amount", unit="USD"), col("tx", S, "transaction hash or evidence"), col("utc", T, "time (NULL where the source gives only a block number)"), col("block_number", I, "Polygon block number where the source gives one instead of a time"),
+    col("source", S, "source file"), col("source_url", S, "source URL")])

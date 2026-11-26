@@ -17,6 +17,10 @@ nul = lambda df: df.replace({"": None})
 ARROW = {"string": pa.string(), "int64": pa.int64(), "float64": pa.float64(), "bool": pa.bool_(), "timestamp": pa.timestamp("s", tz="UTC"), "date": pa.date32()}
 
 
+def is_text(s):
+    return s.dtype == object or pd.api.types.is_string_dtype(s)
+
+
 def cast(name, df):
     spec = TABLES[name]["cols"]; names = [c["name"] for c in spec]
     missing = [n for n in names if n not in df.columns]; extra = [c for c in df.columns if c not in names]
@@ -28,16 +32,16 @@ def cast(name, df):
             s = s.astype("object").where(s.notna(), None)
             s = s.map(lambda x: None if x is None or (isinstance(x, float) and np.isnan(x)) or x == "" else str(x))
         elif c["dtype"] in ("int64", "float64"):
-            s = pd.to_numeric(s.replace({"": None}) if s.dtype == object else s, errors="raise")
+            s = pd.to_numeric(s.astype(object).replace({"": None}) if is_text(s) else s, errors="raise")
             s = s.round().astype("Int64") if c["dtype"] == "int64" else s.astype("float64")
         elif c["dtype"] == "bool":
-            if s.dtype == object:
-                s = s.map(lambda x: None if x is None or x == "" or (isinstance(x, float) and np.isnan(x)) else str(x).strip().lower() in ("true", "1"))
+            if not pd.api.types.is_bool_dtype(s):
+                s = s.astype(object).map(lambda x: None if x is None or x == "" or (isinstance(x, float) and np.isnan(x)) else str(x).strip().lower() in ("true", "1"))
             s = s.astype("boolean")
         elif c["dtype"] == "timestamp":
-            s = pd.to_datetime(s.replace({"": None}) if s.dtype == object else s, utc=True, errors="raise", format="mixed").dt.floor("s")
+            s = pd.to_datetime(s.astype(object).replace({"": None}) if is_text(s) else s, utc=True, errors="raise", format="mixed").dt.floor("s")
         elif c["dtype"] == "date":
-            s = pd.to_datetime(s.replace({"": None}), errors="raise").dt.date
+            s = pd.to_datetime(s.astype(object).replace({"": None}), errors="raise").dt.date
         df[c["name"]] = s
     pk = [c["name"] for c in spec if c["pk"]]
     if pk:
@@ -92,9 +96,12 @@ write("markets", nul(mk))
 pl = rd("data/placebo_markets.csv"); pl["benchmark_split"] = pl.case_id.map(split)
 write("placebo_markets", nul(pl))
 write("contradictions", nul(rd("data/contradictions.csv")))
-write("edges", nul(rd("data/wallet_edges.csv")))
+ed = rd("data/wallet_edges.csv")
+blk = ed.utc.str.extract(r"^block (\d+)$")[0]
+ed["block_number"] = blk.fillna(""); ed.loc[blk.notna(), "utc"] = ""  # some sources give a block number instead of a time
+write("edges", nul(ed))
 # ---------- large tables via parquet
-c = duckdb.connect(); c.sql("SET memory_limit='10GB'; SET enable_progress_bar=false")
+c = duckdb.connect(); c.sql("SET memory_limit='4GB'; SET enable_progress_bar=false")
 # controls / episodes (both versions)
 ctrl = pd.concat([pd.read_parquet(os.path.join(V1, f"controls_{v}.parquet")) for v in ["day", "precise"]], ignore_index=True)
 ep_ids = {}
@@ -132,22 +139,4 @@ print("weak_labels", len(wl), flush=True)
 del wl, pos
 mm = pd.read_parquet(os.path.join(V1, "market_minutes.parquet")).rename(columns={})
 write("market_minutes", mm)
-# fills: parts of PART_ROWS rows, ordered as written by build/v1/fills.py
-for f in sorted(os.listdir(OUT)):
-    if f.startswith("fills_part"):
-        os.remove(os.path.join(OUT, f))
-n_part = 0; total = 0
-for ms in ["case", "placebo", "label_other"]:
-  for src in ["hf_polymarket_v1", "data_api_v2"]:  # separate files per source, so data_api_v2 rows can be withheld if its terms require
-    p0 = os.path.join(V1, "fills", f"fills_{ms}.parquet")
-    p = f"(SELECT * FROM '{p0}' WHERE source = '{src}')"
-    n = c.sql(f"SELECT count(*) FROM {p}").fetchall()[0][0]
-    for off in range(0, n, PART_ROWS):
-        n_part += 1
-        t = c.sql(f"""SELECT market_set, leg_id, source, fill_id, tx_hash, ts, to_timestamp(ts) ts_utc, condition_id, asset_id, outcome_label, outcome_seq,
-                     price, usdc, shares, fee_usdc, wallet, wallet_role, wallet_side, aggressor_side, maker, taker, market_slug
-                     FROM {p} LIMIT {PART_ROWS} OFFSET {off}""").arrow()
-        t = t.cast(schema_of("fills"))
-        pq.write_table(t, os.path.join(OUT, f"fills_part{n_part:03d}_{ms}_{src}.parquet"), compression="zstd", row_group_size=500_000)
-        total += t.num_rows
-print("fills", total, "rows in", n_part, "parts")
+# fills: written by build/v1/fills_release.py (streaming COPY)

@@ -1,6 +1,19 @@
 # Prediction-Market Informed-Trading Casebook (PMITC)
 
-An open, source-traced register of every publicly documented case of suspected informed trading on prediction markets: court and regulator actions, platform sanctions, analyst investigations, press reports, and rule-based screens. Each claim keeps its own source and evidence grade, so a researcher can choose how strict to be.
+An open, source-traced register of every publicly documented case of suspected informed trading on prediction markets, joined to trade-level data for analysis and machine learning.
+
+**Version 1.0.0 (2026-11-26, run 7).** The release package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A16.1. Run 7 is described in [`logs/run7_report.md`](logs/run7_report.md).
+
+Files over 50 MB (`release/data/positions.parquet`, `weak_labels.parquet`, `fills_part*.parquet`) are not in git; they are listed with SHA-256 in `release/MANIFEST.json` and rebuilt by the scripts.
+
+### v1.0 build order (after the v0.3 order below)
+
+`run7_markets.py '<withheld pattern>'` → `placebo_markets.py` → `hf_pass_v7.py <hf> <work>` → `pull_market_trades.py` → `weak_labels.py <work>` → `v1/fills.py` → `v1/labels.py confirm` → `v1/coordinated.py` → `v1/labels.py candidates` → `pull_activity.py` (candidates) → `v1/fills.py` → `v1/positions.py` → `v1/episodes.py <work> day|precise` → `v1/minutes.py` → `v1/amount_checks.py` → `v1/tables.py` → `v1/fills_release.py` → `v1/codebook.py` → `v1/notebooks.py` + nbconvert → `release/benchmarks/pmitc_bench.py` → `v1/kaggle_meta.py` → `v1/codebook.py` (manifest) → `python3 -m pytest tests`.
+
+---
+
+## v0.3 description (kept for the run history)
+
 
 **Version:** 0.3 (2026-11-26, run 3: trades, markets, controls). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A8. Every column is described in [CODEBOOK.md](CODEBOOK.md); the datasheet is [DATASHEET.md](DATASHEET.md).
 

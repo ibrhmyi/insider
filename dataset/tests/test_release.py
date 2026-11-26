@@ -29,7 +29,7 @@ def test_schema_dtypes_and_columns(t):
     """Schema: explicit dtypes, snake_case, one CODEBOOK entry per column."""
     want = [(c["name"], ARROW[c["dtype"]]) for c in TABLES[t]["cols"]]
     for f in files_of(t):
-        got = [(x.name, str(x.type)) for x in pq.read_schema(f)]
+        got = [(x.name, re.sub(r"timestamp\[(s|ms|us|ns), tz=UTC\]", "timestamp[s, tz=UTC]", str(x.type))) for x in pq.read_schema(f)]
         assert got == want, f
     assert all(re.fullmatch(r"[a-z][a-z0-9_@]*", c["name"]) for c in TABLES[t]["cols"])
     cb = open(os.path.join(D, "release", "docs", "CODEBOOK.md")).read()

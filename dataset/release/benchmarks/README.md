@@ -20,7 +20,7 @@ Treat scores as "how well a method finds wallets that sources flagged", not as i
 - **Unit:** `episodes` rows: documented episodes (`role = suspected`) vs their matched controls (`control_same_side`, `control_other_side_large_buyer`).
 - **Metrics:** AUC and log loss, case-grouped 5-fold CV, and train -> test.
 - **Base result to report:** matched same-side controls win about as often as documented episodes (`won_post` by role), so outcome-based features cannot separate them; the task asks whether behaviour before the news can.
-- **Do not use:** `role`, `episode_id`, `control_of`, `wallet`, `case_share_of_lifetime_volume` (lifetime denominator), `is_shortest_sufficient`, `follower_*_60m` (window can cross t_news), every `_post` column, and the empty funding columns.
+- **Do not use:** `share_on_this_ladder_market` (construction artifact: controls are sampled one market at a time, so it is always 1 for them; alone it gives AUC 0.97), `role`, `episode_id`, `control_of`, `wallet`, `case_share_of_lifetime_volume` (lifetime denominator), `is_shortest_sufficient`, `follower_*_60m` (window can cross t_news), every `_post` column, and the empty funding columns.
 
 ## T3: market-level detection
 - **Unit:** case markets with matched placebos vs those placebo markets (A14), features from pre-cut flow only (`market_minutes` with `minutes_from_cut < 0`, `positions` before the cut).
