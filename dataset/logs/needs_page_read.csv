@@ -1,0 +1,15 @@
+claim_id_or_lead,url,what_to_check,added_run
+CL0085,https://stocktwits.com/news-articles/markets/cryptocurrency/polymarket-wallets-profit-before-maduro-arrest/cmxA4w6R4Gr,"read page; confirm claim text, amount, date; recover the X post URL of Lookonchain",3
+CL0086,https://crypto.news/bubblemaps-polymarket-maduro-bet-wlfi-claims-2026/,"read page; confirm claim text, amount, date; recover the X post URL of Bubblemaps",3
+CL0087,https://blockchain.news/flashnews/polymarket-insider-trading-allegations-highlight-onchain-connections,"read page; confirm claim text, amount, date; recover the X post URL of Bubblemaps",3
+CL0088,https://blockchain.news/flashnews/insiders-pocket-663k-on-us-iran-ceasefire-bet-via-polymarket,"read page; confirm claim text, amount, date; recover the X post URL of Lookonchain",3
+CL0089,https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears,"read page; confirm claim text, amount, date; recover the X post URL of Lookonchain; confirm this page is the one reporting BlueHorseshoe86",3
+CL0090,https://cointelegraph.com/news/suspected-insider-1-2m-zachxbt-axiom-expose,"read page; confirm claim text, amount, date; recover the X post URL of DefiOasis",3
+CL0091,https://crypto.news/polymarket-world-cup-bets-raise-questions-after-24m-wallet-profits/,"read page; confirm claim text, amount, date; recover the X post URL of Lookonchain; confirm exact post date (month only so far)",3
+CL0092,https://www.cryptotimes.io/2026/03/11/insiders-game-on-polymarket-andrew-tates-x-bets-spark-fresh-debate/,"read page; confirm claim text, amount, date; recover the X post URL of Euanker",3
+lead:polymarket-money-25-posts,https://www.itiger.com/news/2614645958,"Barron's: Polymarket-run X account, 25 insider-signal posts since Dec 9; need article date and the account's post URLs",3
+lead:zachxbt-70k-deposit,https://beincrypto.com/zachxbt-investigation-polymarket-betting-crypto-insider-trading,ZachXBT flagged a $70k USDC deposit into a new account before the Axiom market; find source page and address,3
+lead:ceasefire-fernandoinfante,https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears,$13.2k to $463k ceasefire trade; who reported it (Lookonchain?),3
+lead:nothingeverfrickinhappens,https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears,account with $88.9k profit on US-strikes-Iran; who reported it,3
+lead:lookonchain-maduro-clear-case,https://www.mexc.com/news/402493,Lookonchain called a $33k to $400k Venezuela bet a clear case; find post URL,3
+lead:andrey-post,https://x.com/Andrey_10gwei/status/2007904168791454011,read post; check whether it is the source of CL0006,3

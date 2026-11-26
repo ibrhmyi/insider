@@ -34,6 +34,41 @@ NEW = {  # case_id: (title, category)
  "world-cup-2026-06": ("FIFA World Cup 2026 match markets, three linked accounts", "sports"),
  "tweet-count-self-2026-03": ("Weekly post-count markets traded by accounts linked to the subject", "celebrity"),
 }
+import re, datetime
+
+
+def parse_date(v):
+    """PROTOCOL A6.3: partial dates. Returns (earliest possible day as ISO string, precision) or ("", "").
+    Accepts YYYY, YYYY-MM, YYYY-MM-DD, YYYY-Qn, and ranges A/B, YYYY-YYYY, YYYY-YYYY-MM-DD (earliest day of A)."""
+    v = (v or "").strip()
+    if not v:
+        return "", ""
+    m = re.fullmatch(r"(\d{4})-(\d{4}(?:-\d{2}){0,2})", v)
+    if "/" in v or m:
+        a = v.split("/")[0] if "/" in v else m.group(1)
+        return parse_date(a)[0], "range"
+    m = re.fullmatch(r"(\d{4})-Q([1-4])", v)
+    if m:
+        return f"{m.group(1)}-{3 * int(m.group(2)) - 2:02d}-01", "quarter"
+    for fmt, prec, pad in (("%Y-%m-%d", "day", ""), ("%Y-%m", "month", "-01"), ("%Y", "year", "-01-01")):
+        try:
+            datetime.datetime.strptime(v, fmt)
+            return v + pad, prec
+        except ValueError:
+            pass
+    raise ValueError(f"unparseable date {v!r}")
+
+
+def earliest(rows, key):
+    """Earliest possible day among rows[key]; returns (original value, earliest day, precision)."""
+    best = None
+    for x in rows:
+        d, p = parse_date(x[key])
+        if d and (best is None or d < best[1]):
+            best = (x[key], d, p)
+    return best or ("", "", "")
+
+
 RANK = {"E1": 1, "E2": 2, "E3": 3, "E4": 4, "E5": 5, "E6": 6}
 
 by = defaultdict(list)
@@ -55,8 +90,10 @@ for cid in sorted(by):
         case_id=cid, title=title, category=cat,
         platform=";".join(sorted({x["platform"] for x in cl})), family=";".join(fam),
         case_grade=grades[0], grades_present=";".join(grades),
-        event_date=min(x["event_date"] for x in cl if x["event_date"]) if any(x["event_date"] for x in cl) else "",
-        first_claim_date=min(x["claim_date"] for x in cl if x["claim_date"]) if any(x["claim_date"] for x in cl) else "",
+        event_date=earliest(cl, "event_date")[0], event_date_earliest=earliest(cl, "event_date")[1],
+        event_date_precision=earliest(cl, "event_date")[2],
+        first_claim_date=earliest(cl, "claim_date")[0], first_claim_date_earliest=earliest(cl, "claim_date")[1],
+        first_claim_date_precision=earliest(cl, "claim_date")[2],
         n_claims=len(cl), n_sources=len({x["url"] for x in cl}),
         n_wallet_addresses=len(wal.get(cid, ())),
         max_amount_claimed_usd=max((float(x["amount_claimed_usd"]) for x in cl if x["amount_claimed_usd"]), default=""),

@@ -10,11 +10,12 @@ import csv, os
 ACC = "2026-11-26"
 F = ["claim_id", "case_id", "platform", "family", "subject_type", "subject", "claim_text", "evidence_grade",
      "amount_claimed_usd", "n_accounts_claimed", "event_date", "claim_date", "source_class", "source_name",
-     "url", "accessed_date", "extractor", "notes"]
+     "url", "accessed_date", "extractor", "notes", "run", "verified"]
 
 C = []
+RUN, VERIFIED = 1, "true"  # PROTOCOL A6.1/A6.2: set per collection run below
 def c(case, platform, family, stype, subject, text, grade, amount, n, event, cdate, sclass, sname, url, notes=""):
-    C.append(dict(case_id=case, platform=platform, family=family, subject_type=stype, subject=subject,
+    C.append(dict(run=RUN, verified=VERIFIED, case_id=case, platform=platform, family=family, subject_type=stype, subject=subject,
                   claim_text=text, evidence_grade=grade, amount_claimed_usd=amount, n_accounts_claimed=n,
                   event_date=event, claim_date=cdate, source_class=sclass, source_name=sname, url=url,
                   accessed_date=ACC, extractor="claude-opus-5.5", notes=notes))
@@ -127,6 +128,7 @@ c("romania-2024", PM, "resolution_event", "market", "Romanian election market", 
 c("xfm-self-trading", PM, MAN, "cluster", "37 XFM accounts", "Paired accounts minted matching Yes and No in two-party fills, paying collectors; a self-trading pattern.", "E4", "", 37, "2026-10", "2026-11-07", "S5", "searadacunha/POLYMARKET-HOME-OF-THE-INSIDERS", "https://github.com/searadacunha/POLYMARKET-HOME-OF-THE-INSIDERS")
 
 # --- Run 2: X sweep through search engines (amendment A5). Appended at the end so earlier claim_ids stay fixed.
+RUN, VERIFIED = 2, "pending"  # snippet-only rows (A6.1)
 A5 = "via=search_engine; extracted from search-engine result text, source page not read (page fetch blocked in run 2); post URL not recovered"
 c("maduro-2026-01", PM, IT, "cluster", "three wallets", "Lookonchain: three wallets created and funded days earlier netted $630,484 betting on Maduro's removal hours before the arrest.", "E5", 630484, 3, "2026-01-03", "2026-01-03", "S4", "Lookonchain via Stocktwits", "https://stocktwits.com/news-articles/markets/cryptocurrency/polymarket-wallets-profit-before-maduro-arrest/cmxA4w6R4Gr", A5 + "; probably the origin of CL0005")
 c("maduro-2026-01", PM, IT, "account", "Maduro winner", "Bubblemaps disputed linking the Maduro winner to a WLFI cofounder; exchange timing and amount matches cannot prove wallet ownership.", "E5", "", 1, "2026-01-03", "2026-01", "S4", "Bubblemaps via crypto.news", "https://crypto.news/bubblemaps-polymarket-maduro-bet-wlfi-claims-2026/", A5 + "; counter-claim to the ownership hypothesis behind CL0006; alleges nothing itself")
