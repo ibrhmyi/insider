@@ -140,3 +140,12 @@ Coarse (month, quarter, year, range) claim dates are ignored. Precision is kept.
 *Reason:* a report cannot precede the event it describes, so the event date is the anchor, and a claim date can only move t_news earlier. Under A6.6, a month-only claim date put t_news on the first of the month. In the Maduro case that was 2026-01-01, two days before the operation, so the trades at issue would have counted as post-news.
 
 *A rejected first draft* ("earliest day-precision date of either kind, else the earliest coarse date") was tried on `markets.csv` and not adopted. Where the event date is coarse, it moved t_news to a much later claim date: ftx-sbf, romania-2024 and biden-pardons to 2026, and kpmg-earnings to 2026-11. The changes are listed in `logs/run3_report.md`. No other part of A6 changes.
+
+**A8 (2026-11-26, run 3, before any Polygon transfer data was pulled).** Details of the A6.8 money graph that A6 left open.
+- *Reason:* the reachable public RPC (`polygon-bor-rpc.publicnode.com`) serves at most 10,000 blocks per `eth_getLogs` call, so all-time histories are not practical. A per-address window is set instead.
+- *Window:* from the proxy's Gamma profile `createdAt` (or one day before its first Data API activity if it has no profile) to 30 days after its last Data API activity. Transfers outside the window are not seen; this is reported as a limitation.
+- *Funder / cash-out:* a funder is an address that sent USDC or USDC.e to the suspected wallet in its window. A cash-out address received USDC or USDC.e from it.
+- *Hub test:* for each funder or cash-out address, distinct counterparties are counted over the union of the windows of the suspected wallets it touches. Counting stops at 501, and such an address is a hub.
+- *Polymarket contracts:* the addresses listed in Polymarket's developer documentation (docs.polymarket.com) are tagged `polymarket_contract` and are never hubs or candidates.
+- *One hop:* every other address that transacted with a non-hub funder or cash-out address in that window, and has at least one Data API v2 activity row, is a candidate (`L4_graph_expanded`, `polarity=candidate`). Addresses already in `wallet_labels.csv` are not candidates.
+- *Edges:* every edge records the transaction hash, block, token, amount and direction.
