@@ -246,3 +246,12 @@ Minutes with no fills are left out. The table covers the outcome token of each m
 3. A code error in the last relaxation step (operator precedence) ignored the decile condition. Fixed.
 
 **A14.2 (2026-11-26, run 7).** Case markets attached after the placebo selection and the start of the Polymarket-v1 pass (the 4 markets of the new case `nvidia-ceo-return-2026-11`, all after the Polymarket-v1 end date) are not matched to placebos in v1.0; they are listed in `data/placebo_markets.csv` with `relaxation = not_matched_added_after_selection`. Re-sampling would have changed every later match.
+
+**A16 (2026-11-26, run 7, before any gate column is computed). Gate columns in `weak_labels` (PIPELINE step 5).**
+- *Scope.* Gates are computed for every wallet in the positions table (C2: case and placebo markets), not platform-wide; wallets outside those markets get NULL gate columns (`gate_scope = not_in_case_or_placebo_markets`).
+- *Gate 1* = the frozen v1 Layer-1 screen (`rules/frozen_v1.md`, F1-F6, high score = score >= 4), one value per (wallet, market, version), taking T_news = `t_news` or `t_news_precise` (placebo: `t_ref`). Two inputs are substituted, because the user-stats and user-volume endpoints cannot be called for hundreds of thousands of wallets:
+  - F1 account start = the wallet's first Polymarket-v1 fill (the rule's own fallback, "earliest first activity"), or its Gamma `createdAt` where looked up;
+  - F2 denominator = the wallet's Polymarket-v1 USDC volume (all markets) up to the end of T_news's UTC day, from the day files; the market-count branch uses its Polymarket-v1 distinct markets up to that day (never more than lifetime, so it cannot flag more than the frozen rule).
+  Gate 1 is NULL for markets with no Polymarket-v1 fills (Data API era). `gate1_inputs = substituted_f1_f2`.
+- *Gate 2a* = Signal A of PIPELINE step 7 (a pre-news BUY at >= 1.5x the wallet's first pre-news price on that token). *Gate 2b* = Signal B (the wallet's largest pre-news BUY is on the shortest deadline that resolved Yes in its Gamma event).
+- `weak_labels` reports counts per wallet: `gate1_n`, `gate2a_n`, `gate2b_n` (number of (market, token) positions that fire, `precise` version) and the same with `_day`. The frozen v0 ripple alert (seed, anchors, excess ripple) is not run in v1.0: it needs the taker-only feed with transaction keys for every market, which the cleaned Polymarket-v1 layers do not carry.
