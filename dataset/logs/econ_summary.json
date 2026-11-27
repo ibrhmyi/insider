@@ -1,0 +1,31 @@
+{
+ "label_other": {
+  "legs": 64968,
+  "sell_legs": 26504,
+  "inferred": 6437,
+  "inferred_maker": 5,
+  "inferred_taker": 6430,
+  "partial": 201,
+  "iterations": [
+   3218,
+   1233,
+   1400,
+   1840,
+   731,
+   2143,
+   2620,
+   2177,
+   2200,
+   8977,
+   2182,
+   6031,
+   1821,
+   2295,
+   2409,
+   1857
+  ],
+  "wallets_changed": 84,
+  "markets_no_complement": 756,
+  "wallets": 103
+ }
+}
