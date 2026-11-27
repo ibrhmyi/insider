@@ -2,7 +2,7 @@
  "seed": 192,
  "n_episodes": 580,
  "n_controls": 10251,
- "n_pre_rows": 1700611,
+ "n_pre_rows": 1690777,
  "n_excluded_addresses": 1763,
  "episodes_with_same_side_controls": 542,
  "relaxation_counts": {
@@ -32,10 +32,10 @@
   "biden-pardons": 11,
   "maduro-2026-01": 10,
   "israel-rising-lion-2025-06": 3,
-  "mstr-btc-sale": 2,
   "taylor-swift-engagement": 2,
-  "trump-pardon-cz-2025": 1,
+  "mstr-btc-sale": 2,
   "draftkings-pm-launch": 1,
-  "fed-chair-nomination-2026": 1
+  "fed-chair-nomination-2026": 1,
+  "trump-pardon-cz-2025": 1
  }
 }

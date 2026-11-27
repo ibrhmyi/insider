@@ -2,7 +2,7 @@
  "seed": 192,
  "n_episodes": 580,
  "n_controls": 10221,
- "n_pre_rows": 1700611,
+ "n_pre_rows": 1690777,
  "n_excluded_addresses": 12337,
  "episodes_with_same_side_controls": 542,
  "relaxation_counts": {

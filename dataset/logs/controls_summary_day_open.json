@@ -2,7 +2,7 @@
  "seed": 192,
  "n_episodes": 461,
  "n_controls": 8388,
- "n_pre_rows": 1602661,
+ "n_pre_rows": 1596123,
  "n_excluded_addresses": 1763,
  "episodes_with_same_side_controls": 433,
  "relaxation_counts": {
@@ -31,11 +31,11 @@
   "maduro-2026-01": 8,
   "israel-rising-lion-2025-06": 3,
   "mstr-btc-sale": 2,
-  "nobel-peace-2025": 2,
   "taylor-swift-engagement": 2,
-  "draftkings-pm-launch": 1,
+  "nobel-peace-2025": 2,
+  "trump-pardon-cz-2025": 1,
   "fed-chair-nomination-2026": 1,
-  "world-cup-2026-06": 1,
-  "trump-pardon-cz-2025": 1
+  "draftkings-pm-launch": 1,
+  "world-cup-2026-06": 1
  }
 }
