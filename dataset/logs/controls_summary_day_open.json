@@ -1,0 +1,41 @@
+{
+ "seed": 192,
+ "n_episodes": 461,
+ "n_controls": 8388,
+ "n_pre_rows": 1602661,
+ "n_excluded_addresses": 1763,
+ "episodes_with_same_side_controls": 433,
+ "relaxation_counts": {
+  "base": 299,
+  "size_0.25_4x": 105,
+  "window_72h": 18,
+  "price_0.10": 11
+ },
+ "n_episodes_without_same_side": 28,
+ "n_episode_rows": 8849,
+ "rows_by_role": {
+  "control_other_side_large_buyer": 4531,
+  "control_same_side": 3857,
+  "suspected": 461
+ },
+ "suspected_episodes_by_case": {
+  "us-iran-strike-2026-02-28": 311,
+  "kpmg-earnings-2025-26": 33,
+  "google-yis-2025": 19,
+  "us-iran-ceasefire-2026-04-07": 18,
+  "bubblemaps-military-cluster": 15,
+  "super-bowl-halftime-2026": 13,
+  "walz-vp-2024": 12,
+  "biden-pardons": 10,
+  "zachxbt-axiom-2026-02": 9,
+  "maduro-2026-01": 8,
+  "israel-rising-lion-2025-06": 3,
+  "mstr-btc-sale": 2,
+  "nobel-peace-2025": 2,
+  "taylor-swift-engagement": 2,
+  "draftkings-pm-launch": 1,
+  "fed-chair-nomination-2026": 1,
+  "world-cup-2026-06": 1,
+  "trump-pardon-cz-2025": 1
+ }
+}

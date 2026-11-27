@@ -1,25 +1,26 @@
 {
  "seed": 192,
- "n_episodes": 473,
- "n_controls": 8757,
- "n_pre_rows": 1489360,
- "n_excluded_addresses": 12139,
- "episodes_with_same_side_controls": 453,
+ "n_episodes": 580,
+ "n_controls": 10221,
+ "n_pre_rows": 1700611,
+ "n_excluded_addresses": 12337,
+ "episodes_with_same_side_controls": 542,
  "relaxation_counts": {
   "base": 282,
-  "size_0.25_4x": 131,
-  "price_0.10": 21,
-  "window_72h": 19
+  "size_0.25_4x": 217,
+  "price_0.10": 23,
+  "window_72h": 20
  },
- "n_episodes_without_same_side": 20,
- "n_episode_rows": 9230,
+ "n_episodes_without_same_side": 38,
+ "n_episode_rows": 10801,
  "rows_by_role": {
-  "control_other_side_large_buyer": 4675,
-  "control_same_side": 4082,
-  "suspected": 473
+  "control_other_side_large_buyer": 5727,
+  "control_same_side": 4494,
+  "suspected": 580
  },
  "suspected_episodes_by_case": {
   "us-iran-strike-2026-02-28": 332,
+  "kpmg-earnings-2025-26": 90,
   "us-iran-ceasefire-2026-04-07": 22,
   "zachxbt-axiom-2026-02": 20,
   "google-yis-2025": 19,
@@ -27,11 +28,12 @@
   "nobel-peace-2025": 14,
   "super-bowl-halftime-2026": 13,
   "walz-vp-2024": 12,
+  "world-cup-2026-06": 12,
+  "biden-pardons": 11,
   "maduro-2026-01": 10,
-  "biden-pardons": 6,
   "israel-rising-lion-2025-06": 3,
-  "kpmg-earnings-2025-26": 2,
   "taylor-swift-engagement": 2,
+  "mstr-btc-sale": 2,
   "trump-pardon-cz-2025": 1,
   "draftkings-pm-launch": 1,
   "fed-chair-nomination-2026": 1
