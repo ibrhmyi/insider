@@ -89,7 +89,7 @@ Every column has a type, unit, allowed values, source and leakage note in `docs/
 
 Every time-dependent table exists for two cut times (`t_news_version`): `day` and `precise`. Cuts are **per market** (A25): a Gamma scheduled start (matches, earnings releases), a market deadline inside a coarse case date, or else the case time; the case-level `t_news_utc` (00:00 UTC of the earliest documented day) and `t_news_precise_utc` (a sourced minute- or hour-level time, A10, inside the coarse date, A18) are kept. {n_exact} of {markets.case_id.nunique()} market-bearing cases have an exact time; the rest fall back to the day.
 
-## Benchmarks (PROTOCOL A23; `benchmarks/`)
+## Benchmarks (PROTOCOL A23, A26, A27; `benchmarks/`)
 
 Leave-one-case-out over cases with at least 3 `label_standard` wallets, plus a time split (test = cases first claimed on or after 2026-03-01). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
 
