@@ -158,7 +158,7 @@ def run_task(df, feats, metric, std_counts, rule_col, age_col, tune, n_neg, rng,
         if rule_col is not None:
             r["gate1_rule"] = dict(primary=metric(test.assign(score=test[rule_col].fillna(-1) + 1e-9 * test.get("tie", 0))))
         if age_col is not None:
-            r["account_age_heuristic"] = dict(primary=metric(test.assign(score=-test[age_col].fillna(test[age_col].median()))))
+            r["account_age_heuristic"] = dict(primary=metric(test.assign(score=-test[age_col].fillna(test[age_col].median()).fillna(0.0))))  # a test case with no known ages ranks as ties
         tr = subsample(train, n_neg, rng)
         m = lr_model().fit(tr[feats], tr.y); r["logistic_regression"] = dict(primary=metric(test.assign(score=m.predict_proba(test[feats])[:, 1])))
         if tune:
