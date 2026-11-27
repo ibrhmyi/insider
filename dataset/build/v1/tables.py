@@ -117,11 +117,12 @@ write("claim_wallet_links", nul(rd("data/claim_wallet_links.csv")))
 # ---------- large tables via parquet
 c = duckdb.connect(); c.sql("SET memory_limit='4GB'; SET enable_progress_bar=false")
 # controls / episodes (both versions)
-ctrl = pd.concat([pd.read_parquet(os.path.join(V1, f"controls_{v}.parquet")) for v in ["day", "precise"]], ignore_index=True)
+DES = ["standard", "age_matched", "open"]  # A27
+ctrl = pd.concat([pd.read_parquet(os.path.join(V1, f"controls_{v}_{d}.parquet")) for v in ["day", "precise"] for d in DES], ignore_index=True)
 ep_ids = {}
 for v in ["day", "precise"]:
-    e = pd.read_parquet(os.path.join(V1, f"episodes_{v}.parquet"))
-    ep_ids[v] = e
+    for d in DES:
+        ep_ids[(v, d)] = pd.read_parquet(os.path.join(V1, f"episodes_{v}_{d}.parquet"))
 epi = pd.concat(ep_ids.values(), ignore_index=True)
 LS = wallets[["wallet", "case_id", "label_strict", "label_standard", "label_broad"]]
 epi = epi.merge(LS, on=["wallet", "case_id"], how="left")
@@ -136,7 +137,7 @@ fr = CC.sort_values("trigger_utc").drop_duplicates(["candidate_wallet", "case_id
 fr = fr.rename(columns={"candidate_wallet": "wallet", "trigger_wallet": "triggering_suspect"})[["wallet", "case_id", "condition_id", "asset_id", "t_news_version", "triggering_suspect"]]
 fr = fr.assign(placebo_rate=fr.t_news_version.map(lambda v: PR[v]["placebo_to_real_ratio"]))
 hn = HN[HN.rule != "cleared_case_wallet"][["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "rule"]].rename(columns={"rule": "hard_negative_rule"})
-ctl = ctrl[["t_news_version", "case_id", "condition_id", "wallet"]].drop_duplicates()
+ctl = ctrl[ctrl.control_design == "standard"][["t_news_version", "case_id", "condition_id", "wallet"]].drop_duplicates()
 for nm, df in [("doc_df", doc), ("fr_df", fr), ("ls_df", LS), ("hn_df", hn), ("ctl_df", ctl)]:
     c.register(nm, df)
 c.sql(f"""CREATE TEMP VIEW pos_v AS SELECT p.*, d.doc_grade AS doc_grade_d, (d.wallet IS NOT NULL) AS doc_hit,

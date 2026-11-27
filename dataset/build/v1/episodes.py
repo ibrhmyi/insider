@@ -14,6 +14,8 @@ import duckdb, numpy as np, pandas as pd
 
 D = os.path.join(os.path.dirname(__file__), "..", "..")
 WORK, VER = sys.argv[1], sys.argv[2]
+MODE = sys.argv[3] if len(sys.argv) > 3 else "standard"  # A27: standard | age_matched | open
+assert MODE in ("standard", "age_matched", "open")
 OUT0 = os.path.join(D, "out")
 OUT = os.path.join(D, "out", "v1")
 LEGS = os.path.join(OUT, "fills", "fills_case.parquet")
@@ -39,7 +41,7 @@ exp_p = os.path.join(D, "data", "wallet_labels_expanded.csv")
 expanded = set(pd.read_csv(exp_p, dtype=str)["address"]) if os.path.exists(exp_p) else set()
 weak_flag = {r[0] for r in c.sql(f"SELECT address FROM '{OUT0}/weak_labels.parquet' WHERE acdc_class = 'Orca' OR inca_flag").fetchall()}
 cands = set(pd.read_csv(os.path.join(D, "data", "coordinated_candidates.csv"), dtype=str).candidate_wallet)  # A13 / A17: rule-fired wallets
-excluded = labelled | expanded | weak_flag | cands
+excluded = labelled | expanded | cands | (set() if MODE == "open" else weak_flag)  # A27: T2-open lets Orca/Inca wallets be controls
 c.execute("CREATE TABLE excl(a VARCHAR)"); c.executemany("INSERT INTO excl VALUES (?)", [(a,) for a in excluded])
 sus = W[(W["polarity"] == "suspected") & (W["trade_confirmed"].astype(str).str.lower() == "true") & (W["label_family"] == "informed_trading")][["address", "case_id"]].drop_duplicates()
 cand = pd.read_csv(exp_p, dtype=str)[["address"]].assign(case_id="") if expanded else pd.DataFrame(columns=["address", "case_id"])
@@ -62,7 +64,16 @@ print("episodes", len(ep), flush=True)
 
 # --- controls
 rng = np.random.default_rng(SEED)
-pre_by = {k: g for k, g in c.sql("SELECT * FROM pre WHERE wallet NOT IN (SELECT a FROM excl)").df().groupby(["case_id", "condition_id"])}
+BANDS = [(-1e18, 1, "lt_1d"), (1, 7, "1_7d"), (7, 30, "7_30d"), (30, 180, "30_180d"), (180, 1e18, "ge_180d")]
+c.sql(f"CREATE TABLE ffw AS SELECT address wallet, epoch(first_fill_utc)::BIGINT ffts FROM '{OUT0}/weak_labels.parquet'")
+def age_band(df):  # A27: days from first Polymarket-v1 fill to first pre-cut buy; 'unknown' without v1 history
+    d = (df["first_buy_ts"] - df["ffts"]) / 86400
+    return [("unknown" if pd.isna(x) else next(n for lo, hi, n in BANDS if lo <= x < hi)) for x in d]
+ffw = c.sql("SELECT * FROM ffw WHERE wallet IN (SELECT DISTINCT wallet FROM pre)").df().set_index("wallet").ffts
+ep["ffts"] = ep.wallet.map(ffw); ep["age_band"] = age_band(ep)
+pre_df = c.sql("SELECT * FROM pre WHERE wallet NOT IN (SELECT a FROM excl)").df()
+pre_df["ffts"] = pre_df.wallet.map(ffw); pre_df["age_band"] = age_band(pre_df)
+pre_by = {k: g for k, g in pre_df.groupby(["case_id", "condition_id"])}
 LADDER = [("base", 86400, 0.05, (0.5, 2.0)), ("window_72h", 3 * 86400, 0.05, (0.5, 2.0)),
           ("price_0.10", 3 * 86400, 0.10, (0.5, 2.0)), ("size_0.25_4x", 3 * 86400, 0.10, (0.25, 4.0))]
 ctrl = []
@@ -70,6 +81,8 @@ for _, e in ep.iterrows():
     g = pre_by.get((e["case_id"], e["condition_id"]))
     if g is None:
         continue
+    if MODE == "age_matched":  # never relaxed
+        g = g[g["age_band"] == e["age_band"]]
     same = g[g["asset_id"] == e["asset_id"]]
     picked, used = pd.DataFrame(), "none_available"
     for name, win, dp, (lo, hi) in LADDER:
@@ -90,8 +103,8 @@ for _, e in ep.iterrows():
                          **{k: r[k] for k in ("case_id", "condition_id", "asset_id", "outcome_label", "wallet", "first_buy_ts",
                                                "first_buy_price", "size_usdc", "n_buys")}))
 ctrl = pd.DataFrame(ctrl)
-ctrl["t_news_version"] = VER
-ctrl.to_parquet(os.path.join(OUT, f"controls_{VER}.parquet"), index=False)
+ctrl["t_news_version"] = VER; ctrl["control_design"] = MODE
+ctrl.to_parquet(os.path.join(OUT, f"controls_{VER}_{MODE}.parquet"), index=False)
 summ = dict(seed=SEED, n_episodes=len(ep), n_controls=len(ctrl), n_pre_rows=n_pre, n_excluded_addresses=len(excluded),
             episodes_with_same_side_controls=int(ctrl[ctrl.control_type == "same_side"].episode_id.nunique()) if len(ctrl) else 0,
             relaxation_counts=ctrl[ctrl.control_type == "same_side"].groupby("episode_id").relaxation.first().value_counts().to_dict() if len(ctrl) else {},
@@ -205,9 +218,9 @@ keep = ["row_id", "role", "control_of", "case_id", "condition_id", "event_slug",
 X = X.rename(columns={})[keep]
 X = X.merge(ep[["episode_id", "case_id", "condition_id", "asset_id", "wallet"]], on=["case_id", "condition_id", "asset_id", "wallet"], how="left")
 X.loc[X.role != "suspected", "episode_id"] = None
-X["t_news_version"] = VER
-X.to_parquet(os.path.join(OUT, f"episodes_{VER}.parquet"), index=False)
+X["t_news_version"] = VER; X["control_design"] = MODE
+X.to_parquet(os.path.join(OUT, f"episodes_{VER}_{MODE}.parquet"), index=False)
 summ.update(n_episode_rows=len(X), rows_by_role=X["role"].value_counts().to_dict(),
             suspected_episodes_by_case=X[X.role == "suspected"]["case_id"].value_counts().to_dict())
-json.dump(summ, open(os.path.join(D, "logs", f"controls_summary_{VER}.json"), "w"), indent=1, default=str)
+json.dump(summ, open(os.path.join(D, "logs", f"controls_summary_{VER}_{MODE}.json"), "w"), indent=1, default=str)
 print(json.dumps(summ, indent=1, default=str))

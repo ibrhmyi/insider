@@ -28,10 +28,10 @@ def cell(task, s, model):
 
 
 bench_rows = []
-for task, metric in [("T1", "AP, case-weighted"), ("T2", "AUC, case-weighted"), ("T3", "AUC, case-weighted"), ("T3b", "AUC, case-weighted")]:
+for task, metric in [("T1s", "AP"), ("T2s", "AUC"), ("T2open", "AUC"), ("T1", "AP"), ("T2", "AUC"), ("T3", "AUC"), ("T3b", "AUC")]:
     for model in ["prevalence", "gate1_rule", "account_age_heuristic", "logistic_regression", "gradient_boosting_tuned"]:
         if model in B["precise"]["label_strict"][task]["summary"] or model in B["precise"]["label_standard"][task]["summary"]:
-            bench_rows.append(f"| {task} | {metric} | {model} | " + " | ".join(cell(task, s, model) for s in ["label_strict", "label_standard", "label_broad"]) + " |")
+            bench_rows.append(f"| {task} | {metric} | {model} | " + " | ".join(cell(task, s, model) for s in ["label_standard", "label_strict", "label_broad"]) + " |")
 yaml_cfg = []
 for t in TABLES:
     files = "data/fills_part*.parquet" if t == "fills" else f"data/{t}.parquet"
@@ -49,7 +49,7 @@ configs:
 {chr(10).join(yaml_cfg)}
 ---
 
-# PMITC v1.1: Prediction-Market Informed-Trading Casebook
+# PMITC v1.2: Prediction-Market Informed-Trading Casebook
 
 PMITC is a source-traced register of **publicly documented, suspected** informed trading on prediction markets (Polymarket and Kalshi): {len(cases)} cases and {len(claims)} claims from courts, regulators, platforms, researchers, journalists and on-chain analysts, each graded E1 (adjudicated) to E6 (rule-based screen), joined to the trades. For every case market it ships every fill, every buyer before the news, matched controls, hard negatives, same-category "twin" markets and placebo markets where nobody can know the outcome early, so that detection methods can be trained and tested honestly. **Every label is an allegation by a named source ("flagged by <source>"), not a finding.** No table contains a personal name.
 
@@ -79,21 +79,23 @@ Every column has a type, unit, allowed values, source and leakage note in `docs/
 
 | Set | Definition | Wallets | Cases |
 |---|---|---|---|
-| `label_strict` | trade-confirmed, informed trading, and either linked to an E1-E3 claim or named by address or resolved handle in an E4 claim | {ls['label_strict']} | {lsc['label_strict']} |
-| `label_standard` | trade-confirmed, informed trading, case grade E1-E4 (includes cluster members linked by money flows) | {ls['label_standard']} | {lsc['label_standard']} |
+| `label_standard` (main training label) | trade-confirmed, informed trading, case grade E1-E4 (includes cluster members linked by money flows) | {ls['label_standard']} | {lsc['label_standard']} |
+| `label_strict` (evaluation only) | label_standard, linked to an E1-E3 claim or named by address or resolved handle in an E4 claim, with a buy before the precise news time | {ls['label_strict']} | {lsc['label_strict']} |
 | `label_broad` | trade-confirmed, informed trading, case grade E1-E5 (= `is_documented`) | {ls['label_broad']} | {lsc['label_broad']} |
 
-Lead with `label_strict`. Other label columns are kept separate and never merged: `hard_negative` (A21: {len(hn):,} rows; look-alike losers, look-alike winners in placebo markets, cleared cases), `coordinated_rule_fired` (rule output; about 1/3 expected by chance; may include copy-traders; not an allegation), `gate1`/`gate2a`/`gate2b` (frozen screens), `acdc_class` (reconstruction, not a label), `inca_flag` (published rule only; broader than Inca's list), `is_control`, `is_placebo_market`, `is_twin_market`.
+**`label_standard` is the main training label; `label_strict` is evaluation-only** (models are trained on `label_standard` and scored on strict positives, A26). `label_strict` also needs a buy before the market's precise news time; {int(wallets.strict_no_prenews.sum())} wallet(s) meet the rest of the rule without one (`strict_no_prenews`). Other label columns are kept separate and never merged: `hard_negative` (A21: {len(hn):,} rows; look-alike losers, look-alike winners in placebo markets, cleared cases), `coordinated_rule_fired` (rule output; about 1/3 expected by chance; may include copy-traders; not an allegation), `gate1`/`gate2a`/`gate2b` (frozen screens), `acdc_class` (reconstruction, not a label), `inca_flag` (published rule only; broader than Inca's list), `is_control`, `is_placebo_market`, `is_twin_market`.
 
 ## News times
 
-Every time-dependent table exists for two cut times (`t_news_version`): `day` (00:00 UTC on the earliest documented day) and `precise` (a sourced minute- or hour-level time, A10; used only inside the coarse date, A18). {n_exact} of {markets.case_id.nunique()} market-bearing cases have an exact time; the rest fall back to the day.
+Every time-dependent table exists for two cut times (`t_news_version`): `day` and `precise`. Cuts are **per market** (A25): a Gamma scheduled start (matches, earnings releases), a market deadline inside a coarse case date, or else the case time; the case-level `t_news_utc` (00:00 UTC of the earliest documented day) and `t_news_precise_utc` (a sourced minute- or hour-level time, A10, inside the coarse date, A18) are kept. {n_exact} of {markets.case_id.nunique()} market-bearing cases have an exact time; the rest fall back to the day.
 
 ## Benchmarks (PROTOCOL A23; `benchmarks/`)
 
-Leave-one-case-out over cases with at least 3 `label_standard` wallets, plus a time split (test = cases first claimed on or after 2026-03-01). Cells: leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. T1 ranks all pre-news buyers in a case market; T2 separates documented episodes from matched controls; T3 separates case markets from same-category twin markets; T3b from crypto/weather placebo markets (market-type sensitive).
+Leave-one-case-out over cases with at least 3 `label_standard` wallets, plus a time split (test = cases first claimed on or after 2026-03-01). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
 
-| Task | Metric | Model | label_strict | label_standard | label_broad |
+**Headline tasks control for how sources select cases (A27):** **T1s** ranks pre-news buyers only within the size band of the market's positives (size alone no longer separates them); **T2s** matches controls on account-age band as well as time, price and size; **T2-open** lets Orca/Inca-flagged wallets be controls. Secondary: T1 (all buyers), T2 (standard controls), T3 (case vs same-category twin markets), T3b (case vs crypto/weather placebo markets; market-type sensitive).
+
+| Task | Metric | Model | label_standard | label_strict (eval only) | label_broad |
 |---|---|---|---|---|---|
 {chr(10).join(bench_rows)}
 
@@ -126,7 +128,7 @@ CC-BY-4.0 for PMITC tables and docs; MIT for code. Polymarket-v1 (TimeSeventeen,
 
 ## How to cite
 
-> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.1.0 [dataset]. Protocol v1.0 with amendments A1 to A24. https://github.com/ibrhmyi/insider
+> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.2.0 [dataset]. Protocol v1.0 with amendments A1 to A28. https://github.com/ibrhmyi/insider
 
 See `docs/CITATION.cff`. Please also cite Polymarket-v1 for the fills.
 """

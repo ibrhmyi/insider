@@ -259,3 +259,46 @@ def test_numeric_columns_carry_units(t):
     bad = [c["name"] for c in TABLES[t]["cols"] if c["dtype"] in ("int64", "float64") and not c["name"].startswith("n_") and not UNIT.search(c["name"])
            and not c["name"].startswith(("f2_", "gate1_", "f5_"))]
     assert not bad, (t, bad)
+
+
+def test_market_cut_not_after_sourced_case_time():
+    """A25/A25.1: per-market cuts never fall after the case's sourced exact time nor after the day-level case date ends."""
+    m = load("markets", ["t_news_utc", "t_news_precise_utc", "t_news_precise_precision", "t_news_market_utc", "t_news_market_day_utc", "t_news_market_method"])
+    m = m[m.t_news_market_utc.notna()]
+    sourced = m.t_news_precise_precision != "day_fallback"
+    assert (m[sourced].t_news_market_utc <= m[sourced].t_news_precise_utc).all()
+    assert (m.t_news_market_day_utc <= m.t_news_utc + pd.Timedelta(days=1)).all()
+    assert (m[m.t_news_market_method == "case_time"].t_news_market_utc == m[m.t_news_market_method == "case_time"].t_news_precise_utc).all()
+
+
+def test_positions_use_market_cut():
+    """A25: positions' cut is the market's own cut in both versions."""
+    m = load("markets", ["case_id", "condition_id", "t_news_market_utc", "t_news_market_day_utc"])
+    p = load("positions", ["market_set", "case_id", "condition_id", "t_news_version", "t_cut_unix"])
+    p = p[p.market_set == "case"].drop_duplicates(["case_id", "condition_id", "t_news_version"]).merge(m, on=["case_id", "condition_id"])
+    exp = p.t_news_market_utc.where(p.t_news_version == "precise", p.t_news_market_day_utc)
+    assert len(p) and (exp.map(lambda x: int(x.timestamp())).values == p.t_cut_unix.values).all()
+
+
+def test_strict_requires_prenews_buy():
+    """A26: every label_strict wallet bought before a case market's precise cut; strict_no_prenews is disjoint from strict and within standard."""
+    w = load("wallets", ["wallet", "label_strict", "label_standard", "strict_no_prenews"])
+    assert not (w.label_strict & w.strict_no_prenews).any() and (~w.strict_no_prenews | w.label_standard).all()
+    p = load("positions", ["market_set", "wallet", "t_news_version"])
+    pre = set(p[(p.market_set == "case") & (p.t_news_version == "precise")].wallet)
+    assert set(w[w.label_strict].wallet) <= pre
+
+
+def test_control_designs():
+    """A27: three control designs; suspected episodes identical across designs; age-matched controls share the episode's age band."""
+    e = load("episodes", ["t_news_version", "control_design", "role", "episode_id"])
+    assert set(e.control_design) == {"standard", "age_matched", "open"}
+    s = e[e.role == "suspected"].groupby(["t_news_version", "control_design"]).episode_id.apply(frozenset)
+    for v in ["day", "precise"]:
+        assert s[v]["standard"] == s[v]["age_matched"] == s[v]["open"]
+
+
+def test_label_sets_exclude_non_informed_families():
+    """A19/A28: only informed_trading wallets carry a label set."""
+    w = load("wallets", ["label_family", "label_broad"])
+    assert (w[w.label_broad].label_family == "informed_trading").all()

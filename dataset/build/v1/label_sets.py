@@ -56,8 +56,16 @@ e4 = L[(L.evidence_grade == "E4") & L.link_type.isin(["address_in_claim", "resol
 e4set = set(zip(e4.wallet, e4.case_id))
 strict_g = W.wallet_grade.isin(["E1", "E2", "E3"])
 strict_e4 = pd.Series([(a.lower(), c) in e4set for a, c in zip(W.address, W.case_id)], index=W.index)
-W["label_strict"] = W.label_standard & (strict_g | strict_e4)
+strict_rule = W.label_standard & (strict_g | strict_e4)
+# A26: strict also needs >= 1 BUY in a market of its case before that market's precise cut (positions hold exactly the pre-cut buyers)
+POS = os.path.join(D, "out", "v1", "positions.parquet")
+import duckdb
+pre = {(a, k) for a, k in duckdb.sql(f"SELECT DISTINCT wallet, case_id FROM '{POS}' WHERE market_set = 'case' AND t_news_version = 'precise'").fetchall()}
+has_pre = pd.Series([(a.lower(), k) in pre for a, k in zip(W.address, W.case_id)], index=W.index)
+W["label_strict"] = strict_rule & has_pre
+W["strict_no_prenews"] = (strict_rule & ~has_pre).map({True: "true", False: "false"})
 W["strict_basis"] = [("wallet_grade_" + g if s and g in ("E1", "E2", "E3") else ("named_in_E4_claim" if s else "")) for s, g in zip(W.label_strict, W.wallet_grade)]
+print("strict_no_prenews", list(W[W.strict_no_prenews == "true"][["address", "case_id"]].itertuples(index=False)))
 for c_ in ["label_broad", "label_standard", "label_strict"]:
     W[c_] = W[c_].map({True: "true", False: "false"})
 W.to_csv(os.path.join(D, "data", "wallet_labels.csv"), index=False)

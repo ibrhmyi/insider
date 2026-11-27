@@ -1,7 +1,10 @@
-"""PMITC v1.1 benchmark tasks (PROTOCOL A15, A23). Runs on the released files only (../data).
+"""PMITC v1.2 benchmark tasks (PROTOCOL A15, A23, A26, A27). Runs on the released files only (../data).
   python3 pmitc_bench.py [--data ../data] [--out baselines.json] [--quick]
 Folds: leave-one-case-out over cases with >= 3 label_standard wallets in the task's rows, plus the A15 time split (splits.csv).
-Label sets: label_strict, label_standard, label_broad (A20). Documented wallets outside the set are dropped from that run.
+Label sets: label_strict, label_standard, label_broad (A20). A26: models train on label_standard (label_broad for the broad run); label_strict is
+evaluation-only. Documented wallets outside the evaluated set are dropped from evaluation (and outside the training set from training).
+Headline tasks (A27): T1s (rank within the positives' size band), T2s (controls also matched on account-age band), T2-open (Orca/Inca wallets may be controls).
+Secondary: T1, T2 (logistic regression and baselines only), T3 (case vs twin), T3b (case vs placebo; market-type sensitive).
 Baselines: prevalence, Gate 1 rule, account-age heuristic, logistic regression; gradient boosting with case-grouped tuning (precise only).
 Seed 192.
 """
@@ -146,7 +149,8 @@ def summarise(per_fold):
 def run_task(df, feats, metric, std_counts, rule_col, age_col, tune, n_neg, rng, task, extra=None):
     per_fold = {}
     for name, trm, tem in folds_for(df, std_counts):
-        train, test = df[trm], df[tem]
+        train = df[trm & df.use_tr].assign(y=lambda d: d.y_tr)
+        test = df[tem & df.use_ev]
         if test.y.sum() == 0 or train.y.sum() == 0 or test.y.nunique() < 2:
             continue
         r = {}
@@ -183,33 +187,54 @@ def univariate(df, feats):
     return dict(sorted(out.items(), key=lambda kv: -kv[1]))
 
 
-def t1(data, splits, version, lset, tune, quick):
+def train_set(lset):
+    """A26: label_standard is the training label; label_broad trains on itself; label_strict is evaluation-only."""
+    return "label_broad" if lset == "label_broad" else "label_standard"
+
+
+def t1(data, splits, version, lset, tune, quick, size_band=False):
+    """T1 (secondary) or T1s (A27 headline, size_band=True: candidates within [0.5 x min, 2 x max] of the market's positives' pre-cut BUY)."""
     p = pd.read_parquet(os.path.join(data, "positions.parquet"), filters=[("market_set", "==", "case"), ("t_news_version", "==", version), ("is_main_side", "==", True)])
     p = prep_t1(p).merge(splits, on="case_id")
-    p = p[~(p.is_documented & ~p[lset])]  # documented wallets outside the set are dropped
-    p["y"] = p[lset].astype(int); p["tie"] = p.buy_usdc_pre
-    p = p[p.groupby(["case_id", "condition_id"]).y.transform("max") > 0].reset_index(drop=True)
-    std = p.assign(s=p.label_standard).groupby("case_id").apply(lambda g: g.loc[g.s, "wallet"].nunique(), include_groups=False).to_dict()
-    res = run_task(p, T1_FEATURES, t1_ap, std, "gate1_score", "account_age_days_at_first_buy", tune, 20000 if quick else 60000, np.random.default_rng(SEED), "T1", extra=market_ap)
-    res.update(n_rows=int(len(p)), n_pos=int(p.y.sum()), n_cases_with_pos=int(p[p.y == 1].case_id.nunique()), univariate_auc=univariate(p, T1_FEATURES))
+    tr = train_set(lset)
+    p["y"] = p[lset].astype(int); p["y_tr"] = p[tr].astype(int); p["tie"] = p.buy_usdc_pre
+    p["use_ev"] = ~(p.is_documented & ~p[lset]); p["use_tr"] = ~(p.is_documented & ~p[tr])
+    k = ["case_id", "condition_id"]
+    if size_band:
+        for lab, use in [("y", "use_ev"), ("y_tr", "use_tr")]:
+            b = p[p[lab] == 1].groupby(k).buy_usdc_pre.agg(["min", "max"])
+            lo = p.set_index(k).index.map(lambda x: b["min"].get(x, np.nan) * 0.5).values
+            hi = p.set_index(k).index.map(lambda x: b["max"].get(x, np.nan) * 2).values
+            p[use] = p[use] & (p.buy_usdc_pre >= lo) & (p.buy_usdc_pre <= hi)
+    p = p[(p.groupby(k).y.transform("max") > 0) | (p.groupby(k).y_tr.transform("max") > 0)].reset_index(drop=True)
+    std = p[p.label_standard].groupby("case_id").wallet.nunique().to_dict()
+    res = run_task(p, T1_FEATURES, t1_ap, std, "gate1_score", "account_age_days_at_first_buy", tune, 20000 if quick else 60000, np.random.default_rng(SEED), "T1s" if size_band else "T1", extra=market_ap)
+    ev = p[p.use_ev]
+    res.update(n_rows_eval=int(len(ev)), n_pos_eval=int(ev.y.sum()), n_cases_with_pos=int(ev[ev.y == 1].case_id.nunique()), train_label=tr,
+               univariate_auc=univariate(ev, T1_FEATURES))
     return res
 
 
-def t2(data, splits, version, lset, tune, quick):
-    e = pd.read_parquet(os.path.join(data, "episodes.parquet"), filters=[("t_news_version", "==", version)]).merge(splits, on="case_id")
-    keep_ep = set(e[(e.role == "suspected") & e[lset]].episode_id)
-    e = e[((e.role == "suspected") & e[lset]) | ((e.role != "suspected") & e.control_of.isin(keep_ep))].reset_index(drop=True)
+def t2(data, splits, version, lset, tune, quick, design="standard"):
+    """T2 (standard controls), T2s (A27: age_matched) or T2-open (A27: open)."""
+    e = pd.read_parquet(os.path.join(data, "episodes.parquet"), filters=[("t_news_version", "==", version), ("control_design", "==", design)]).merge(splits, on="case_id")
+    tr = train_set(lset)
+    ep_tr = set(e[(e.role == "suspected") & e[tr]].episode_id); ep_ev = set(e[(e.role == "suspected") & e[lset]].episode_id)
+    owner = np.where(e.role == "suspected", e.episode_id, e.control_of)
+    e["use_tr"] = pd.Series(owner).isin(ep_tr).values; e["use_ev"] = pd.Series(owner).isin(ep_ev).values
+    e = e[e.use_tr | e.use_ev].reset_index(drop=True)
     pos = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "gate1_score"],
                           filters=[("market_set", "==", "case"), ("t_news_version", "==", version)])
     e = e.merge(pos.drop(columns=["market_set", "t_news_version"]), on=["case_id", "condition_id", "asset_id", "wallet"], how="left")
-    e["y"] = (e.role == "suspected").astype(int); e["tie"] = e.pre_buy_usdc
+    e["y"] = (e.role == "suspected").astype(int); e["y_tr"] = e.y; e["tie"] = e.pre_buy_usdc
     W = pd.read_parquet(os.path.join(data, "wallets.parquet"), columns=["wallet", "case_id", "label_standard"])
-    std = W[W.label_standard].groupby("case_id").wallet.nunique().to_dict()
-    std = {c: n for c, n in std.items() if c in set(e.case_id)}
+    std = {c: n for c, n in W[W.label_standard].groupby("case_id").wallet.nunique().items() if c in set(e.case_id)}
     res = run_task(e, T2_FEATURES, auc_cw, std, "gate1_score", "account_age_days_at_first_buy", tune, 10**9, np.random.default_rng(SEED), "T2")
-    res.update(n_rows=int(len(e)), n_pos=int(e.y.sum()), won_post_rate_by_role={k: round(float(v), 4) for k, v in e.groupby("role").won_post.mean().items()},
+    ev = e[e.use_ev]
+    res.update(control_design=design, train_label=tr, n_rows_eval=int(len(ev)), n_pos_eval=int(ev.y.sum()),
+               won_post_rate_by_role={k: round(float(v), 4) for k, v in ev.groupby("role").won_post.mean().items()},
                base_result="matched same-side controls win about as often as documented episodes: outcome alone does not separate them",
-               univariate_auc=univariate(e, T2_FEATURES + ["share_on_this_ladder_market"]))
+               univariate_auc=univariate(ev, T2_FEATURES + ["share_on_this_ladder_market"]))
     return res
 
 
@@ -251,16 +276,20 @@ def t3(data, splits, version, comp, lset, tune, feats_cache):
     cid_col = "twin_condition_id" if comp == "twin" else "placebo_condition_id"
     ref = ref[ref[cid_col].notna()]
     case = f[f.market_set == "case"].merge(ref[["case_id", "case_condition_id"]].drop_duplicates(), left_on=["case_id", "condition_id"], right_on=["case_id", "case_condition_id"])
-    if lset != "all":
-        case = case[case[f"has_{lset}"] == True]  # noqa: E712
+    if lset == "all":
+        case["use_ev"] = True; case["use_tr"] = True
+    else:
+        case["use_ev"] = case[f"has_{lset}"] == True; case["use_tr"] = case[f"has_{train_set(lset)}"] == True  # noqa: E712
+        case = case[case.use_ev | case.use_tr]
     other = f[f.market_set == comp].merge(ref[["case_id", "case_condition_id", cid_col]], left_on=["case_id", "condition_id"], right_on=["case_id", cid_col])
-    other = other[other.case_condition_id.isin(set(case.case_condition_id))]
+    other = other.merge(case[["case_condition_id", "use_ev", "use_tr"]].drop_duplicates("case_condition_id"), on="case_condition_id")
     d = pd.concat([case.assign(y=1), other.assign(y=0)], ignore_index=True).merge(splits, on="case_id")
-    d["tie"] = 0
+    d["tie"] = 0; d["y_tr"] = d.y
     W = pd.read_parquet(os.path.join(data, "wallets.parquet"), columns=["wallet", "case_id", "label_standard"])
     std = {c: n for c, n in W[W.label_standard].groupby("case_id").wallet.nunique().items() if c in set(d.case_id)}
     res = run_task(d, T3_FEATURES, auc_cw, std, "gate1_rate", None, tune, 10**9, np.random.default_rng(SEED), "T3")
-    res.update(n_case_markets=int(d.y.sum()), n_comparison_markets=int((d.y == 0).sum()), univariate_auc=univariate(d, T3_FEATURES))
+    ev = d[d.use_ev]
+    res.update(n_case_markets=int(ev.y.sum()), n_comparison_markets=int((ev.y == 0).sum()), univariate_auc=univariate(ev, T3_FEATURES))
     return res
 
 
@@ -270,19 +299,21 @@ if __name__ == "__main__":
     ap.add_argument("--quick", action="store_true", help="no gradient-boosting tuning, smaller negative samples (for the notebook)")
     a = ap.parse_args()
     splits = pd.read_csv(os.path.join(here, "splits.csv"))[["case_id", "split"]]
-    out = dict(seed=SEED, protocol="A15, A23", label_sets=SETS, leakage=LEAKAGE, known_shortcuts=SHORTCUTS,
+    out = dict(seed=SEED, protocol="A15, A23, A26, A27", label_sets=SETS, training_label="label_standard (label_broad for the broad run); label_strict evaluation-only (A26)",
+               headline_tasks=["T1s", "T2s", "T2open"], secondary_tasks=["T1", "T2", "T3", "T3b"], leakage=LEAKAGE, known_shortcuts=SHORTCUTS,
                features=dict(T1=T1_FEATURES, T2=T2_FEATURES, T3=T3_FEATURES), gb_grid=GRID)
     cache = {}
     for v in ["precise", "day"]:
         tune = (v == "precise") and not a.quick
         out[v] = {}
-        for s in SETS:
-            out[v][s] = dict(T1=t1(a.data, splits, v, s, tune, a.quick), T2=t2(a.data, splits, v, s, tune, a.quick),
-                             T3=t3(a.data, splits, v, "twin", s, tune, cache), T3b=t3(a.data, splits, v, "placebo", s, tune, cache))
-            print(v, s, "done", flush=True)
+        for s_ in SETS:
+            out[v][s_] = dict(T1s=t1(a.data, splits, v, s_, tune, a.quick, size_band=True), T2s=t2(a.data, splits, v, s_, tune, a.quick, "age_matched"),
+                              T2open=t2(a.data, splits, v, s_, tune, a.quick, "open"), T1=t1(a.data, splits, v, s_, False, a.quick),
+                              T2=t2(a.data, splits, v, s_, False, a.quick, "standard"), T3=t3(a.data, splits, v, "twin", s_, tune, cache),
+                              T3b=t3(a.data, splits, v, "placebo", s_, tune, cache))
+            print(v, s_, "done", flush=True)
         out[v]["all_case_markets"] = dict(T3=t3(a.data, splits, v, "twin", "all", tune, cache), T3b=t3(a.data, splits, v, "placebo", "all", tune, cache))
     json.dump(out, open(a.out, "w"), indent=1, default=lambda x: None if (isinstance(x, float) and np.isnan(x)) else (bool(x) if isinstance(x, np.bool_) else float(x)))
-    for v in ["precise"]:
-        for s in SETS:
-            for t in ["T1", "T2", "T3", "T3b"]:
-                print(v, s, t, {m: (r["loco_mean"], r["loco_sd"], r["time_split"]) for m, r in out[v][s][t]["summary"].items()})
+    for s_ in SETS:
+        for t in ["T1s", "T2s", "T2open", "T1", "T2", "T3", "T3b"]:
+            print("precise", s_, t, {m: (r["loco_mean"], r["loco_sd"], r["time_split"]) for m, r in out["precise"][s_][t]["summary"].items()})

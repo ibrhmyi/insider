@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.0 (2026-11-27, run 10): final fixes
+- A25: per-market news times. `markets.t_news_market_utc` (precise) and `markets.t_news_market_day_utc` (day) with `t_news_market_method`: a Gamma scheduled start (matches, earnings releases), a market deadline inside a coarse case date, else the case time; never later than a sourced exact case time (A25.1). Case-level `t_news_utc` and `t_news_precise_utc` are kept. Every time-dependent table (positions, minute paths, episodes, controls, coordinated rule, label sets, hard negatives, placebo and twin `t_ref`) is rebuilt with the per-market cut. This also fixes stale precise `t_ref` values for the Maduro and Railgun-Venezuela placebos and twins left by run 9.
+- A26: `label_strict` additionally requires a buy before the precise news time; `wallets.strict_no_prenews` marks the rest. `label_standard` is the main training label (case-weighted); `label_strict` is evaluation-only.
+- A27: selection-controlled headline benchmarks: T1s (size-banded ranking), T2s (controls matched on account-age band too), T2-open (Orca/Inca-flagged wallets allowed as controls); `episodes` and `controls` gain `control_design` (`standard`, `age_matched`, `open`) in their primary keys. T1, T2, T3, T3b kept as secondary.
+- A28: `label_family = multi_account` for allegations of shared ownership or multi-accounting without an informed-trading claim (excluded from label sets). The World Cup 2026 source was re-read: it alleges a suspected insider and uses a shared deposit address as evidence of common control, so the case stays `informed_trading` (context claim CL0124).
+- Issue templates copied to the repository root `.github/ISSUE_TEMPLATE/`. Contact e-mail and upload ids remain placeholders for the owner.
+
 ## v1.1.0 (2026-11-27, run 9): public release
 - A20: three nested label sets in `wallets`, `episodes`, `positions`: `label_strict` (linked to an E1-E3 claim, or named in an E4 claim), `label_standard` (case grade E1-E4, includes cluster members), `label_broad` (E1-E5 = `is_documented`); `wallet_grade` and the new table `claim_wallet_links`.
 - A21: hard negatives (`hard_negatives` table; `positions.hard_negative`, `wallets.hard_negative`): look-alike losers in case and twin markets, look-alikes in cleared cases, look-alike winners in placebo markets, wallets of cleared cases.
