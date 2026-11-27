@@ -87,22 +87,28 @@ if MODE == "winrate_matched":  # A33: prior win-rate band, computed as episodes.
                UNION ALL SELECT wallet, condition_id, first_buy_ts FROM ep_q)""")
     # same quantity as the episode feature (avg over net-long resolved (market, token) rows with first trade before t, other markets only),
     # computed with cumulative counts and an ASOF join instead of a candidate x prior-market join (disk)
-    c.sql(f"""CREATE TABLE pm AS
-        WITH p AS (SELECT wallet, condition_id, asset_id, min(first_ts) fts, sum(buy_shares) bs, sum(sell_shares) ss
-                   FROM read_parquet('{WORK}/P/*.parquet') WHERE wallet IN (SELECT DISTINCT wallet FROM q) GROUP BY 1, 2, 3),
-             r AS (SELECT asset_id, condition_id, any_value(outcome_label) ol, any_value(winning_outcome_label) wl, any_value(resolution_status) st
-                   FROM '{OUT0}/hf_market_catalog.parquet' GROUP BY 1, 2)
-        SELECT p.wallet, p.condition_id, p.fts, CASE WHEN r.st = 'resolved' AND r.wl IS NOT NULL AND p.bs > p.ss THEN (r.ol = r.wl)::INT END win
-        FROM p LEFT JOIN r ON r.asset_id = p.asset_id AND r.condition_id = p.condition_id""")
-    c.sql("""CREATE TABLE cum AS SELECT wallet, fts, sum(n) OVER w cn, sum(k) OVER w ck FROM
-               (SELECT wallet, fts, count(win) n, sum(win) k FROM pm GROUP BY 1, 2) WINDOW w AS (PARTITION BY wallet ORDER BY fts ROWS UNBOUNDED PRECEDING)""")
-    wr = c.sql("""WITH a AS (SELECT q.wallet, q.condition_id, q.first_buy_ts, coalesce(cum.cn, 0) cn, coalesce(cum.ck, 0) ck
-                             FROM q ASOF LEFT JOIN cum ON cum.wallet = q.wallet AND cum.fts < q.first_buy_ts),
-                       o AS (SELECT q.wallet, q.condition_id, q.first_buy_ts, count(pm.win) on_, coalesce(sum(pm.win), 0) ok
-                             FROM q JOIN pm ON pm.wallet = q.wallet AND pm.condition_id = q.condition_id AND pm.fts < q.first_buy_ts GROUP BY 1, 2, 3)
-                  SELECT a.wallet, a.condition_id, a.first_buy_ts,
-                         (a.ck - coalesce(o.ok, 0))::DOUBLE / nullif(a.cn - coalesce(o.on_, 0), 0) wr
-                  FROM a LEFT JOIN o USING (wallet, condition_id, first_buy_ts)""").df()
+    NB = 32; parts = []  # wallet-hash buckets keep the DuckDB spill within the disk allowance
+    c.sql("SET preserve_insertion_order = false")
+    for bkt in range(NB):
+        c.sql(f"CREATE OR REPLACE TABLE qb AS SELECT * FROM q WHERE hash(wallet) % {NB} = {bkt}")
+        c.sql(f"""CREATE OR REPLACE TABLE pm AS
+            WITH p AS (SELECT wallet, condition_id, asset_id, min(first_ts) fts, sum(buy_shares) bs, sum(sell_shares) ss
+                       FROM read_parquet('{WORK}/P/*.parquet') WHERE hash(wallet) % {NB} = {bkt} AND wallet IN (SELECT DISTINCT wallet FROM qb) GROUP BY 1, 2, 3),
+                 r AS (SELECT asset_id, condition_id, any_value(outcome_label) ol, any_value(winning_outcome_label) wl, any_value(resolution_status) st
+                       FROM '{OUT0}/hf_market_catalog.parquet' GROUP BY 1, 2)
+            SELECT p.wallet, p.condition_id, p.fts, CASE WHEN r.st = 'resolved' AND r.wl IS NOT NULL AND p.bs > p.ss THEN (r.ol = r.wl)::INT END win
+            FROM p LEFT JOIN r ON r.asset_id = p.asset_id AND r.condition_id = p.condition_id""")
+        c.sql("""CREATE OR REPLACE TABLE cum AS SELECT wallet, fts, sum(n) OVER w cn, sum(k) OVER w ck FROM
+                   (SELECT wallet, fts, count(win) n, sum(win) k FROM pm GROUP BY 1, 2) WINDOW w AS (PARTITION BY wallet ORDER BY fts ROWS UNBOUNDED PRECEDING)""")
+        parts.append(c.sql("""WITH a AS (SELECT qb.wallet, qb.condition_id, qb.first_buy_ts, coalesce(cum.cn, 0) cn, coalesce(cum.ck, 0) ck
+                                         FROM qb ASOF LEFT JOIN cum ON cum.wallet = qb.wallet AND cum.fts < qb.first_buy_ts),
+                                   o AS (SELECT qb.wallet, qb.condition_id, qb.first_buy_ts, count(pm.win) on_, coalesce(sum(pm.win), 0) ok
+                                         FROM qb JOIN pm ON pm.wallet = qb.wallet AND pm.condition_id = qb.condition_id AND pm.fts < qb.first_buy_ts GROUP BY 1, 2, 3)
+                              SELECT a.wallet, a.condition_id, a.first_buy_ts,
+                                     (a.ck - coalesce(o.ok, 0))::DOUBLE / nullif(a.cn - coalesce(o.on_, 0), 0) wr
+                              FROM a LEFT JOIN o USING (wallet, condition_id, first_buy_ts)""").df())
+    c.sql("DROP TABLE pm; DROP TABLE cum; DROP TABLE qb")
+    wr = pd.concat(parts, ignore_index=True)
     wr = wr.set_index(["wallet", "condition_id", "first_buy_ts"]).wr
     band = lambda x: "none" if pd.isna(x) else ("lt_0.25" if x < 0.25 else "0.25_0.5" if x < 0.5 else "0.5_0.75" if x < 0.75 else "ge_0.75")
     for df_ in (ep, pre_df):
