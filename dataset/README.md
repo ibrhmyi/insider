@@ -2,13 +2,15 @@
 
 An open, source-traced register of every publicly documented case of suspected informed trading on prediction markets, joined to trade-level data for analysis and machine learning.
 
-**Version 1.0.1 (2026-11-27, run 8).** Two release packages: [`release/`](release/) (all files) and [`release_safe/`](release_safe/) (without the Data API fill files, with a script that rebuilds them). The full package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A19. Runs 7 and 8 are described in [`logs/run7_report.md`](logs/run7_report.md) and [`logs/run8_report.md`](logs/run8_report.md).
+**Version 1.1.0 (2026-11-27, run 9), the public release.** Start with the dataset card [`release/README.md`](release/README.md). Two release packages: [`release/`](release/) (all files) and [`release_safe/`](release_safe/) (without the Data API fill files, with a script that rebuilds them). The full package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A24. Runs 7 to 9 are described in `logs/run7_report.md`, `logs/run8_report.md` and [`logs/run9_report.md`](logs/run9_report.md).
 
 Files over 50 MB (`release/data/positions.parquet`, `weak_labels.parquet`, `fills_part*.parquet`) are not in git; they are listed with SHA-256 in `release/MANIFEST.json` and rebuilt by the scripts.
 
 ### v1.0 build order (after the v0.3 order below)
 
 `run7_markets.py '<withheld pattern>'` → `placebo_markets.py` → `hf_pass_v7.py <hf> <work>` → `pull_market_trades.py` → `weak_labels.py <work>` → `v1/fills.py` → `v1/labels.py confirm` → `v1/coordinated.py` → `v1/labels.py candidates` → `pull_activity.py` (candidates) → `v1/fills.py` → `v1/positions.py` → `v1/episodes.py <work> day|precise` → `v1/minutes.py` → `v1/amount_checks.py` → `v1/tables.py` → `v1/fills_release.py` → `v1/codebook.py` → `v1/notebooks.py` + nbconvert → `release/benchmarks/pmitc_bench.py` → `v1/kaggle_meta.py` → `v1/codebook.py` (manifest) → `python3 -m pytest tests`.
+
+Run 9 adds: `v1/label_sets.py` (after `v1/labels.py confirm`) → `v1/twin_markets.py` → `hf_pass_v9.py <hf> <work>` → (`v1/fills.py`, `v1/coordinated.py`, `v1/episodes.py`, `v1/positions.py`, `v1/minutes.py` as above) → `v1/hard_negatives.py <work>` → `v1/tables.py` → `v1/fills_release.py` → `release/benchmarks/pmitc_bench.py` → `v1/notebooks.py` + nbconvert → `v1/figure.py` → `v1/card.py` → `v1/kaggle_meta.py` → `v1/codebook.py` → `v1/package_safe.py` → `v1/upload_copies.py`; tests on `release`, `release_safe` and `upload/hf` (`PMITC_RELEASE=...`). Compute and disk: `release/docs/REBUILD.md`.
 
 ---
 

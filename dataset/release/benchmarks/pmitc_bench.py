@@ -41,6 +41,8 @@ SHORTCUTS = {
     "T2.share_on_this_ladder_market": "controls are sampled one market at a time, so the value is always 1 for a control (excluded)",
     "T2.hours_first_buy_to_tnews": "controls are matched on first-buy time within 24-72 h, so this cannot separate classes much (kept; check its univariate AUC)",
     "T3b.*": "placebo markets are crypto-price and weather markets: volume shape, price path and buyer mix differ by market type, not by informed trading",
+    'T1.log_buy_usdc_pre / log_market_usdc_pre / log_n_buy_fills_pre': 'selection by the sources, not construction: sources flag large bets, so pre-cut size alone ranks positives highly (univariate AUC 0.93-0.98). A detector that learns size learns what the press notices.',
+    'T2.prior_net_long_win_rate / n_prior_markets': 'partly construction: control pools exclude Orca- and Inca-flagged wallets (A6.10), which removes many strong past traders from the controls; and partly selection (sources flag fresh wallets). Univariate AUC 0.82-0.88.',
     "T3.log_usdc_*": "twins are matched on total volume decile, so total volume is controlled only coarsely; pre-cut volume can still differ by market age",
 }
 
@@ -65,6 +67,14 @@ def subsample(df, n_neg, rng):
     return df.loc[df.index[df.y == 1].union(pd.Index(keep))]
 
 
+def fit_gb(tr, feats, params):
+    """drops features that are entirely missing in this training set (HistGradientBoosting cannot bin them)"""
+    use = [f for f in feats if tr[f].notna().any()]
+    m = HistGradientBoostingClassifier(random_state=SEED, **params).fit(tr[use], tr.y)
+    m.used_features_ = use
+    return m
+
+
 def tuned_gb(train, feats, score_fn, rng, n_neg):
     """Inner leave-cases-out (3 groups) over GRID; returns the model refit on all training cases with the best parameters."""
     cases = train.case_id.unique()
@@ -78,12 +88,16 @@ def tuned_gb(train, feats, score_fn, rng, n_neg):
                 tr = subsample(train.iloc[a], n_neg, rng); te = train.iloc[b]
                 if te.y.nunique() < 2:
                     continue
-                m = HistGradientBoostingClassifier(random_state=SEED, **g).fit(tr[feats], tr.y)
-                s.append(score_fn(te.assign(score=m.predict_proba(te[feats])[:, 1])))
+                try:
+                    m = fit_gb(tr, feats, g)
+                    s.append(score_fn(te.assign(score=m.predict_proba(te[m.used_features_])[:, 1])))
+                except ValueError:
+                    s.append(np.nan)
             res.append((np.nanmean(s) if s else -1, g))
+        res = [(x if x == x else -1, g) for x, g in res]
         best = max(res, key=lambda x: x[0])[1]
     tr = subsample(train, n_neg, rng)
-    return HistGradientBoostingClassifier(random_state=SEED, **best).fit(tr[feats], tr.y), best
+    return fit_gb(tr, feats, best), best
 
 
 def market_ap(df):
@@ -99,6 +113,10 @@ def market_ap(df):
         return dict(ap=np.nan)
     m = pd.DataFrame(out).groupby("case_id").mean(numeric_only=True)
     return {k: float(v) for k, v in m.mean().items()}
+
+
+def t1_ap(df):
+    return market_ap(df)["ap"]
 
 
 def auc_cw(df):
@@ -125,7 +143,7 @@ def summarise(per_fold):
     return out
 
 
-def run_task(df, feats, metric, std_counts, rule_col, age_col, tune, n_neg, rng, task):
+def run_task(df, feats, metric, std_counts, rule_col, age_col, tune, n_neg, rng, task, extra=None):
     per_fold = {}
     for name, trm, tem in folds_for(df, std_counts):
         train, test = df[trm], df[tem]
@@ -140,15 +158,20 @@ def run_task(df, feats, metric, std_counts, rule_col, age_col, tune, n_neg, rng,
         tr = subsample(train, n_neg, rng)
         m = lr_model().fit(tr[feats], tr.y); r["logistic_regression"] = dict(primary=metric(test.assign(score=m.predict_proba(test[feats])[:, 1])))
         if tune:
-            gb, best = tuned_gb(train, feats, metric, rng, n_neg)
-            r["gradient_boosting_tuned"] = dict(primary=metric(test.assign(score=gb.predict_proba(test[feats])[:, 1])), params=best)
+            try:
+                gb, best = tuned_gb(train, feats, metric, rng, n_neg)
+                r["gradient_boosting_tuned"] = dict(primary=metric(test.assign(score=gb.predict_proba(test[gb.used_features_])[:, 1])), params=best)
+            except ValueError as ex:
+                r["gradient_boosting_tuned"] = dict(primary=np.nan, error=str(ex)[:80])
         per_fold[name] = {k: dict(v, primary=float(v["primary"]) if v["primary"] == v["primary"] else np.nan) for k, v in r.items()}
+        if extra is not None:  # T1: P@10, R@10, R@100 for logistic regression and the rule, recomputed on the same scores
+            per_fold[name]["logistic_regression"]["extra"] = {k: round(x, 4) for k, x in extra(test.assign(score=m.predict_proba(test[feats])[:, 1])).items()}
         per_fold[name]["_n"] = dict(primary=float(test.y.sum()))
     clean = {f: {m: v for m, v in r.items() if m != "_n"} for f, r in per_fold.items()}
     s = summarise(clean)
     if "gradient_boosting_tuned" in s and "prevalence" in s and s["gradient_boosting_tuned"]["loco_mean"] is not None and s["prevalence"]["loco_mean"] is not None:
         s["gradient_boosting_tuned"]["below_prevalence"] = s["gradient_boosting_tuned"]["loco_mean"] < s["prevalence"]["loco_mean"]
-    return dict(summary=s, folds={f: {m: {k: (round(x, 4) if isinstance(x, float) else x) for k, x in v.items()} for m, v in r.items()} for f, r in per_fold.items()})
+    return dict(summary=s, folds={f: {m: {k: (round(x, 4) if isinstance(x, float) else x) for k, x in v.items()} for m, v in r.items() if m != "_n"} | {"n_test_positives": int(r["_n"]["primary"])} for f, r in per_fold.items()})
 
 
 def univariate(df, feats):
@@ -167,14 +190,14 @@ def t1(data, splits, version, lset, tune, quick):
     p["y"] = p[lset].astype(int); p["tie"] = p.buy_usdc_pre
     p = p[p.groupby(["case_id", "condition_id"]).y.transform("max") > 0].reset_index(drop=True)
     std = p.assign(s=p.label_standard).groupby("case_id").apply(lambda g: g.loc[g.s, "wallet"].nunique(), include_groups=False).to_dict()
-    res = run_task(p, T1_FEATURES, market_ap if True else None, std, "gate1_score", "account_age_days_at_first_buy", tune, 20000 if quick else 60000, np.random.default_rng(SEED), "T1")
+    res = run_task(p, T1_FEATURES, t1_ap, std, "gate1_score", "account_age_days_at_first_buy", tune, 20000 if quick else 60000, np.random.default_rng(SEED), "T1", extra=market_ap)
     res.update(n_rows=int(len(p)), n_pos=int(p.y.sum()), n_cases_with_pos=int(p[p.y == 1].case_id.nunique()), univariate_auc=univariate(p, T1_FEATURES))
     return res
 
 
 def t2(data, splits, version, lset, tune, quick):
     e = pd.read_parquet(os.path.join(data, "episodes.parquet"), filters=[("t_news_version", "==", version)]).merge(splits, on="case_id")
-    keep_ep = set(e[(e.role == "suspected") & e[lset]].row_id)
+    keep_ep = set(e[(e.role == "suspected") & e[lset]].episode_id)
     e = e[((e.role == "suspected") & e[lset]) | ((e.role != "suspected") & e.control_of.isin(keep_ep))].reset_index(drop=True)
     pos = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "gate1_score"],
                           filters=[("market_set", "==", "case"), ("t_news_version", "==", version)])

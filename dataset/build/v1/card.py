@@ -65,7 +65,7 @@ from datasets import load_dataset; wallets = load_dataset("<hf-user>/pmitc", "wa
 print(positions.groupby("market_set").label_strict.sum(), wallets.num_rows)
 ```
 
-Notebooks: `notebooks/01_quickstart.ipynb` (load, join, plot), `02_case_study.ipynb` (the Maduro market: price path, the wallet's buys, matched controls), `03_benchmarks.ipynb`. Requirements: `requirements.txt` (pinned).
+Notebooks: `notebooks/01_quickstart.ipynb` (load, join, plot), `02_case_study.ipynb` (the Maduro market: price path, the wallet's buys, matched controls), `03_benchmarks.ipynb`. Requirements: `requirements.txt` (pinned); rebuilding from scratch takes about 7 hours and 30 GB of disk (`docs/REBUILD.md`).
 
 ## Tables
 

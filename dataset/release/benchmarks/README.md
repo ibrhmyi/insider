@@ -29,7 +29,9 @@ Labels are allegations by named sources. Positives are sparse and clustered: 74 
 ## Known shortcuts (features that separate classes for construction reasons)
 - **T2 `share_on_this_ladder_market`**: controls are sampled one market at a time, so the value is 1 for every control; alone it gives AUC about 0.97. Excluded.
 - **T2 `hours_first_buy_to_tnews`**: controls are matched on first-buy time (24-72 h), so this feature is controlled by design; its univariate AUC should be near 0.5 (reported).
-- **T2 `account_age_days_at_first_buy`, `n_prior_markets`**: not a construction artifact, but the source bias: sources flag fresh wallets, so these features find what sources look for. A detector that only learns "new wallet" learns the selection rule of the press.
+- **T2 `prior_net_long_win_rate`, `n_prior_markets` (univariate AUC 0.82-0.88)**: partly construction: control pools exclude Orca- and Inca-flagged wallets (A6.10), which removes many strong past traders from the controls; partly selection: sources flag fresh wallets.
+- **T2 `account_age_days_at_first_buy`**: the source bias, not construction: sources flag fresh wallets, so the one-feature account-age heuristic matches or beats the models. A detector that only learns "new wallet" learns the selection rule of the press.
+- **T1 size features (`buy_usdc_pre`, `market_usdc_pre`, `n_buy_fills_pre`; univariate AUC 0.93-0.98)**: selection, not construction: sources flag large bets, so size alone ranks positives highly within a market.
 - **T3b (all features)**: placebo markets are crypto and weather markets; volume shape and buyer mix differ by market type.
 - **T3 volume features**: twins are matched on total-volume decile only; pre-cut volume can still differ by market age and by where the cut falls.
 The univariate AUC of every feature per task and label set is in `baselines.json` (`univariate_auc`).

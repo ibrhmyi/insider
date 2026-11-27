@@ -17,7 +17,7 @@ for p in sorted(glob.glob(os.path.join(REL, "data", "*"))):
                                              description=(c["desc"] + (f" Unit: {c['unit']}." if c["unit"] else "") + (f" Allowed: {c['allowed'].replace(';', ', ')}." if c["allowed"] else "") + f" Leakage: {c['leak']}.")[:255])
                                         for c in TABLES[t]["cols"]])))
 for p in (["scripts/rebuild_data_api_fills.py"] if os.path.basename(REL) == "release_safe" else []) + ["benchmarks/README.md", "benchmarks/splits.csv", "benchmarks/baselines.json", "benchmarks/pmitc_bench.py", "notebooks/01_quickstart.ipynb", "notebooks/02_case_study.ipynb", "notebooks/03_benchmarks.ipynb", "README.md", "CONTRIBUTING.md", "requirements.txt",
-          "docs/DATA_PROTECTION.md", "docs/EXTRACTION.md", "docs/cases_timeline.png",
+          "docs/DATA_PROTECTION.md", "docs/EXTRACTION.md", "docs/REBUILD.md", "docs/cases_timeline.png",
           "docs/README.md", "docs/DATASHEET.md", "docs/CODEBOOK.md", "docs/PROTOCOL.md", "docs/CHANGELOG.md", "docs/LICENSE.md", "docs/CITATION.cff", "docs/LICENSES_UPSTREAM.md"]:
     res.append(dict(path=p, description={"benchmarks/splits.csv": "Frozen case-grouped, time-ordered split (PROTOCOL A15)"}.get(p, os.path.basename(p))))
 meta = dict(title="PMITC: Prediction-Market Informed-Trading Casebook", subtitle="Documented suspected informed trading on Polymarket and Kalshi, with trades, controls, twins and benchmarks",

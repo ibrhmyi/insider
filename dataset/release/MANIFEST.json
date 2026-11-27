@@ -32,22 +32,28 @@
    "sha256": "1b98620d8b9be631d9a4d5fc58bc2740b60e4b2f3c10e9c294afb25f88de65e8"
   },
   {
+   "path": "README.md",
+   "rows": null,
+   "bytes": 12852,
+   "sha256": "fbd8ea003e4c1744aabf1963861594ffb4b7ee43eef1fb3057ed2393657dc690"
+  },
+  {
    "path": "benchmarks/README.md",
    "rows": null,
-   "bytes": 5180,
-   "sha256": "0b5e4d4adb57d61c3859ff532afc1684e1544093c117a108180752e6cf620ff1"
+   "bytes": 5652,
+   "sha256": "7c99bc493c6916c112b345c4a2b647e3bf8ef45b973a7fa1f1e999f9bf0db368"
   },
   {
    "path": "benchmarks/baselines.json",
    "rows": null,
-   "bytes": 30260,
-   "sha256": "1533876c8c9e540e1f1393d6eb082705eba93e0be62a5058a3c3e27c357822e0"
+   "bytes": 114403,
+   "sha256": "bbdd9259f4ddcdd8dc36e80d710548027c3151dc646942ac611c3bf5bb727065"
   },
   {
    "path": "benchmarks/pmitc_bench.py",
    "rows": null,
-   "bytes": 18543,
-   "sha256": "ad062ab78b6ff28ce459749b13e714df7c957ceaea0e9a063556b868b28b4624"
+   "bytes": 20037,
+   "sha256": "c7067f5348ee209a33ed0202028956b344a68fa4d125f47c853cb5558a563999"
   },
   {
    "path": "benchmarks/splits.csv",
@@ -280,8 +286,8 @@
   {
    "path": "dataset-metadata.json",
    "rows": null,
-   "bytes": 117182,
-   "sha256": "a48fc55c007d591f749fbcc0d2835c64c463e26f60a6f57023ab7ff206a241d5"
+   "bytes": 148284,
+   "sha256": "6cba7339377ab559d3920208273f8607de87ac429d9f7d573b4892d3641f9562"
   },
   {
    "path": "docs/CHANGELOG.md",
@@ -340,8 +346,14 @@
   {
    "path": "docs/README.md",
    "rows": null,
-   "bytes": 10152,
-   "sha256": "c2dc565eed0dfec68b8fe9bad4824245c5440d9b45064846caaf45893d42c74d"
+   "bytes": 11481,
+   "sha256": "bcc91e9aa69beddbf856009d13b6a0218299a49b2641b6f9c6faf3a9a0ab1f0a"
+  },
+  {
+   "path": "docs/REBUILD.md",
+   "rows": null,
+   "bytes": 1465,
+   "sha256": "eb4d4d38482d9ad3019a75b163b719505f602d61da4b343e3b46bdb3949caa82"
   },
   {
    "path": "docs/blind_check_sample.csv",
@@ -356,16 +368,22 @@
    "sha256": "9edb428118e0943d3bc5326f573f1e2cbd6f8b83414897ec8cd04743810d11a0"
   },
   {
-   "path": "notebooks/01_explore.ipynb",
+   "path": "notebooks/01_quickstart.ipynb",
    "rows": null,
-   "bytes": 142726,
-   "sha256": "807fbaa9a563c82795d42acc6435af805fa71005177dd97796a94cff47e548d6"
+   "bytes": 124998,
+   "sha256": "3c96cec140a5c9bf3a16fb72c2a170a981982c3e1c92a7955712062d625acd3e"
   },
   {
-   "path": "notebooks/02_baselines.ipynb",
+   "path": "notebooks/02_case_study.ipynb",
    "rows": null,
-   "bytes": 16308,
-   "sha256": "78811de3b0e972f16f023affc340705904e511d3d2371fe28821032d2fc997b7"
+   "bytes": 107486,
+   "sha256": "edf4fce476803bd1eb80aeeb5acbd03af2da6997b4574f518e6b424d6dbdf83e"
+  },
+  {
+   "path": "notebooks/03_benchmarks.ipynb",
+   "rows": null,
+   "bytes": 20160,
+   "sha256": "7903c6a90728c2f36e8e8bf0c7d5fec8034e025f5722d5f39f662e9b6f13b94b"
   },
   {
    "path": "requirements.txt",
