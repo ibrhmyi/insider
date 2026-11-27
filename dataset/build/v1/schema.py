@@ -106,7 +106,11 @@ FILL = [col("market_set", S, "which part of the fills table", allowed="case;plac
     col("econ_side", S, "A34 economic side: BUY for an inferred leg (SELL of a token the wallet held none of = BUY of the complement), else wallet_side", allowed="BUY;SELL"),
     col("econ_asset_id", S, "A34 economic token (the complement for an inferred leg)"), col("econ_outcome_label", S, "A34 label of econ_asset_id"),
     col("econ_price_usdc", FL, "A34 economic price (1 - price_usdc for an inferred leg)"), col("econ_size_usdc", FL, "A34 economic size: shares x econ_price_usdc for an inferred leg, else usdc", unit="USDC"),
-    col("econ_inferred", B, "A34: leg re-read as an economic BUY of the complement (split or mint inferred); raw columns unchanged")]
+    col("econ_inferred", B, "A34: leg re-read as an economic BUY of the complement (split or mint inferred); raw columns unchanged"),
+    col("econ_partial", B, "A34.1: SELL larger than the econ holding; the econ_* columns give the held SELL part, econ_excess_* the inferred BUY"),
+    col("econ_excess_shares", FL, "A34.1: shares beyond the holding, re-read as an economic BUY of the complement", unit="shares"),
+    col("econ_excess_asset_id", S, "A34.1: the complement token"), col("econ_excess_outcome_label", S, "A34.1: its label"),
+    col("econ_excess_price_usdc", FL, "A34.1: 1 - price_usdc"), col("econ_excess_size_usdc", FL, "A34.1: econ_excess_shares x econ_excess_price_usdc", unit="USDC")]
 TABLES["fills"] = dict(desc="Every leg of every fill in case and placebo markets, plus every leg of labelled wallets elsewhere. Parquet only (split into parts).", cols=FILL)
 POS = [col("market_set", S, "case, placebo (A14) or twin (A22) market", allowed="case;placebo;twin", pk=True), col("case_id", S, "case (placebo: matched case)", pk=True),
     col("condition_id", S, "market", pk=True), col("asset_id", S, "outcome token", pk=True), col("wallet", S, "buyer", pk=True), col("t_news_version", S, "A10.2", allowed=VER, pk=True),

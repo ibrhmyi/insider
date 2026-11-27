@@ -363,7 +363,10 @@ def test_few_fold_results_have_no_headline_number():
 def test_econ_view_consistent():
     """A34: econ columns equal the raw ones except on inferred legs, which are raw SELLs re-read as BUYs of the other token at 1 - p."""
     q = f"read_parquet('{R}/fills_part*.parquet')"
-    bad = duckdb.sql(f"""SELECT count(*) FROM {q} WHERE (NOT econ_inferred AND (econ_side <> wallet_side OR econ_asset_id <> asset_id OR abs(econ_size_usdc - usdc) > 1e-6))
+    bad = duckdb.sql(f"""SELECT count(*) FROM {q} WHERE (NOT econ_inferred AND NOT econ_partial AND (econ_side <> wallet_side OR econ_asset_id <> asset_id OR abs(econ_size_usdc - usdc) > 1e-6))
+                          OR (econ_partial AND (wallet_side <> 'SELL' OR econ_side <> 'SELL' OR econ_inferred OR NOT (econ_excess_shares > 0 AND econ_excess_shares < shares)
+                              OR econ_excess_asset_id = asset_id OR abs(econ_excess_size_usdc - econ_excess_shares * (1 - price_usdc)) > 1e-6
+                              OR abs(econ_size_usdc - (shares - econ_excess_shares) * price_usdc) > 1e-6))
                           OR (econ_inferred AND (wallet_side <> 'SELL' OR econ_side <> 'BUY' OR econ_asset_id = asset_id
                               OR abs(econ_price_usdc - (1 - price_usdc)) > 1e-9 OR abs(econ_size_usdc - shares * (1 - price_usdc)) > 1e-6))""").fetchall()[0][0]
     assert bad == 0

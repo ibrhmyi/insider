@@ -1,4 +1,5 @@
-"""PROTOCOL A34: economic-side exposure. Adds econ_side, econ_asset_id, econ_outcome_label, econ_price_usdc, econ_size_usdc, econ_inferred
+"""PROTOCOL A34, A34.1: economic-side exposure (A34.1: a SELL larger than the econ holding = held SELL + inferred BUY of the complement for the excess;
+the econ_excess_* columns describe that BUY). Adds econ_side, econ_asset_id, econ_outcome_label, econ_price_usdc, econ_size_usdc, econ_inferred
 to out/v1/fills/fills_{case,placebo,twin,label_other}.parquet (raw columns unchanged). A SELL of token X by a wallet holding no X
 (<= 1e-6 shares, from its own earlier legs in that market; inferred acquisitions count) is an economic BUY of the complementary token
 at 1 - p, size = shares. Computed in one sequential pass per (wallet, market) in time order. Writes logs/econ_summary.json.
@@ -50,29 +51,32 @@ for s in SETS_RUN:
                     SELECT wallet, condition_id, wallet_side, comp_asset_id,
                            sum(CASE WHEN wallet_side = 'BUY' THEN shares ELSE -shares END) OVER (PARTITION BY wallet, condition_id, asset_id ORDER BY ts, leg_id
                                ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) rb FROM L WHERE wallet <> '')
-                  WHERE wallet_side = 'SELL' AND comp_asset_id IS NOT NULL AND coalesce(rb, 0) <= {EPS}""")
+                  WHERE wallet_side = 'SELL' AND comp_asset_id IS NOT NULL AND coalesce(rb, 0) < shares - {EPS}""")  # A34.1: partial sells too
         g = c.sql("""SELECT rid, wallet, condition_id, asset_id, comp_asset_id, wallet_side = 'SELL' sell, shares FROM L
                      WHERE (wallet, condition_id) IN (SELECT wallet, condition_id FROM cand) ORDER BY wallet, condition_id, ts, leg_id""").df()
         rid, wa, cd, aa, cc, se, sh = (g[x].tolist() for x in ["rid", "wallet", "condition_id", "asset_id", "comp_asset_id", "sell", "shares"])
-        vv, bb, key, bal = [], [], None, {}
+        vv, bb, xx, key, bal = [], [], [], None, {}
         for i in range(len(rid)):  # one sequential pass per (wallet, market), in time order (A34)
             k = (wa[i], cd[i])
             if k != key:
                 key, bal = k, {}
             x = bal.get(aa[i], 0.0)
+            has_c = cc[i] is not None and cc[i] == cc[i]
             if not se[i]:
-                bal[aa[i]] = x + sh[i]; vv.append(False); bb.append(x)
-            elif cc[i] is not None and cc[i] == cc[i] and x <= EPS:
-                bal[cc[i]] = bal.get(cc[i], 0.0) + sh[i]; vv.append(True); bb.append(x)
+                bal[aa[i]] = x + sh[i]; vv.append(False); bb.append(x); xx.append(0.0)
+            elif has_c and x <= EPS:  # A34: no holding -> the whole SELL is an economic BUY of the complement
+                bal[cc[i]] = bal.get(cc[i], 0.0) + sh[i]; vv.append(True); bb.append(x); xx.append(0.0)
+            elif has_c and x < sh[i] - EPS:  # A34.1: held part stays a SELL, the excess is an economic BUY of the complement
+                bal[aa[i]] = 0.0; bal[cc[i]] = bal.get(cc[i], 0.0) + (sh[i] - x); vv.append(False); bb.append(x); xx.append(sh[i] - x)
             else:
-                bal[aa[i]] = x - sh[i]; vv.append(False); bb.append(x)
-        c.register("seq_df", pd.DataFrame(dict(rid=rid, v=vv, bal=bb)))
-        c.sql("CREATE OR REPLACE TABLE inf2 AS SELECT L.rid, coalesce(q.v, false) v, q.bal FROM L LEFT JOIN seq_df q USING (rid)")
-        c.sql("CREATE OR REPLACE TABLE inf AS SELECT rid, v FROM inf2")
+                bal[aa[i]] = x - sh[i]; vv.append(False); bb.append(x); xx.append(0.0)
+        c.register("seq_df", pd.DataFrame(dict(rid=rid, v=vv, bal=bb, xs=xx)))
+        c.sql("CREATE OR REPLACE TABLE inf2 AS SELECT L.rid, coalesce(q.v, false) v, q.bal, coalesce(q.xs, 0) xs FROM L LEFT JOIN seq_df q USING (rid)")
+        c.sql("CREATE OR REPLACE TABLE inf AS SELECT rid, v, xs FROM inf2")
         it = len(rid)
         st["iterations"].append(it)
         q = c.sql(f"""SELECT count(*), sum((wallet_side = 'SELL')::INT), sum(i.v::INT), sum((i.v AND wallet_role = 'maker')::INT), sum((i.v AND wallet_role = 'taker')::INT),
-                             sum((wallet_side = 'SELL' AND NOT i.v AND bal > {EPS} AND bal < shares - {EPS})::INT)
+                             sum((i.xs > 0)::INT)
                       FROM L JOIN inf2 i USING (rid)""").fetchall()[0]
         for k, x in zip(["legs", "sell_legs", "inferred", "inferred_maker", "inferred_taker", "partial"], q):
             st[k] += int(x or 0)
@@ -84,8 +88,11 @@ for s in SETS_RUN:
                     CASE WHEN i.v THEN L.comp_asset_id ELSE L.asset_id END econ_asset_id,
                     CASE WHEN i.v THEN L.comp_label ELSE L.outcome_label END econ_outcome_label,
                     CASE WHEN i.v THEN 1 - L.price ELSE L.price END econ_price_usdc,
-                    CASE WHEN i.v THEN L.shares * (1 - L.price) ELSE L.usdc END econ_size_usdc,
-                    i.v econ_inferred
+                    CASE WHEN i.v THEN L.shares * (1 - L.price) WHEN i.xs > 0 THEN (L.shares - i.xs) * L.price ELSE L.usdc END econ_size_usdc,
+                    i.v econ_inferred, i.xs > 0 econ_partial,
+                    CASE WHEN i.xs > 0 THEN i.xs END econ_excess_shares, CASE WHEN i.xs > 0 THEN L.comp_asset_id END econ_excess_asset_id,
+                    CASE WHEN i.xs > 0 THEN L.comp_label END econ_excess_outcome_label, CASE WHEN i.xs > 0 THEN 1 - L.price END econ_excess_price_usdc,
+                    CASE WHEN i.xs > 0 THEN i.xs * (1 - L.price) END econ_excess_size_usdc
                   FROM L JOIN inf i USING (rid)) TO '{out_b}' (FORMAT parquet, COMPRESSION zstd)""")
         parts.append(out_b)
         print(s, b, it, flush=True)
