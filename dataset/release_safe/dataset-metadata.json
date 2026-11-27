@@ -722,6 +722,11 @@
       "description": "A10.2 Allowed: day, precise. Leakage: meta."
      },
      {
+      "name": "control_design",
+      "type": "string",
+      "description": "A27 design Allowed: standard, age_matched, open. Leakage: meta."
+     },
+     {
       "name": "episode_id",
       "type": "string",
       "description": "documented episode Leakage: meta."
@@ -798,6 +803,11 @@
       "name": "t_news_version",
       "type": "string",
       "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "control_design",
+      "type": "string",
+      "description": "A27 design Allowed: standard, age_matched, open. Leakage: meta."
      },
      {
       "name": "episode_id",
@@ -1022,6 +1032,11 @@
       "name": "t_news_version",
       "type": "string",
       "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "control_design",
+      "type": "string",
+      "description": "A27: standard (A6.10), age_matched (plus account-age band; T2s) or open (Orca/Inca wallets allowed; T2-open) Allowed: standard, age_matched, open. Leakage: meta."
      },
      {
       "name": "role",
@@ -1255,6 +1270,11 @@
       "name": "t_news_version",
       "type": "string",
       "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "control_design",
+      "type": "string",
+      "description": "A27: standard (A6.10), age_matched (plus account-age band; T2s) or open (Orca/Inca wallets allowed; T2-open) Allowed: standard, age_matched, open. Leakage: meta."
      },
      {
       "name": "role",
@@ -2848,6 +2868,21 @@
       "description": "A12.6 Leakage: meta."
      },
      {
+      "name": "t_news_market_utc",
+      "type": "datetime",
+      "description": "A25: per-market exact cut (precise version): Gamma scheduled start, market deadline inside a coarse case date, or the case time Leakage: label."
+     },
+     {
+      "name": "t_news_market_day_utc",
+      "type": "datetime",
+      "description": "A25: per-market day-level cut (day version) Leakage: label."
+     },
+     {
+      "name": "t_news_market_method",
+      "type": "string",
+      "description": "A25 method Allowed: scheduled_start, market_deadline, case_time. Leakage: meta."
+     },
+     {
       "name": "is_placebo_market",
       "type": "boolean",
       "description": "always false here Leakage: meta."
@@ -3014,6 +3049,21 @@
       "name": "title_withheld",
       "type": "boolean",
       "description": "A12.6 Leakage: meta."
+     },
+     {
+      "name": "t_news_market_utc",
+      "type": "datetime",
+      "description": "A25: per-market exact cut (precise version): Gamma scheduled start, market deadline inside a coarse case date, or the case time Leakage: label."
+     },
+     {
+      "name": "t_news_market_day_utc",
+      "type": "datetime",
+      "description": "A25: per-market day-level cut (day version) Leakage: label."
+     },
+     {
+      "name": "t_news_market_method",
+      "type": "string",
+      "description": "A25 method Allowed: scheduled_start, market_deadline, case_time. Leakage: meta."
      },
      {
       "name": "is_placebo_market",
@@ -3382,7 +3432,7 @@
      {
       "name": "t_cut_unix",
       "type": "integer",
-      "description": "cut time: t_news / t_news_precise (case) or t_ref (placebo) Unit: Unix s. Leakage: label."
+      "description": "cut time: the per-market cut (A25; case) or t_ref (placebo, twin) Unit: Unix s. Leakage: label."
      },
      {
       "name": "is_shortest_sufficient",
@@ -3971,7 +4021,7 @@
      {
       "name": "label_family",
       "type": "string",
-      "description": "A19: manipulation for manipulation rows, else the family of the case's claims Allowed: informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested. Leakage: label."
+      "description": "A19: manipulation for manipulation rows, else the family of the case's claims Allowed: informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested, multi_account. Leakage: label."
      },
      {
       "name": "is_documented",
@@ -4002,6 +4052,11 @@
       "name": "label_strict",
       "type": "boolean",
       "description": "A20: label_standard and (wallet_grade E1-E3, or named by address or resolved handle in an E4 claim) Leakage: label."
+     },
+     {
+      "name": "strict_no_prenews",
+      "type": "boolean",
+      "description": "A26: meets the rest of the strict rule but has no BUY before its case markets' precise cuts (so not strict) Leakage: label."
      },
      {
       "name": "strict_basis",
@@ -4099,7 +4154,7 @@
      {
       "name": "label_family",
       "type": "string",
-      "description": "A19: manipulation for manipulation rows, else the family of the case's claims Allowed: informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested. Leakage: label."
+      "description": "A19: manipulation for manipulation rows, else the family of the case's claims Allowed: informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested, multi_account. Leakage: label."
      },
      {
       "name": "is_documented",
@@ -4130,6 +4185,11 @@
       "name": "label_strict",
       "type": "boolean",
       "description": "A20: label_standard and (wallet_grade E1-E3, or named by address or resolved handle in an E4 claim) Leakage: label."
+     },
+     {
+      "name": "strict_no_prenews",
+      "type": "boolean",
+      "description": "A26: meets the rest of the strict rule but has no BUY before its case markets' precise cuts (so not strict) Leakage: label."
      },
      {
       "name": "strict_basis",
