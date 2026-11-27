@@ -17,7 +17,7 @@ SEED = 192
 T1_FEATURES = ["log_buy_usdc_pre", "vwap_pre", "first_buy_price", "max_buy_price", "log_n_buy_fills_pre", "taker_share_pre", "log_account_age_days",
                "log_market_usdc_pre", "f2_share", "log_lifetime_markets", "f5_conviction", "f6_hours_median_buy_to_tnews", "gate1_score", "gate2a_int",
                "sell_share_pre", "hours_first_buy_to_cut", "hours_last_buy_to_cut"]
-T1_LEAKAGE = ["is_documented", "doc_grade", "is_candidate_coordinated", "is_control", "is_placebo_market", "gate1", "gate2b", "is_shortest_sufficient",
+T1_LEAKAGE = ["is_documented", "doc_grade", "coordinated_rule_fired", "triggering_suspect", "placebo_rate", "is_control", "is_placebo_market", "gate1", "gate2b", "is_shortest_sufficient",
               "won_post", "pnl_post", "buy_usdc_post", "buy_shares_post", "sell_usdc_post", "sell_shares_post", "wallet", "case_id", "condition_id",
               "asset_id", "t_cut_ts (absolute time)", "first_buy_ts / last_buy_ts (absolute time)", "source_pre", "vol_to_day (includes the rest of the cut's day)"]
 T2_FEATURES = ["account_age_days_at_first_buy", "prior_markets", "prior_net_long_win_rate", "first_price", "vwap", "max_price_paid", "n_buy_fills",
@@ -48,9 +48,19 @@ def per_market_rank_metrics(df, score, ks=(10, 100)):
     if not len(m):
         return {}
     byc = m.groupby("case_id")[[c for c in m.columns if c[:2] in ("ap", "p@", "r@")]].mean()
-    res = {k: round(float(v), 4) for k, v in byc.mean().items()}
+    res = {k: round(float(v), 4) for k, v in byc.mean().items()}  # case-weighted: each case counts once
+    res["ap_pooled_markets"] = round(float(m.ap.mean()), 4)
     res.update(n_cases=int(len(byc)), n_markets=int(len(m)), per_case={c: {k: round(float(v), 4) for k, v in r.items()} for c, r in byc.iterrows()})
     return res
+
+
+def per_case_auc(df, score):
+    """AUC within each case that has both classes, then the case-weighted mean (each case counts once)."""
+    out = {}
+    for case, g in df.groupby("case_id"):
+        if g.y.nunique() == 2:
+            out[case] = round(float(roc_auc_score(g.y, g[score])), 4)
+    return dict(case_weighted_auc=round(float(np.mean(list(out.values()))), 4) if out else None, n_cases=len(out), per_case=out)
 
 
 def models():
@@ -102,11 +112,13 @@ def t2(data, splits, version):
         cv = np.full(len(e), np.nan)
         for a, b in GroupKFold(5).split(X, e.y, e.case_id):
             m.fit(X.iloc[a], e.y.iloc[a]); cv[b] = m.predict_proba(X.iloc[b])[:, 1]
-        res[f"{name}_grouped_cv"] = dict(auc=round(roc_auc_score(e.y, cv), 4), log_loss=round(log_loss(e.y, np.clip(cv, 1e-6, 1 - 1e-6)), 4))
+        res[f"{name}_grouped_cv"] = dict(auc_pooled=round(roc_auc_score(e.y, cv), 4), log_loss=round(log_loss(e.y, np.clip(cv, 1e-6, 1 - 1e-6)), 4),
+                                         **per_case_auc(e.assign(s=cv), "s"))
         tr, te = e.split == "train", e.split == "test"
         if e[te].y.nunique() == 2:
             m.fit(X[tr], e.y[tr]); pr = m.predict_proba(X[te])[:, 1]
-            res[f"{name}_test"] = dict(auc=round(roc_auc_score(e.y[te], pr), 4), log_loss=round(log_loss(e.y[te], np.clip(pr, 1e-6, 1 - 1e-6)), 4), n=int(te.sum()))
+            res[f"{name}_test"] = dict(auc_pooled=round(roc_auc_score(e.y[te], pr), 4), log_loss=round(log_loss(e.y[te], np.clip(pr, 1e-6, 1 - 1e-6)), 4), n=int(te.sum()),
+                                       **per_case_auc(e[te].assign(s=pr), "s"))
     return res
 
 
@@ -150,9 +162,10 @@ def t3(data, splits, version):
         cv = np.full(len(d), np.nan)
         for a, b in GroupKFold(5).split(X, d.y, d.case_id):
             m.fit(X.iloc[a], d.y.iloc[a]); cv[b] = m.predict_proba(X.iloc[b])[:, 1]
-        res[f"{name}_grouped_cv_auc"] = round(roc_auc_score(d.y, cv), 4)
+        res[f"{name}_grouped_cv"] = dict(auc_pooled=round(roc_auc_score(d.y, cv), 4), **per_case_auc(d.assign(s=cv), "s"))
         tr, te = d.split == "train", d.split == "test"
-        m.fit(X[tr], d.y[tr]); res[f"{name}_test_auc"] = round(roc_auc_score(d.y[te], m.predict_proba(X[te])[:, 1]), 4)
+        m.fit(X[tr], d.y[tr]); pr = m.predict_proba(X[te])[:, 1]
+        res[f"{name}_test"] = dict(auc_pooled=round(roc_auc_score(d.y[te], pr), 4), **per_case_auc(d[te].assign(s=pr), "s"))
     return res
 
 

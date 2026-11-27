@@ -2,7 +2,7 @@
 
 An open, source-traced register of every publicly documented case of suspected informed trading on prediction markets, joined to trade-level data for analysis and machine learning.
 
-**Version 1.0.0 (2026-11-26, run 7).** The release package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A16.1. Run 7 is described in [`logs/run7_report.md`](logs/run7_report.md).
+**Version 1.0.1 (2026-11-27, run 8).** Two release packages: [`release/`](release/) (all files) and [`release_safe/`](release_safe/) (without the Data API fill files, with a script that rebuilds them). The full package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A19. Runs 7 and 8 are described in [`logs/run7_report.md`](logs/run7_report.md) and [`logs/run8_report.md`](logs/run8_report.md).
 
 Files over 50 MB (`release/data/positions.parquet`, `weak_labels.parquet`, `fills_part*.parquet`) are not in git; they are listed with SHA-256 in `release/MANIFEST.json` and rebuilt by the scripts.
 

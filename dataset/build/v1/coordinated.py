@@ -16,8 +16,8 @@ c = duckdb.connect(); c.sql(f"SET memory_limit='10GB'; SET temp_directory='{TMPD
 ep = lambda s: (pd.to_datetime(s.replace("", None), utc=True, errors="coerce", format="mixed") - pd.Timestamp("1970-01-01", tz="UTC")).dt.total_seconds().round().astype("Int64")
 mk = pd.read_csv(os.path.join(D, "data", "markets.csv"), dtype=str, keep_default_na=False); mk["condition_id"] = mk.condition_id.str.lower()
 W = pd.read_csv(os.path.join(D, "data", "wallet_labels.csv"), dtype=str, keep_default_na=False)
-doc = W[(W.polarity == "suspected") & (W.trade_confirmed.str.lower() == "true")][["address", "case_id"]].drop_duplicates()
-labelled = sorted(set(W.address))
+doc = W[(W.polarity == "suspected") & (W.trade_confirmed.str.lower() == "true") & (W.label_family == "informed_trading")]  # A19[["address", "case_id"]].drop_duplicates()
+labelled = sorted(set(W[W.label_tier != "L4_coordinated"].address))
 M = pd.concat([mk.assign(t_news_version=v, t_cut=ep(mk[col]))[["case_id", "condition_id", "t_news_version", "t_cut"]]
                for v, col in [("day", "t_news_utc"), ("precise", "t_news_precise_utc")]])
 c.register("M_df", M); c.sql("CREATE TABLE M AS SELECT * FROM M_df")
@@ -63,13 +63,13 @@ for X in (R, P):
 need = sorted(set(R.loc[R.prefilter_pass, "wallet"]) | set(P.loc[P.prefilter_pass, "wallet"]))
 lst = os.path.join(TMPD, "coord_profiles.txt"); open(lst, "w").write("\n".join(need))
 print("profile lookups", len(need), flush=True)
+PC = os.path.join(RAW, "profiles_created_run7.csv")  # run-7 lookups keep only address and createdAt (raw profiles not committed)
+PCD = {r[0]: r[1] for r in pd.read_csv(PC, dtype=str, keep_default_na=False).values} if os.path.exists(PC) else {}
 todo = [a for a in need if a not in PCD]
 if todo:
     open(lst, "w").write("\n".join(todo)); subprocess.run([sys.executable, os.path.join(D, "build", "pull_profiles.py"), lst], check=True)
 
 
-PC = os.path.join(RAW, "profiles_created_run7.csv")  # run-7 lookups keep only address and createdAt (raw profiles not committed)
-PCD = {r[0]: r[1] for r in pd.read_csv(PC, dtype=str, keep_default_na=False).values} if os.path.exists(PC) else {}
 
 
 def created(a):

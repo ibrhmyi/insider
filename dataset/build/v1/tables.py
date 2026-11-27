@@ -74,8 +74,8 @@ RANK = {g: i for i, g in enumerate("E1 E2 E3 E4 E5 E6".split())}
 direct = cl[~cl.subject_type.isin(["aggregate", "market"])]
 dg = direct.groupby("case_id").evidence_grade.agg(lambda s: min(s, key=RANK.get))
 W = W.rename(columns={"address": "wallet"})
-W["is_documented"] = (W.polarity == "suspected") & (W.trade_confirmed == "true")
-W["is_candidate_coordinated"] = W.polarity == "candidate"
+W = W[W.label_tier != "L4_coordinated"]  # A17: rule output is not a wallet label
+W["is_documented"] = (W.polarity == "suspected") & (W.trade_confirmed == "true") & (W.label_family == "informed_trading")  # A19
 W["doc_grade"] = np.where(W.polarity.isin(["suspected", "ambiguous"]), W.case_id.map(dg), None)
 W = W.drop(columns=["case_market_traded", "case_check_note"])
 wallets = write("wallets", nul(W))
@@ -84,8 +84,10 @@ cs["benchmark_split"] = cs.case_id.map(split)
 cs["n_markets"] = cs.case_id.map(mk.groupby("case_id").size()).fillna(0)
 g = wallets.groupby("case_id")
 cs["n_wallets_suspected"] = cs.case_id.map(wallets[wallets.polarity == "suspected"].groupby("case_id").size()).fillna(0)
-cs["n_wallets_documented"] = cs.case_id.map(wallets[wallets.is_documented].groupby("case_id").size()).fillna(0)
-cs["n_wallets_candidate"] = cs.case_id.map(wallets[wallets.is_candidate_coordinated].groupby("case_id").size()).fillna(0)
+cs["n_documented_by_case"] = cs.case_id.map(wallets[wallets.is_documented].groupby("case_id").size()).fillna(0)
+CC = pd.read_csv(os.path.join(D, "data", "coordinated_candidates.csv"), dtype=str, keep_default_na=False)
+cs["n_wallets_coordinated_rule"] = cs.case_id.map(CC.groupby("case_id").candidate_wallet.nunique()).fillna(0)
+PR = json.load(open(os.path.join(D, "logs", "coordinated_placebo.json")))
 cs = cs.drop(columns=["n_wallet_addresses"])
 write("cases", nul(cs))
 mk["is_placebo_market"] = "false"
@@ -114,13 +116,15 @@ write("episodes", epi.drop(columns=[x for x in epi.columns if x not in [k["name"
 # positions with label columns
 pos = pd.read_parquet(os.path.join(V1, "positions.parquet"))
 doc = wallets[wallets.is_documented][["wallet", "case_id", "doc_grade"]].assign(is_documented=True)
-cand = wallets[wallets.is_candidate_coordinated][["wallet", "case_id"]].drop_duplicates().assign(is_candidate_coordinated=True)
-pos = pos.merge(doc, on=["wallet", "case_id"], how="left").merge(cand, on=["wallet", "case_id"], how="left")
-pos.loc[pos.market_set == "placebo", ["is_documented", "is_candidate_coordinated", "doc_grade"]] = [False, False, None]
+fr = CC.sort_values("trigger_utc").drop_duplicates(["candidate_wallet", "case_id", "condition_id", "asset_id", "t_news_version"])
+fr = fr.rename(columns={"candidate_wallet": "wallet", "trigger_wallet": "triggering_suspect"})[["wallet", "case_id", "condition_id", "asset_id", "t_news_version", "triggering_suspect"]]
+fr = fr.assign(coordinated_rule_fired=True, placebo_rate=fr.t_news_version.map(lambda v: PR[v]["placebo_to_real_ratio"]), market_set="case")
+pos = pos.merge(doc, on=["wallet", "case_id"], how="left").merge(fr, on=["market_set", "wallet", "case_id", "condition_id", "asset_id", "t_news_version"], how="left")
+pos.loc[pos.market_set == "placebo", ["is_documented", "doc_grade"]] = [False, None]
 ctl = ctrl[["t_news_version", "case_id", "condition_id", "wallet"]].drop_duplicates().assign(is_control=True)
 pos = pos.merge(ctl, on=["t_news_version", "case_id", "condition_id", "wallet"], how="left")
 pos.loc[pos.market_set == "placebo", "is_control"] = False
-for x in ["is_documented", "is_candidate_coordinated", "is_control"]:
+for x in ["is_documented", "coordinated_rule_fired", "is_control"]:
     pos[x] = pos[x].fillna(False).astype(bool)
 pos["is_placebo_market"] = pos.market_set == "placebo"
 pos = cast("positions", pos)
@@ -131,6 +135,12 @@ gc = pos[pos.market_set.isin(["case", "placebo"])].groupby(["wallet", "t_news_ve
 gc.columns = [f"{a}_n" + ("" if b == "precise" else "_day") for a, b in gc.columns]
 wl = pd.read_parquet(os.path.join(D, "out", "weak_labels.parquet")).rename(columns={"address": "wallet"})
 wl = wl.merge(gc.reset_index(), on="wallet", how="left")
+wf = CC.assign(v_rank=CC.t_news_version.map({"precise": 0, "day": 1})).sort_values(["v_rank", "trigger_utc"])
+first = wf.drop_duplicates("candidate_wallet").set_index("candidate_wallet")
+wl["coordinated_rule_fired"] = wl.wallet.isin(set(CC[CC.t_news_version == "precise"].candidate_wallet))
+wl["coordinated_rule_fired_day"] = wl.wallet.isin(set(CC[CC.t_news_version == "day"].candidate_wallet))
+wl["triggering_suspect"] = wl.wallet.map(first.trigger_wallet)
+wl["placebo_rate"] = wl.wallet.map(first.t_news_version).map(lambda v: PR[v]["placebo_to_real_ratio"] if isinstance(v, str) else np.nan)
 wl["gate_scope"] = np.where(wl.gate1_n.notna(), "case_or_placebo_markets", "not_in_case_or_placebo_markets")
 wl["acdc_class"] = wl.acdc_class.replace("", None)
 wl = cast("weak_labels", wl)

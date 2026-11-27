@@ -1,32 +1,28 @@
 {
  "name": "PMITC",
- "version": "1.0.0",
+ "version": "1.0.1",
+ "package": "release",
+ "withheld_sources": [],
  "hf_source": "TimeSeventeen/Polymarket-v1 @ 6d1bcd5279cbbd8e833feaeba9a56a0aee139144",
  "generated_by": "build/v1/codebook.py",
  "files": [
   {
    "path": "benchmarks/README.md",
    "rows": null,
-   "bytes": 3332,
-   "sha256": "4cfe3ae2aaf107a1aed9dc69c62b4a4f1dc5f79b09fc03edaad96c64f793dc23"
-  },
-  {
-   "path": "benchmarks/__pycache__/pmitc_bench.cpython-313.pyc",
-   "rows": null,
-   "bytes": 24564,
-   "sha256": "b7f6dec8d55e6934c924065e4285d789f3604556a4666524dd9fb24b2753ebd7"
+   "bytes": 3693,
+   "sha256": "36dd30e925c32f2f375aff4454f9deeb776ae0cde809817f586e1cfaad87adfd"
   },
   {
    "path": "benchmarks/baselines.json",
    "rows": null,
-   "bytes": 18926,
-   "sha256": "d2029e46165d38411de50aa9dbef12df0c99b9967be832f84ca33a3081622130"
+   "bytes": 30260,
+   "sha256": "1533876c8c9e540e1f1393d6eb082705eba93e0be62a5058a3c3e27c357822e0"
   },
   {
    "path": "benchmarks/pmitc_bench.py",
    "rows": null,
-   "bytes": 12429,
-   "sha256": "c3a14de976cb94cdd1032d6068f032d6b70f299526c27a91f54948374ead0e87"
+   "bytes": 13280,
+   "sha256": "bbb1d11da77ed2467cd2bc3588f612c9d8e9f15a5ed5cac1cfa6197157e40e60"
   },
   {
    "path": "benchmarks/splits.csv",
@@ -37,14 +33,14 @@
   {
    "path": "data/cases.csv",
    "rows": 66,
-   "bytes": 17442,
-   "sha256": "c5d9766e2149938968734f86f99891dbdd7de28352351a206122240b5d17c5d1"
+   "bytes": 17448,
+   "sha256": "1c18a0c3324845163fde680f0b434ec401b764784c6b54a7270e1627bdda6d08"
   },
   {
    "path": "data/cases.parquet",
    "rows": 66,
-   "bytes": 22479,
-   "sha256": "e3e948beac2a3939d7952441640bc1519ec89b4fb204f6a3eab4d2e1750248d1"
+   "bytes": 22525,
+   "sha256": "ca4601d1fc20f520a86389962b3ff11ae4d8a0fd08617d45448dd802bcfd1128"
   },
   {
    "path": "data/claims.csv",
@@ -60,27 +56,27 @@
   },
   {
    "path": "data/contradictions.csv",
-   "rows": 4,
-   "bytes": 1574,
-   "sha256": "2a093207920c383effe167b482839db6403e3e49503006c93745bbd8c12a06c4"
+   "rows": 5,
+   "bytes": 2038,
+   "sha256": "7d187229e0c1993194858d94497a57ab9868fab1ba0faf2a8984d6aa3875f7d8"
   },
   {
    "path": "data/contradictions.parquet",
-   "rows": 4,
-   "bytes": 8239,
-   "sha256": "1b30b6dd8cf8ed43c8f17546ba9b487b1c3047c78623979a3cf035d3c54d964a"
+   "rows": 5,
+   "bytes": 8861,
+   "sha256": "185996c08c9bc4e9a1479012496a9a59b0e5098cb32f2355a5107d0c7d4786cb"
   },
   {
    "path": "data/controls.csv",
-   "rows": 16767,
-   "bytes": 5064459,
-   "sha256": "8786d633f6a6c57f9019768b3678c35cddd949c94c0a8e2e3e9d12ed9292af2a"
+   "rows": 16650,
+   "bytes": 5029532,
+   "sha256": "c830a13aa39faa5032ca313b397739d5c001c4cb299d556e393d194b1798eb29"
   },
   {
    "path": "data/controls.parquet",
-   "rows": 16767,
-   "bytes": 252351,
-   "sha256": "268d7c5a42cccfe58452c1d708106c8e663e1ac218ddc1b04b2510a06bf3386d"
+   "rows": 16650,
+   "bytes": 247596,
+   "sha256": "9d8ff927e4f3dd717b47d4a0de970ee4e9dde73f0aed9c1f172608c3904756d4"
   },
   {
    "path": "data/edges.csv",
@@ -96,15 +92,15 @@
   },
   {
    "path": "data/episodes.csv",
-   "rows": 17671,
-   "bytes": 10701700,
-   "sha256": "710a15776a5ade2f3d89c9cd1ce18e0faa0389e4242f0048c977e7bd9dae8591"
+   "rows": 17548,
+   "bytes": 10629525,
+   "sha256": "48a5075af1c3a57f9bf12e7fd9abd28acb588409c184d0fafe8d7e651acea81f"
   },
   {
    "path": "data/episodes.parquet",
-   "rows": 17671,
-   "bytes": 1145081,
-   "sha256": "02dde753c9379082e77b264754a0cb32e5851ee618c2e18e15eaf81875a52cfe"
+   "rows": 17548,
+   "bytes": 1134042,
+   "sha256": "691b1d0200d07efc516bd940d5f07ac0d719bd9e39dc3bafc40eb51658eb1418"
   },
   {
    "path": "data/fills_part001_case_hf_polymarket_v1.parquet",
@@ -150,27 +146,27 @@
   },
   {
    "path": "data/fills_part008_label_other_data_api_v2.parquet",
-   "rows": 4636128,
-   "bytes": 629022018,
-   "sha256": "657272634e412f91f56bc6ab62dcd9e3d7a9f7a7fd795f0dbd2213412785ef2d"
+   "rows": 6158,
+   "bytes": 810725,
+   "sha256": "bc15c452164c3524b7130ae517a3bfd0cade93f3ec172966887fdbcddf7aab3b"
   },
   {
    "path": "data/market_minutes.parquet",
-   "rows": 1239464,
-   "bytes": 22911649,
-   "sha256": "1d7ce1a90d467d37e60332549f2ebd8406a9b80966975279fac27c0b58a258d8"
+   "rows": 1238536,
+   "bytes": 22816498,
+   "sha256": "bf4b08f66847ece643c2eaf90acb34fefd22a829026d648d47402a5b3a05914b"
   },
   {
    "path": "data/markets.csv",
    "rows": 1118,
-   "bytes": 784456,
-   "sha256": "9e4e1e9aab5f780b7cc899f93d4656a3e0396723deee56fffc7246acec734eb7"
+   "bytes": 781390,
+   "sha256": "20689e858988b530ce37dbd66ccd9dc7016dbc7f4812b7bb6648e01759871342"
   },
   {
    "path": "data/markets.parquet",
    "rows": 1118,
-   "bytes": 182249,
-   "sha256": "2bfe861537d6ed56c6eb2dbce5c0d24237ee22dce226de379acc33a664863f9c"
+   "bytes": 182042,
+   "sha256": "d8d6057ef476f0b13e9e221ef0ec4e9a8c6cfcccec9877888a74d8ea421cb5d2"
   },
   {
    "path": "data/placebo_markets.csv",
@@ -186,39 +182,39 @@
   },
   {
    "path": "data/positions.parquet",
-   "rows": 6074515,
-   "bytes": 510331532,
-   "sha256": "31c526e314bce23591fab404a1a166ab4daf5d9ebd092a72ec68dfc3868cdd46"
+   "rows": 6069622,
+   "bytes": 510843663,
+   "sha256": "f6284bbd3a4d4f0ee25dca40e268b065adebcd77e4672aa84e4cdff5fee6407b"
   },
   {
    "path": "data/wallets.csv",
-   "rows": 1598,
-   "bytes": 588730,
-   "sha256": "0a96d9d5b9200b65008542c013482a1c77a25dcd401e7d18130a5359a4e836de"
+   "rows": 260,
+   "bytes": 108210,
+   "sha256": "694944a51010868aca57876e82bebee346d31588db0c14978e646af50f3afdfd"
   },
   {
    "path": "data/wallets.parquet",
-   "rows": 1598,
-   "bytes": 88644,
-   "sha256": "b4fcfa58547ff137c001833c492c034f6a263bce4b0e6c3bbc6373b0b539ffa2"
+   "rows": 260,
+   "bytes": 27598,
+   "sha256": "bb239bf101154414bdae8f82364b837b40e37eedcaae5ba23df24bde0828fa11"
   },
   {
    "path": "data/weak_labels.parquet",
    "rows": 2651672,
-   "bytes": 129486608,
-   "sha256": "4410a0bec74e7ba8f2f8416d2f3bfdfb71809bff52a8bdca86c06c3104224b31"
+   "bytes": 129562813,
+   "sha256": "ce495f79472dbcbf0a1cbf6f73c4246427a17b548b2afe2f4f27027e4225c69b"
   },
   {
    "path": "dataset-metadata.json",
    "rows": null,
-   "bytes": 113756,
-   "sha256": "651e251564649f226946f1e1af1851bf6e2e789f9b3df221d8fc90896c28091e"
+   "bytes": 117182,
+   "sha256": "a48fc55c007d591f749fbcc0d2835c64c463e26f60a6f57023ab7ff206a241d5"
   },
   {
    "path": "docs/CHANGELOG.md",
    "rows": null,
-   "bytes": 1808,
-   "sha256": "025bbe04a622ebcacc3e0c376398ed3d38e845478e9f94467acbfff2dcb1409f"
+   "bytes": 2973,
+   "sha256": "c307751f2f98b866f0c5bc0a2163eb9fecc2649b3760563547718a275ea93b27"
   },
   {
    "path": "docs/CITATION.cff",
@@ -229,14 +225,14 @@
   {
    "path": "docs/CODEBOOK.md",
    "rows": null,
-   "bytes": 29319,
-   "sha256": "2e1415fd4842a81d6c09e685a1500d20b3aac37abf6a2d93b81c81ddac63bab0"
+   "bytes": 30591,
+   "sha256": "44270889eda770ee53b08579ba9db5f0509db81519a627537a7aae5785b68ee5"
   },
   {
    "path": "docs/DATASHEET.md",
    "rows": null,
-   "bytes": 4619,
-   "sha256": "824be54e9ea9ba32f306d55058ef2912f3d47628dd5f2147d22868a8c1b5f50e"
+   "bytes": 4925,
+   "sha256": "35e8ffbae6913e780414e7323605820fc3b67c76e61256e1a6edb21d9e6cd518"
   },
   {
    "path": "docs/LICENSE.md",
@@ -253,14 +249,14 @@
   {
    "path": "docs/PROTOCOL.md",
    "rows": null,
-   "bytes": 32255,
-   "sha256": "dc5b89b9433f636666089f1f7a1ea5ab43ffcb1c77fc8e46a150b6ffbf7ff8c8"
+   "bytes": 35078,
+   "sha256": "96e34c4197c004c83dabd3d5e6dd53dd6521bca25df71cbc40e5c157d221d160"
   },
   {
    "path": "docs/README.md",
    "rows": null,
-   "bytes": 8762,
-   "sha256": "0b7c1703930bd1185ad6ba8d190602216863a0ff0ab31ccc2e4566a0dac8d467"
+   "bytes": 10152,
+   "sha256": "c2dc565eed0dfec68b8fe9bad4824245c5440d9b45064846caaf45893d42c74d"
   },
   {
    "path": "docs/blind_check_sample.csv",
@@ -271,14 +267,14 @@
   {
    "path": "notebooks/01_explore.ipynb",
    "rows": null,
-   "bytes": 142784,
-   "sha256": "fd8aa4de37e24cd1193f6a347d94f05dfaa62bc536d56e96a3447dc10976af67"
+   "bytes": 142726,
+   "sha256": "807fbaa9a563c82795d42acc6435af805fa71005177dd97796a94cff47e548d6"
   },
   {
    "path": "notebooks/02_baselines.ipynb",
    "rows": null,
-   "bytes": 8817,
-   "sha256": "e624aa631a24c62e1f4d616a190a35184c9914c87962b55d7ccb99931725d2bc"
+   "bytes": 16308,
+   "sha256": "78811de3b0e972f16f023affc340705904e511d3d2371fe28821032d2fc997b7"
   }
  ]
 }

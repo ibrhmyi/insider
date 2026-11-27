@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.1 (2026-11-27, run 8): release fixes
+- A17: the coordinated-buyer rule (A13) is a rule label, not a wallet label. The 1,338 `L4_coordinated` rows left `wallets`; `positions` and `weak_labels` gain `coordinated_rule_fired`, `triggering_suspect`, `placebo_rate`. Rule-fired wallets' histories outside case markets are no longer in `fills`.
+- A18: an exact news time must fall inside the coarse date that set the day-level time; Super Bowl LX's (01:12 UTC on the next day) does not, so its day date is kept and a contradiction is recorded (CX005). Kalshi notices keep their printed years.
+- A19: `label_family` in `wallets`; `is_documented` only for informed trading (119 wallets; the Spotify Wrapped public-data-leak wallet is no longer a positive). Benchmarks recomputed, reported per case and case-weighted.
+- `cases.n_documented_by_case`; docs state that 74 of 119 documented wallets come from two cases and 87 are money-flow cluster members.
+- `__pycache__` removed from the package and the manifest; `*.pyc` ignored.
+- Two packages: `release/` (all files) and `release_safe/` (without the Data API fill files, with `scripts/rebuild_data_api_fills.py`).
+
 ## v1.0.0 (2026-11-26, run 7)
 - Exact news times (PROTOCOL A10): every time-dependent table in two versions, `day` and `precise`; 7 new sourced times (16 cases with an exact time).
 - Pseudonym handle rule (A11): `Burdensome-Mix` resolved by pseudonym plus fills; every claim handle re-checked (`logs/handle_checks_run7.csv`).

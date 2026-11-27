@@ -2,7 +2,7 @@
 
 A source-traced register of publicly documented cases of **suspected** informed trading on prediction markets (court and regulator actions, platform sanctions, analyst investigations, press reports, rule-based screens), joined to trade-level Polymarket data so that the cases can be analysed and used for machine learning: every fill in the case markets, all buyers before the news, matched controls, placebo markets where nobody can know the outcome early, minute paths, and three benchmark tasks.
 
-**Version 1.0.0 (2026-11-26).** Collected under `PROTOCOL.md` v1.0 and amendments A1 to A16.1. Every column is in `CODEBOOK.md`; the datasheet is `DATASHEET.md`; file hashes are in `../MANIFEST.json`.
+**Version 1.0.1 (2026-11-27).** Collected under `PROTOCOL.md` v1.0 and amendments A1 to A19. Every column is in `CODEBOOK.md`; the datasheet is `DATASHEET.md`; file hashes are in `../MANIFEST.json`.
 
 > **Labels are allegations, not findings.** A wallet in this dataset is "flagged by <source>", never "an insider". Only E1 claims are final outcomes, and most E1 claims are Kalshi platform discipline. No table contains a personal name.
 
@@ -12,38 +12,43 @@ A source-traced register of publicly documented cases of **suspected** informed 
 |---|---|---|
 | `cases` | 66 | one underlying event: strongest grade, investigation outcome, counts, benchmark split |
 | `claims` | 123 | one statement by one source at one time: grade, stance, verified flag, source URL |
-| `wallets` | 1,598 | one (wallet, case) label: tier, polarity, `trade_confirmed`, `is_documented`, `is_candidate_coordinated` |
+| `wallets` | 260 | one (wallet, case) label from a named source: tier, polarity, `label_family`, `trade_confirmed`, `is_documented` |
 | `markets` | 1,118 | one (case, market): Gamma ladder, dates, outcome, volume, `t_news_utc`, `t_news_precise_utc` |
 | `placebo_markets` | 4,495 | one placebo market (4,227) with its matched case market, or an unmatched case-market row |
-| `fills` (8 parquet parts) | 58,060,526 | one wallet leg of one fill: case markets, placebo markets, and labelled wallets elsewhere |
-| `positions` | 6,074,515 | one (market, token, wallet, version) for every buyer before the cut: the population a detector must search |
-| `episodes` | 17,671 | one documented episode or matched control, pre-news features and `_post` outcomes, both versions |
-| `controls` | 16,767 | one matched control with its relaxation flag |
-| `weak_labels` | 2,651,672 | one Polymarket-v1 wallet: ACDC reconstruction, Inca rule, Gate 1/2 counts |
-| `market_minutes` | 1,239,464 | one market, version and minute with fills, 48 h before to 24 h after the cut |
-| `contradictions` | see file | a claim contradicted by the trades (claims are never edited) |
+| `fills` (8 parquet parts) | 53,430,556 | one wallet leg of one fill: case markets, placebo markets, and labelled wallets elsewhere |
+| `positions` | 6,069,622 | one (market, token, wallet, version) for every buyer before the cut: the population a detector must search |
+| `episodes` | 17,548 | one documented episode or matched control, pre-news features and `_post` outcomes, both versions |
+| `controls` | 16,650 | one matched control with its relaxation flag |
+| `weak_labels` | 2,651,672 | one Polymarket-v1 wallet: ACDC reconstruction, Inca rule, Gate 1/2 counts, coordinated-buyer rule output |
+| `market_minutes` | 1,238,536 | one market, version and minute with fills, 48 h before to 24 h after the cut |
+| `contradictions` | 5 | a claim contradicted by the trades (claims are never edited) |
 | `edges` | 416 | a money link from the seed sources (not expanded; no archive RPC was available) |
 
 CSV copies exist for every table under 50 MB; parquet for all. Types are explicit (`CODEBOOK.md`): UTC timestamps, lower-case `0x` addresses, NULL for missing, stable ids (`case_id`, `claim_id`, `condition_id`, `asset_id`, `wallet`, `episode_id`).
 
 ## Label columns (never merged)
 
-`is_documented` (suspected by a source **and** confirmed by the wallet's own fills; the default positive), `doc_grade`, `is_candidate_coordinated` (rule A13, never documented), `acdc_class` (reconstruction, not a label: it misses its 5% validation bar), `inca_flag` (published rule only; broader than Inca's list, 9,285 vs 39), `gate1`, `gate2a`, `gate2b` (frozen screens, A16), `is_control`, `is_placebo_market`.
+`is_documented` (suspected by a source, confirmed by the wallet's own fills, and in an informed-trading case: `label_family = informed_trading`; the default positive), `doc_grade`, `label_family`, `coordinated_rule_fired` (rule A13/A17: **rule output; about 1/3 expected by chance; may include copy-traders; not an allegation**), `acdc_class` (reconstruction, not a label: it misses its 5% validation bar), `inca_flag` (published rule only; broader than Inca's list, 9,285 vs 39), `gate1`, `gate2a`, `gate2b` (frozen screens, A16), `is_control`, `is_placebo_market`.
+
+## Concentration of the positives
+
+The labels are few and clustered. **74 of the 119 documented wallets come from two cases** (52 in the Feb-28 2026 US strike on Iran, 22 in the KPMG/Deloitte earnings case), and **87 are cluster members** (`L4_cluster_member`): wallets a source links to a flagged wallet by money flows, not each flagged for its own trades. `cases.n_documented_by_case` gives the count per case. Benchmark metrics are therefore reported **per case and case-weighted** (each case counts once), next to pooled values; a pooled score is dominated by the two large cases.
 
 ## Two news times
 
 Every time-dependent table exists twice (`t_news_version`):
 - `day`: 00:00 UTC on the earliest day-precision event or claim date (A6.6, A7);
-- `precise`: an hour- or minute-level time from `data/event_times.csv` with a source URL (A10), or the day time where none is sourced. 17 of 42 market-bearing cases have an exact time.
+- `precise`: an hour- or minute-level time from `data/event_times.csv` with a source URL (A10), or the day time where none is sourced. 16 of 42 market-bearing cases use an exact time.
 
-Day-start times count every trade on the news day as post-news; the precise version fixes that (for example the Nobel wallets bought between 00:44 and 03:29 UTC before the 09:00 UTC announcement). Use `precise` by default and report `day` as a sensitivity.
+Day-start times count every trade on the news day as post-news; the precise version fixes that. An exact time is used only if it falls inside the coarse date (A18): Super Bowl LX's halftime time (01:12 UTC, the next UTC day) is rejected, so 16 cases use an exact time (for example the Nobel wallets bought between 00:44 and 03:29 UTC before the 09:00 UTC announcement). Use `precise` by default and report `day` as a sensitivity.
 
 ## Benchmarks (`benchmarks/`)
 
 Frozen split (`splits.csv`): grouped by case, ordered in time; `test` = cases first claimed on or after 2026-03-01.
-- **T1, within-market ranking** of all pre-news buyers (positives = documented wallets). Test (precise): logistic regression AP 0.076 vs random 0.052 and the Gate 1 rule 0.065; gradient boosting overfits the train cases (AP 0.012). Case-grouped CV inside train: AP 0.35 (LR).
-- **T2, documented episodes vs matched controls.** Base result: matched same-side controls win as often as documented episodes (83.5% vs 83.9%), so outcome-based features do not separate them. Pre-news behaviour separates them partly: test AUC 0.79 (logistic regression) and 0.70 (gradient boosting); case-grouped CV 0.80 and 0.88. Account age and prior activity carry most of it (documented wallets are new). One feature, `share_on_this_ladder_market`, is a construction artifact (AUC 0.97 alone) and is on the leakage list; see `benchmarks/README.md`.
-- **T3, case markets vs placebo markets** from pre-cut flow only: AUC about 0.72 (LR) to 0.84 (gradient boosting) on test. Placebo markets differ from case markets in kind (crypto prices, weather), so part of this is market type.
+Metrics are case-weighted (each case counts once) unless marked pooled; per-case values are in `baselines.json`. Test numbers rest on few cases (T1 and T2: 4 cases with documented wallets in scored markets, 32 positives).
+- **T1, within-market ranking** of all pre-news buyers (positives = documented wallets). Test (precise), case-weighted AP: logistic regression 0.075, the Gate 1 rule 0.065, random 0.005; gradient boosting overfits the train cases (0.005). Case-grouped CV inside train: AP 0.32 (LR).
+- **T2, documented episodes vs matched controls.** Base result: matched same-side controls win as often as documented episodes (83.5% vs 84.0%), so outcome-based features do not separate them. Pre-news behaviour separates them partly: test AUC case-weighted 0.83 (logistic regression) and 0.74 (gradient boosting), pooled 0.79 and 0.70; case-grouped CV case-weighted 0.75 and 0.79 (16 cases). Account age and prior activity carry most of it (documented wallets are new). One feature, `share_on_this_ladder_market`, is a construction artifact (AUC 0.97 alone) and is on the leakage list; see `benchmarks/README.md`.
+- **T3, case markets vs placebo markets** from pre-cut flow only: test AUC case-weighted 0.79 (both models; 15 cases), pooled 0.75 (LR) and 0.85 (gradient boosting). Placebo markets differ from case markets in kind (crypto prices, weather), so part of this is market type.
 
 Full results: `benchmarks/baselines.json` (both versions). Notebooks: `notebooks/01_explore.ipynb`, `notebooks/02_baselines.ipynb`.
 
@@ -75,7 +80,7 @@ PMITC tables: CC-BY-4.0. Polymarket-v1 fills (`source = hf_polymarket_v1`): CC-B
 - 16 claims are `verified = pending` (search-result text). 22 pages could not be read here (proxy or site bot protection) and are listed in the repository's `dataset/logs/needs_page_read.csv`; none was worked around.
 - Kalshi accounts and trades are not public: Kalshi cases have claims but no wallets or fills.
 - The ACDC reconstruction misses its validation bar (Orcas +188%); `inca_flag` is far broader than Inca's published list.
-- A13 candidates are noisy: the same rule fires in random placebo windows at about a third of the real-trigger rate (precise: 0.145 vs 0.446 candidates per window).
+- The coordinated-buyer rule (A13) is rule output, not a label: the same rule fires in random placebo windows at about a third of the real-trigger rate (`placebo_rate`), and it cannot tell coordination from copy-trading of visible trades. It is not an allegation against any wallet.
 - Polymarket-v1 records some economic buys as maker sells of the other token (mint matching, A6.4); fills keep the leg sides as recorded.
 
 ## How to cite

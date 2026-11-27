@@ -15,10 +15,11 @@ D = os.path.join(os.path.dirname(__file__), "..")
 CASE = "tweet-count-self-2026-03"
 mk = pd.read_csv(os.path.join(D, "data", "markets.csv"), dtype=str, keep_default_na=False)
 mk = mk[mk.case_id != CASE]
+prev_withheld = mk.get("title_withheld", pd.Series("false", index=mk.index)).eq("true")  # keep earlier A12.7 decisions (texts already blank)
 for col in ["title_withheld", "t_news_precise_utc", "t_news_precise_precision", "t_news_precise_source", "t_news_precise_verified"]:
     if col in mk.columns:
         mk = mk.drop(columns=col)
-mk["title_withheld"] = "false"
+mk["title_withheld"] = prev_withheld.map({True: "true", False: "false"})
 PATTERN = sys.argv[1] if len(sys.argv) > 1 else None
 if PATTERN:
     c = duckdb.connect()
@@ -81,6 +82,42 @@ mk["t_news_precise_utc"] = [best.loc[c, "t"].strftime("%Y-%m-%dT%H:%M:%SZ") if c
 mk["t_news_precise_precision"] = [pp(best.loc[c, "t_precision"]) if c in best.index else "day_fallback" for c in mk.case_id]
 mk["t_news_precise_source"] = [best.loc[c, "url"] if c in best.index else "day_fallback" for c in mk.case_id]
 mk["t_news_precise_verified"] = [best.loc[c, "verified"] if c in best.index else "" for c in mk.case_id]
+# --- A18: an exact time must fall inside the range of the date that set the day-level t_news
+def coarse_end(start, prec, case):
+    t = pd.Timestamp(start)
+    if prec == "day": return t + pd.Timedelta(days=1)
+    if prec == "month": return t + pd.offsets.MonthBegin(1)
+    if prec == "quarter": return t + pd.offsets.QuarterBegin(1, startingMonth=1)
+    if prec == "year": return t + pd.offsets.YearBegin(1)
+    ev = [x["event_date"] for x in claims if x["case_id"] == case and "/" in x["event_date"]]  # range: end of B
+    if ev:
+        b = ev[0].split("/")[1]; lo, pr = parse_date(b)
+        return coarse_end(pd.Timestamp(lo, tz="UTC"), pr, case)
+    return None
+rej, cx_rows = set(), []
+for case, g in mk.groupby("case_id"):
+    r = g.iloc[0]
+    if r.t_news_precise_precision == "day_fallback" or not r.t_news_utc:
+        continue
+    t0 = pd.Timestamp(r.t_news_utc); end = coarse_end(t0, r.t_news_precision, case); tp = pd.Timestamp(r.t_news_precise_utc)
+    if end is not None and not (t0 <= tp < end):
+        rej.add(case)
+        day = t0.strftime("%Y-%m-%d")
+        cid = next((x["claim_id"] for x in claims if x["case_id"] == case and (x["event_date"] == day or x["claim_date"] == day)), "")
+        cx_rows.append(dict(claim_id=cid, case_id=case, field="t_news_precise", claimed_value=f"{r.t_news_utc} ({r.t_news_precision} precision)",
+                            observed_value=r.t_news_precise_utc,
+                            evidence=f"A18: the exact time {r.t_news_precise_utc} ({r.t_news_precise_source}) falls outside the coarse date range [{t0:%Y-%m-%dT%H:%M:%SZ}, {end:%Y-%m-%dT%H:%M:%SZ}); the coarse date is kept. Likely a time-zone difference (an evening event in US time is the next UTC day)",
+                            evidence_file="data/event_times.csv", phase="run8_a18", found_utc="2026-11-27T00:00:00Z"))
+for col, v in [("t_news_precise_precision", "day_fallback"), ("t_news_precise_source", "rejected_outside_coarse_date"), ("t_news_precise_verified", "")]:
+    mk.loc[mk.case_id.isin(rej), col] = v
+mk.loc[mk.case_id.isin(rej), "t_news_precise_utc"] = mk.loc[mk.case_id.isin(rej), "t_news_utc"]
+cxp = os.path.join(D, "data", "contradictions.csv")
+cx = pd.read_csv(cxp, dtype=str, keep_default_na=False); cx = cx[cx.phase != "run8_a18"]
+nn = max(int(x[2:]) for x in cx.contradiction_id)
+for i, r_ in enumerate(cx_rows, 1):
+    r_["contradiction_id"] = f"CX{nn + i:03d}"
+pd.concat([cx, pd.DataFrame(cx_rows)[cx.columns] if cx_rows else None]).to_csv(cxp, index=False)
+print("A18 rejected:", sorted(rej))
 # A12.7: withhold any title that names a person on the name-test list (hashes of lower-cased 1-3 word n-grams)
 import hashlib, re
 NH = {x.strip() for x in open(os.path.join(D, "tests", "name_hashes.txt")) if x.strip() and not x.startswith("#")}

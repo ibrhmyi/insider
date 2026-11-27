@@ -1,11 +1,16 @@
-"""Phase F quality gates for the PMITC v1.0 release. Run from dataset/: python3 -m pytest -q tests
-Reads release/data, release/MANIFEST.json and the source CSVs. Each test names the gate it implements.
+"""Phase F quality gates for the PMITC release packages. Run from dataset/:
+    python3 -m pytest -q tests                              (release/, all files)
+    PMITC_RELEASE=release_safe python3 -m pytest -q tests   (release_safe/, without data_api_v2 fill files)
+Reads <package>/data, <package>/MANIFEST.json and the source CSVs. Each test names the gate it implements.
 """
 import glob, hashlib, json, os, re, sys
 import duckdb, pandas as pd, pyarrow.parquet as pq, pytest
 
 D = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-R = os.path.join(D, "release", "data")
+PKG = os.path.join(D, os.environ.get("PMITC_RELEASE", "release"))
+R = os.path.join(PKG, "data")
+MAN = json.load(open(os.path.join(PKG, "MANIFEST.json")))
+WITHHELD = set(MAN.get("withheld_sources", []))  # release_safe: {"data_api_v2"}
 sys.path.insert(0, os.path.join(D, "build", "v1"))
 from schema import TABLES  # noqa
 
@@ -32,7 +37,7 @@ def test_schema_dtypes_and_columns(t):
         got = [(x.name, re.sub(r"timestamp\[(s|ms|us|ns), tz=UTC\]", "timestamp[s, tz=UTC]", str(x.type))) for x in pq.read_schema(f)]
         assert got == want, f
     assert all(re.fullmatch(r"[a-z][a-z0-9_@]*", c["name"]) for c in TABLES[t]["cols"])
-    cb = open(os.path.join(D, "release", "docs", "CODEBOOK.md")).read()
+    cb = open(os.path.join(PKG, "docs", "CODEBOOK.md")).read()
     for c in TABLES[t]["cols"]:
         assert f"| `{c['name']}` |" in cb.split(f"## {t}\n")[1].split("\n## ")[0], (t, c["name"])
 
@@ -45,7 +50,8 @@ def test_allowed_values_and_no_empty_strings(t):
         if c["dtype"] == "string":
             assert not (s == "").any(), (t, c["name"], "empty string instead of NULL")
         if c["allowed"] and c["dtype"] == "string" and c["name"] not in ("platform", "family"):
-            bad = set(s.dropna()) - set(c["allowed"].split(";"))
+            vals = {tok for v in s.dropna() for tok in (v.split(";") if c["name"] == "label_family" else [v])}
+            bad = vals - set(c["allowed"].split(";"))
             assert not bad, (t, c["name"], bad)
 
 
@@ -77,6 +83,8 @@ def test_foreign_keys():
 def test_every_wallet_in_fills_or_flagged():
     w = load("wallets")
     seen = {r[0] for r in duckdb.sql(f"SELECT DISTINCT wallet FROM read_parquet('{R}/fills_part*.parquet')").fetchall()}
+    if WITHHELD:  # wallets whose only fills are in withheld files still appear in positions (derived aggregates)
+        seen |= set(load("positions", ["wallet"]).wallet) | set(MAN.get("wallets_confirmed_only_by_withheld_sources", []))
     missing = w[~w.wallet.isin(seen)]
     assert (missing.trade_confirmed == False).all(), missing[["wallet", "case_id"]]  # noqa: E712
 
@@ -143,6 +151,10 @@ def test_no_pre_news_feature_uses_post_news_fill(v):
     # recompute buy_usdc_pre for documented positions from fills with ts < cut
     pp = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "t_cut_ts", "buy_usdc_pre", "is_documented"])
     pp = pp[(pp.t_news_version == v) & pp.is_documented]
+    if WITHHELD:  # only positions whose pre-cut legs are all in shipped files can be recomputed
+        src = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "source_pre"])
+        pp = pp.merge(src, on=["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version"])
+        pp = pp[pp.source_pre == "hf_polymarket_v1"].drop(columns="source_pre")
     con = duckdb.connect(); con.register("pp", pp)
     d = con.sql(f"""SELECT pp.buy_usdc_pre, sum(f.usdc) re FROM pp JOIN read_parquet('{R}/fills_part*_case_*.parquet') f
                     ON f.condition_id = pp.condition_id AND f.asset_id = pp.asset_id AND f.wallet = pp.wallet AND f.wallet_side = 'BUY' AND f.ts < pp.t_cut_ts
@@ -152,15 +164,15 @@ def test_no_pre_news_feature_uses_post_news_fill(v):
 
 def test_manifest_hashes():
     """Rebuild test (final stage): every file's SHA-256 matches MANIFEST.json (rebuild with build/v1/tables.py reproduces them)."""
-    m = json.load(open(os.path.join(D, "release", "MANIFEST.json")))
-    for f in m["files"]:
-        p = os.path.join(D, "release", f["path"])
+    for f in MAN["files"]:
+        p = os.path.join(PKG, f["path"])
         h = hashlib.sha256(open(p, "rb").read()).hexdigest()
         assert h == f["sha256"], f["path"]
 
 
 def test_fill_counts_reconcile():
     log = pd.read_csv(os.path.join(D, "logs", "fills_counts_by_case.csv"))
+    log = log[~log.source.isin(WITHHELD)]
     mk = load("markets")[["case_id", "condition_id"]]
     con = duckdb.connect(); con.register("mk", mk)
     got = con.sql(f"""SELECT mk.case_id, f.source, count(*) legs FROM mk JOIN read_parquet('{R}/fills_part*_case_*.parquet') f USING (condition_id)
@@ -173,3 +185,22 @@ def test_amount_checks_recorded():
     a = pd.read_csv(os.path.join(D, "logs", "amount_checks.csv"))
     cx = load("contradictions")
     assert set(a[a.over_10pct].claim_id) <= set(cx[cx.phase == "run7_amount_check"].claim_id)
+
+
+def test_no_bytecode_in_package():
+    """R3: no __pycache__ or .pyc in the package or its manifest."""
+    assert not [p for p in glob.glob(os.path.join(PKG, "**", "*"), recursive=True) if "__pycache__" in p or p.endswith(".pyc")]
+    assert not [f for f in MAN["files"] if "__pycache__" in f["path"] or f["path"].endswith(".pyc")]
+
+
+def test_rule_output_not_a_wallet_label():
+    """A17: no L4_coordinated rows in wallets; the rule output lives in positions / weak_labels."""
+    w = load("wallets")
+    assert not (w.label_tier == "L4_coordinated").any()
+    assert (w.is_documented == ((w.polarity == "suspected") & w.trade_confirmed & (w.label_family == "informed_trading"))).all()  # A19
+
+
+def test_withheld_sources_absent():
+    for s in WITHHELD:
+        assert not glob.glob(os.path.join(R, f"fills_part*_{s}.parquet"))
+        assert duckdb.sql(f"SELECT count(*) FROM read_parquet('{R}/fills_part*.parquet') WHERE source = '{s}'").fetchall()[0][0] == 0

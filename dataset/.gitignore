@@ -3,3 +3,8 @@ out/v1/
 release/data/fills_part*.parquet
 release/data/positions.parquet
 release/data/weak_labels.parquet
+*.pyc
+__pycache__/
+release_safe/data/fills_part*.parquet
+release_safe/data/positions.parquet
+release_safe/data/weak_labels.parquet

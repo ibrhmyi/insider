@@ -53,14 +53,19 @@ for r in A.itertuples():
     out.append(dict(claim_id=r.claim_id, case_id=r.case_id, wallets=r.wallets, claimed_usd=r.claimed, **{k: round(v, 2) for k, v in obs.items()},
                     closest_measure=best, closest_gap=round(gaps[best], 4), over_10pct=gaps[best] > 0.10))
 O = pd.DataFrame(out); O.to_csv(os.path.join(D, "logs", "amount_checks.csv"), index=False)
-cx = rd("data/contradictions.csv"); cx = cx[cx.phase != "run7_amount_check"]
-n = max(int(x[2:]) for x in cx.contradiction_id)
+cx_all = rd("data/contradictions.csv")
+prev = {r.claim_id: r.contradiction_id for r in cx_all[cx_all.phase == "run7_amount_check"].itertuples()}  # keep stable ids
+cx = cx_all[cx_all.phase != "run7_amount_check"]
+n = max(int(x[2:]) for x in cx_all.contradiction_id)
 new = []
 for r in O[O.over_10pct].itertuples():
-    n += 1
-    new.append(dict(contradiction_id=f"CX{n:03d}", claim_id=r.claim_id, case_id=r.case_id, field="amount_claimed_usd", claimed_value=str(r.claimed_usd),
+    if r.claim_id in prev:
+        cid_ = prev[r.claim_id]
+    else:
+        n += 1; cid_ = f"CX{n:03d}"
+    new.append(dict(contradiction_id=cid_, claim_id=r.claim_id, case_id=r.case_id, field="amount_claimed_usd", claimed_value=str(r.claimed_usd),
                     observed_value=f"fills: stake {r.stake_buy_usdc}, payout {r.payout_sell_plus_redeem}, net {r.net_payout_minus_buys}; activity: stake {r.activity_stake_buy_usdc}, payout {r.activity_payout_sell_plus_redeem}, net {r.activity_net}",
                     evidence=f"closest measure {r.closest_measure}, gap {r.closest_gap:.1%} (> 10%); case-market fills of {r.wallets}; the claim may count other markets, unrealised value or a different period",
                     evidence_file="release/data/fills (case markets); logs/amount_checks.csv", phase="run7_amount_check", found_utc="2026-11-26T00:00:00Z"))
-pd.concat([cx, pd.DataFrame(new)]).to_csv(os.path.join(D, "data", "contradictions.csv"), index=False)
+pd.concat([cx, pd.DataFrame(new)]).sort_values("contradiction_id").to_csv(os.path.join(D, "data", "contradictions.csv"), index=False)
 print(O.to_string()); print("contradictions added", len(new))

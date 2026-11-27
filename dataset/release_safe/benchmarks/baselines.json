@@ -1,0 +1,1261 @@
+{
+ "seed": 192,
+ "protocol": "A15",
+ "leakage": {
+  "T1": [
+   "is_documented",
+   "doc_grade",
+   "coordinated_rule_fired",
+   "triggering_suspect",
+   "placebo_rate",
+   "is_control",
+   "is_placebo_market",
+   "gate1",
+   "gate2b",
+   "is_shortest_sufficient",
+   "won_post",
+   "pnl_post",
+   "buy_usdc_post",
+   "buy_shares_post",
+   "sell_usdc_post",
+   "sell_shares_post",
+   "wallet",
+   "case_id",
+   "condition_id",
+   "asset_id",
+   "t_cut_ts (absolute time)",
+   "first_buy_ts / last_buy_ts (absolute time)",
+   "source_pre",
+   "vol_to_day (includes the rest of the cut's day)"
+  ],
+  "T2": [
+   "share_on_this_ladder_market (construction artifact: controls are drawn one market at a time, so their share is 1; AUC 0.97 alone)",
+   "role",
+   "episode_id",
+   "control_of",
+   "wallet",
+   "case_share_of_lifetime_volume (lifetime denominator)",
+   "is_shortest_sufficient",
+   "follower_wallets_60m / follower_buy_usdc_60m (window can pass t_news)",
+   "share_sold_before_resolution_post",
+   "won_post",
+   "pnl_post",
+   "redemption_delay_hours_post",
+   "hours_funding_to_first_trade / funding_source_type / funder_shared_with_labelled (empty)"
+  ],
+  "T3": [
+   "market_set / is_placebo_market (the label)",
+   "any minute with minutes_from_cut >= 0",
+   "_post columns",
+   "placebo_category",
+   "resolution, outcome and volume_decile fields (volume is total, includes post-cut)",
+   "question / slug text"
+  ]
+ },
+ "features": {
+  "T1": [
+   "log_buy_usdc_pre",
+   "vwap_pre",
+   "first_buy_price",
+   "max_buy_price",
+   "log_n_buy_fills_pre",
+   "taker_share_pre",
+   "log_account_age_days",
+   "log_market_usdc_pre",
+   "f2_share",
+   "log_lifetime_markets",
+   "f5_conviction",
+   "f6_hours_median_buy_to_tnews",
+   "gate1_score",
+   "gate2a_int",
+   "sell_share_pre",
+   "hours_first_buy_to_cut",
+   "hours_last_buy_to_cut"
+  ],
+  "T2": [
+   "account_age_days_at_first_buy",
+   "prior_markets",
+   "prior_net_long_win_rate",
+   "first_price",
+   "vwap",
+   "max_price_paid",
+   "n_buy_fills",
+   "median_fill_usdc",
+   "fill_size_cv",
+   "taker_share",
+   "hour_of_day_first_buy",
+   "pre_buy_usdc",
+   "signal_a_rebuy_1_5x",
+   "size_price_slope",
+   "hours_last_buy_to_tnews",
+   "ladder_rank",
+   "hours_first_buy_to_tnews"
+  ],
+  "T3": [
+   "log_usdc_48h",
+   "log_usdc_24h",
+   "log_usdc_1h",
+   "usdc_share_last_6h",
+   "log_n_wallets_48h",
+   "new_wallet_share_48h",
+   "price_change_24h",
+   "price_change_6h",
+   "price_change_1h",
+   "abs_max_minute_move_24h",
+   "taker_buy_share_24h",
+   "log_n_buyers",
+   "top10_buy_share",
+   "fresh_buyer_share",
+   "gate1_rate",
+   "longshot_buy_share"
+  ]
+ },
+ "precise": {
+  "T1": {
+   "n_rows": 331947,
+   "n_pos": 414,
+   "n_pos_train": 382,
+   "n_pos_test": 32,
+   "rule_gate1_score_test": {
+    "ap": 0.0648,
+    "p@10": 0.0222,
+    "r@10": 0.191,
+    "p@100": 0.0042,
+    "r@100": 0.3542,
+    "ap_pooled_markets": 0.0716,
+    "n_cases": 4,
+    "n_markets": 20,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.141,
+      "p@10": 0.05,
+      "r@10": 0.375,
+      "p@100": 0.01,
+      "r@100": 0.875
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.0695,
+      "p@10": 0.0222,
+      "r@10": 0.2222,
+      "p@100": 0.0033,
+      "r@100": 0.3333
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0099,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0386,
+      "p@10": 0.0167,
+      "r@10": 0.1667,
+      "p@100": 0.0033,
+      "r@100": 0.2083
+     }
+    }
+   },
+   "random_test": {
+    "ap": 0.0047,
+    "p@10": 0.0,
+    "r@10": 0.0,
+    "p@100": 0.0004,
+    "r@100": 0.0417,
+    "ap_pooled_markets": 0.0029,
+    "n_cases": 4,
+    "n_markets": 20,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.004,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.0005,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0099,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0046,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0017,
+      "r@100": 0.1667
+     }
+    }
+   },
+   "logistic_regression_test": {
+    "ap": 0.0747,
+    "p@10": 0.0229,
+    "r@10": 0.1667,
+    "p@100": 0.0096,
+    "r@100": 0.7812,
+    "ap_pooled_markets": 0.089,
+    "n_cases": 4,
+    "n_markets": 20,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.0781,
+      "p@10": 0.025,
+      "r@10": 0.125,
+      "p@100": 0.01,
+      "r@100": 0.875
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.1276,
+      "p@10": 0.0333,
+      "r@10": 0.3333,
+      "p@100": 0.01,
+      "r@100": 0.7778
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0476,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0453,
+      "p@10": 0.0333,
+      "r@10": 0.2083,
+      "p@100": 0.0083,
+      "r@100": 0.4722
+     }
+    }
+   },
+   "logistic_regression_train_cv": {
+    "ap": 0.3228,
+    "p@10": 0.0792,
+    "r@10": 0.5528,
+    "p@100": 0.0196,
+    "r@100": 0.9618,
+    "ap_pooled_markets": 0.3302,
+    "n_cases": 12,
+    "n_markets": 102,
+    "per_case": {
+     "draftkings-pm-launch": {
+      "ap": 0.1111,
+      "p@10": 0.1,
+      "r@10": 1.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "fed-chair-nomination-2026": {
+      "ap": 0.0238,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "google-yis-2025": {
+      "ap": 0.2847,
+      "p@10": 0.0833,
+      "r@10": 0.8333,
+      "p@100": 0.0103,
+      "r@100": 1.0
+     },
+     "israel-rising-lion-2025-06": {
+      "ap": 0.069,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "maduro-2026-01": {
+      "ap": 0.2062,
+      "p@10": 0.0333,
+      "r@10": 0.3333,
+      "p@100": 0.0267,
+      "r@100": 0.8333
+     },
+     "nobel-peace-2025": {
+      "ap": 0.5679,
+      "p@10": 0.2,
+      "r@10": 0.625,
+      "p@100": 0.0325,
+      "r@100": 1.0
+     },
+     "super-bowl-halftime-2026": {
+      "ap": 0.9,
+      "p@10": 0.1019,
+      "r@10": 1.0,
+      "p@100": 0.027,
+      "r@100": 1.0
+     },
+     "taylor-swift-engagement": {
+      "ap": 0.0333,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "trump-pardon-cz-2025": {
+      "ap": 1.0,
+      "p@10": 0.1,
+      "r@10": 1.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "us-iran-strike-2026-02-28": {
+      "ap": 0.2153,
+      "p@10": 0.0896,
+      "r@10": 0.3254,
+      "p@100": 0.0508,
+      "r@100": 0.7578
+     },
+     "walz-vp-2024": {
+      "ap": 0.2386,
+      "p@10": 0.0667,
+      "r@10": 0.6667,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "zachxbt-axiom-2026-02": {
+      "ap": 0.224,
+      "p@10": 0.175,
+      "r@10": 0.85,
+      "p@100": 0.0275,
+      "r@100": 0.95
+     }
+    }
+   },
+   "gradient_boosting_test": {
+    "ap": 0.0046,
+    "p@10": 0.0,
+    "r@10": 0.0,
+    "p@100": 0.0007,
+    "r@100": 0.0382,
+    "ap_pooled_markets": 0.0036,
+    "n_cases": 4,
+    "n_markets": 20,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.0031,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.0037,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0011,
+      "r@100": 0.1111
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0086,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0029,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0017,
+      "r@100": 0.0417
+     }
+    }
+   },
+   "gradient_boosting_train_cv": {
+    "ap": 0.1014,
+    "p@10": 0.0251,
+    "r@10": 0.1447,
+    "p@100": 0.0099,
+    "r@100": 0.4863,
+    "ap_pooled_markets": 0.0986,
+    "n_cases": 12,
+    "n_markets": 102,
+    "per_case": {
+     "draftkings-pm-launch": {
+      "ap": 0.0013,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "fed-chair-nomination-2026": {
+      "ap": 0.0303,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "google-yis-2025": {
+      "ap": 0.104,
+      "p@10": 0.0278,
+      "r@10": 0.2778,
+      "p@100": 0.0047,
+      "r@100": 0.4444
+     },
+     "israel-rising-lion-2025-06": {
+      "ap": 0.0012,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "maduro-2026-01": {
+      "ap": 0.3708,
+      "p@10": 0.0667,
+      "r@10": 0.3889,
+      "p@100": 0.02,
+      "r@100": 0.7222
+     },
+     "nobel-peace-2025": {
+      "ap": 0.0153,
+      "p@10": 0.025,
+      "r@10": 0.0312,
+      "p@100": 0.01,
+      "r@100": 0.1771
+     },
+     "super-bowl-halftime-2026": {
+      "ap": 0.3906,
+      "p@10": 0.0481,
+      "r@10": 0.4615,
+      "p@100": 0.024,
+      "r@100": 0.6923
+     },
+     "taylor-swift-engagement": {
+      "ap": 0.0303,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "trump-pardon-cz-2025": {
+      "ap": 0.0009,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-strike-2026-02-28": {
+      "ap": 0.0167,
+      "p@10": 0.0083,
+      "r@10": 0.0025,
+      "p@100": 0.009,
+      "r@100": 0.2908
+     },
+     "walz-vp-2024": {
+      "ap": 0.0221,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0083,
+      "r@100": 0.8333
+     },
+     "zachxbt-axiom-2026-02": {
+      "ap": 0.2327,
+      "p@10": 0.125,
+      "r@10": 0.575,
+      "p@100": 0.0225,
+      "r@100": 0.675
+     }
+    }
+   }
+  },
+  "T2": {
+   "n_rows": 9279,
+   "n_suspected": 475,
+   "won_post_rate_by_role": {
+    "control_other_side_large_buyer": 0.1576,
+    "control_same_side": 0.835,
+    "suspected": 0.84
+   },
+   "base_result": "matched same-side controls win about as often as documented episodes: outcome alone does not separate them",
+   "logistic_regression_grouped_cv": {
+    "auc_pooled": 0.8022,
+    "log_loss": 0.1775,
+    "case_weighted_auc": 0.7494,
+    "n_cases": 16,
+    "per_case": {
+     "biden-pardons": 0.7514,
+     "bubblemaps-military-cluster": 0.9614,
+     "draftkings-pm-launch": 1.0,
+     "fed-chair-nomination-2026": 0.9474,
+     "google-yis-2025": 0.1955,
+     "israel-rising-lion-2025-06": 0.7,
+     "kpmg-earnings-2025-26": 0.8913,
+     "maduro-2026-01": 0.678,
+     "nobel-peace-2025": 0.8318,
+     "super-bowl-halftime-2026": 0.9644,
+     "taylor-swift-engagement": 0.2826,
+     "trump-pardon-cz-2025": 0.6154,
+     "us-iran-ceasefire-2026-04-07": 0.711,
+     "us-iran-strike-2026-02-28": 0.8583,
+     "walz-vp-2024": 0.8559,
+     "zachxbt-axiom-2026-02": 0.7459
+    }
+   },
+   "logistic_regression_test": {
+    "auc_pooled": 0.7937,
+    "log_loss": 0.184,
+    "n": 835,
+    "case_weighted_auc": 0.829,
+    "n_cases": 4,
+    "per_case": {
+     "biden-pardons": 0.7814,
+     "bubblemaps-military-cluster": 0.9568,
+     "kpmg-earnings-2025-26": 0.8913,
+     "us-iran-ceasefire-2026-04-07": 0.6866
+    }
+   },
+   "gradient_boosting_grouped_cv": {
+    "auc_pooled": 0.8738,
+    "log_loss": 0.2199,
+    "case_weighted_auc": 0.7946,
+    "n_cases": 16,
+    "per_case": {
+     "biden-pardons": 0.6038,
+     "bubblemaps-military-cluster": 0.9651,
+     "draftkings-pm-launch": 0.8182,
+     "fed-chair-nomination-2026": 0.7895,
+     "google-yis-2025": 0.6163,
+     "israel-rising-lion-2025-06": 0.9056,
+     "kpmg-earnings-2025-26": 0.8913,
+     "maduro-2026-01": 0.8194,
+     "nobel-peace-2025": 0.9138,
+     "super-bowl-halftime-2026": 0.9695,
+     "taylor-swift-engagement": 0.3478,
+     "trump-pardon-cz-2025": 1.0,
+     "us-iran-ceasefire-2026-04-07": 0.4992,
+     "us-iran-strike-2026-02-28": 0.9047,
+     "walz-vp-2024": 0.7779,
+     "zachxbt-axiom-2026-02": 0.8923
+    }
+   },
+   "gradient_boosting_test": {
+    "auc_pooled": 0.7003,
+    "log_loss": 0.3602,
+    "n": 835,
+    "case_weighted_auc": 0.743,
+    "n_cases": 4,
+    "per_case": {
+     "biden-pardons": 0.6421,
+     "bubblemaps-military-cluster": 0.9694,
+     "kpmg-earnings-2025-26": 0.8478,
+     "us-iran-ceasefire-2026-04-07": 0.5128
+    }
+   }
+  },
+  "T3": {
+   "n_case_markets": 581,
+   "n_placebo_markets": 2939,
+   "logistic_regression_grouped_cv": {
+    "auc_pooled": 0.7598,
+    "case_weighted_auc": 0.8267,
+    "n_cases": 35,
+    "per_case": {
+     "arbitrum-airdrop-2023": 1.0,
+     "ballon-dor-2026": 0.4492,
+     "biden-pardons": 0.7181,
+     "btc-etf-2024": 1.0,
+     "bubblemaps-military-cluster": 0.9143,
+     "draftkings-pm-launch": 0.8,
+     "election-2024": 0.9619,
+     "fed-chair-nomination-2026": 0.7872,
+     "ftx-sbf": 0.8333,
+     "gemini3-release-2025": 0.8756,
+     "google-yis-2025": 0.6338,
+     "iran-strike-2024-10": 0.3333,
+     "israel-rising-lion-2025-06": 1.0,
+     "israel-strike-2025-06-week": 1.0,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.8681,
+     "maduro-2026-01": 0.8667,
+     "mstr-btc-sale": 0.75,
+     "nobel-peace-2025": 0.7229,
+     "openai-browser-2025-10": 1.0,
+     "openai-gpt52-2025-12": 0.9048,
+     "pope-conclave-2025": 0.8095,
+     "railgun-venezuela-control": 0.7773,
+     "spotify-wrapped-2025": 0.882,
+     "super-bowl-halftime-2025": 0.707,
+     "super-bowl-halftime-2026": 0.6619,
+     "trump-zelensky-meeting-2025-12": 0.6,
+     "uma-ukraine-minerals-2025": 1.0,
+     "us-iran-ceasefire-2026-03": 0.9901,
+     "us-iran-ceasefire-2026-04-07": 0.9777,
+     "us-iran-strike-2025-06": 0.9875,
+     "us-iran-strike-2026-02-28": 0.9357,
+     "walz-vp-2024": 0.8705,
+     "world-cup-2026-06": 0.4987,
+     "zachxbt-axiom-2026-02": 0.8183
+    }
+   },
+   "logistic_regression_test": {
+    "auc_pooled": 0.752,
+    "case_weighted_auc": 0.7868,
+    "n_cases": 15,
+    "per_case": {
+     "ballon-dor-2026": 0.482,
+     "biden-pardons": 0.7667,
+     "btc-etf-2024": 1.0,
+     "bubblemaps-military-cluster": 0.8807,
+     "election-2024": 0.9841,
+     "ftx-sbf": 0.8333,
+     "iran-strike-2024-10": 0.0,
+     "israel-strike-2025-06-week": 1.0,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.7967,
+     "railgun-venezuela-control": 0.6737,
+     "us-iran-ceasefire-2026-03": 0.9704,
+     "us-iran-ceasefire-2026-04-07": 0.9726,
+     "us-iran-strike-2025-06": 0.975,
+     "world-cup-2026-06": 0.467
+    }
+   },
+   "gradient_boosting_grouped_cv": {
+    "auc_pooled": 0.8591,
+    "case_weighted_auc": 0.8707,
+    "n_cases": 35,
+    "per_case": {
+     "arbitrum-airdrop-2023": 1.0,
+     "ballon-dor-2026": 0.4984,
+     "biden-pardons": 0.7514,
+     "btc-etf-2024": 0.8,
+     "bubblemaps-military-cluster": 0.9999,
+     "draftkings-pm-launch": 0.8,
+     "election-2024": 0.9522,
+     "fed-chair-nomination-2026": 0.7392,
+     "ftx-sbf": 1.0,
+     "gemini3-release-2025": 0.9408,
+     "google-yis-2025": 0.7128,
+     "iran-strike-2024-10": 1.0,
+     "israel-rising-lion-2025-06": 1.0,
+     "israel-strike-2025-06-week": 1.0,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.7473,
+     "maduro-2026-01": 0.9444,
+     "mstr-btc-sale": 0.75,
+     "nobel-peace-2025": 0.8766,
+     "openai-browser-2025-10": 1.0,
+     "openai-gpt52-2025-12": 0.9524,
+     "pope-conclave-2025": 0.963,
+     "railgun-venezuela-control": 0.8756,
+     "spotify-wrapped-2025": 0.812,
+     "super-bowl-halftime-2025": 0.6461,
+     "super-bowl-halftime-2026": 0.6763,
+     "trump-zelensky-meeting-2025-12": 1.0,
+     "uma-ukraine-minerals-2025": 0.8,
+     "us-iran-ceasefire-2026-03": 0.9827,
+     "us-iran-ceasefire-2026-04-07": 0.9726,
+     "us-iran-strike-2025-06": 0.9875,
+     "us-iran-strike-2026-02-28": 0.9998,
+     "walz-vp-2024": 0.9034,
+     "world-cup-2026-06": 0.3978,
+     "zachxbt-axiom-2026-02": 0.9935
+    }
+   },
+   "gradient_boosting_test": {
+    "auc_pooled": 0.8523,
+    "case_weighted_auc": 0.7922,
+    "n_cases": 15,
+    "per_case": {
+     "ballon-dor-2026": 0.4156,
+     "biden-pardons": 0.7722,
+     "btc-etf-2024": 0.8,
+     "bubblemaps-military-cluster": 0.9999,
+     "election-2024": 0.9543,
+     "ftx-sbf": 0.6667,
+     "iran-strike-2024-10": 0.3333,
+     "israel-strike-2025-06-week": 1.0,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.7033,
+     "railgun-venezuela-control": 0.8392,
+     "us-iran-ceasefire-2026-03": 0.9951,
+     "us-iran-ceasefire-2026-04-07": 1.0,
+     "us-iran-strike-2025-06": 1.0,
+     "world-cup-2026-06": 0.4041
+    }
+   }
+  }
+ },
+ "day": {
+  "T1": {
+   "n_rows": 310228,
+   "n_pos": 376,
+   "n_pos_train": 345,
+   "n_pos_test": 31,
+   "rule_gate1_score_test": {
+    "ap": 0.0601,
+    "p@10": 0.0181,
+    "r@10": 0.1493,
+    "p@100": 0.0044,
+    "r@100": 0.3424,
+    "ap_pooled_markets": 0.0705,
+    "n_cases": 4,
+    "n_markets": 19,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.141,
+      "p@10": 0.05,
+      "r@10": 0.375,
+      "p@100": 0.01,
+      "r@100": 0.875
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.0796,
+      "p@10": 0.0222,
+      "r@10": 0.2222,
+      "p@100": 0.0056,
+      "r@100": 0.4444
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0099,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0099,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.002,
+      "r@100": 0.05
+     }
+    }
+   },
+   "random_test": {
+    "ap": 0.0036,
+    "p@10": 0.0,
+    "r@10": 0.0,
+    "p@100": 0.0,
+    "r@100": 0.0,
+    "ap_pooled_markets": 0.0019,
+    "n_cases": 4,
+    "n_markets": 19,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.0041,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.0005,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0086,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0011,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     }
+    }
+   },
+   "logistic_regression_test": {
+    "ap": 0.0758,
+    "p@10": 0.0146,
+    "r@10": 0.1146,
+    "p@100": 0.0087,
+    "r@100": 0.7285,
+    "ap_pooled_markets": 0.1097,
+    "n_cases": 4,
+    "n_markets": 19,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.0645,
+      "p@10": 0.025,
+      "r@10": 0.125,
+      "p@100": 0.01,
+      "r@100": 0.875
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.1894,
+      "p@10": 0.0333,
+      "r@10": 0.3333,
+      "p@100": 0.0089,
+      "r@100": 0.7222
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0312,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0182,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.006,
+      "r@100": 0.3167
+     }
+    }
+   },
+   "logistic_regression_train_cv": {
+    "ap": 0.3537,
+    "p@10": 0.0584,
+    "r@10": 0.4719,
+    "p@100": 0.0141,
+    "r@100": 0.832,
+    "ap_pooled_markets": 0.3382,
+    "n_cases": 12,
+    "n_markets": 97,
+    "per_case": {
+     "draftkings-pm-launch": {
+      "ap": 0.0526,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "fed-chair-nomination-2026": {
+      "ap": 0.0025,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "google-yis-2025": {
+      "ap": 0.2797,
+      "p@10": 0.0778,
+      "r@10": 0.7778,
+      "p@100": 0.0097,
+      "r@100": 0.9444
+     },
+     "israel-rising-lion-2025-06": {
+      "ap": 0.0335,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "maduro-2026-01": {
+      "ap": 0.0247,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 0.3333
+     },
+     "nobel-peace-2025": {
+      "ap": 1.0,
+      "p@10": 0.1,
+      "r@10": 1.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "super-bowl-halftime-2026": {
+      "ap": 0.9103,
+      "p@10": 0.1019,
+      "r@10": 1.0,
+      "p@100": 0.027,
+      "r@100": 1.0
+     },
+     "taylor-swift-engagement": {
+      "ap": 0.0333,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "trump-pardon-cz-2025": {
+      "ap": 1.0,
+      "p@10": 0.1,
+      "r@10": 1.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "us-iran-strike-2026-02-28": {
+      "ap": 0.2049,
+      "p@10": 0.0872,
+      "r@10": 0.352,
+      "p@100": 0.043,
+      "r@100": 0.7733
+     },
+     "walz-vp-2024": {
+      "ap": 0.3322,
+      "p@10": 0.0667,
+      "r@10": 0.6667,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "zachxbt-axiom-2026-02": {
+      "ap": 0.3705,
+      "p@10": 0.1667,
+      "r@10": 0.8667,
+      "p@100": 0.02,
+      "r@100": 0.9333
+     }
+    }
+   },
+   "gradient_boosting_test": {
+    "ap": 0.0048,
+    "p@10": 0.0,
+    "r@10": 0.0,
+    "p@100": 0.001,
+    "r@100": 0.075,
+    "ap_pooled_markets": 0.0031,
+    "n_cases": 4,
+    "n_markets": 19,
+    "per_case": {
+     "biden-pardons": {
+      "ap": 0.0035,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "bubblemaps-military-cluster": {
+      "ap": 0.0002,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "kpmg-earnings-2025-26": {
+      "ap": 0.0088,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-ceasefire-2026-04-07": {
+      "ap": 0.0068,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.004,
+      "r@100": 0.3
+     }
+    }
+   },
+   "gradient_boosting_train_cv": {
+    "ap": 0.1415,
+    "p@10": 0.0385,
+    "r@10": 0.2541,
+    "p@100": 0.0104,
+    "r@100": 0.5748,
+    "ap_pooled_markets": 0.1779,
+    "n_cases": 12,
+    "n_markets": 97,
+    "per_case": {
+     "draftkings-pm-launch": {
+      "ap": 0.0556,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "fed-chair-nomination-2026": {
+      "ap": 0.0013,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "google-yis-2025": {
+      "ap": 0.6359,
+      "p@10": 0.0778,
+      "r@10": 0.7778,
+      "p@100": 0.0092,
+      "r@100": 0.8889
+     },
+     "israel-rising-lion-2025-06": {
+      "ap": 0.5833,
+      "p@10": 0.1,
+      "r@10": 1.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "maduro-2026-01": {
+      "ap": 0.1092,
+      "p@10": 0.15,
+      "r@10": 0.5,
+      "p@100": 0.02,
+      "r@100": 0.6667
+     },
+     "nobel-peace-2025": {
+      "ap": 0.026,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.005,
+      "r@100": 0.5
+     },
+     "super-bowl-halftime-2026": {
+      "ap": 0.1844,
+      "p@10": 0.0712,
+      "r@10": 0.6923,
+      "p@100": 0.027,
+      "r@100": 1.0
+     },
+     "taylor-swift-engagement": {
+      "ap": 0.0385,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.01,
+      "r@100": 1.0
+     },
+     "trump-pardon-cz-2025": {
+      "ap": 0.0009,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0,
+      "r@100": 0.0
+     },
+     "us-iran-strike-2026-02-28": {
+      "ap": 0.0382,
+      "p@10": 0.0298,
+      "r@10": 0.013,
+      "p@100": 0.0215,
+      "r@100": 0.475
+     },
+     "walz-vp-2024": {
+      "ap": 0.0042,
+      "p@10": 0.0,
+      "r@10": 0.0,
+      "p@100": 0.0017,
+      "r@100": 0.1667
+     },
+     "zachxbt-axiom-2026-02": {
+      "ap": 0.0207,
+      "p@10": 0.0333,
+      "r@10": 0.0667,
+      "p@100": 0.01,
+      "r@100": 0.2
+     }
+    }
+   }
+  },
+  "T2": {
+   "n_rows": 8269,
+   "n_suspected": 423,
+   "won_post_rate_by_role": {
+    "control_other_side_large_buyer": 0.1557,
+    "control_same_side": 0.8366,
+    "suspected": 0.8416
+   },
+   "base_result": "matched same-side controls win about as often as documented episodes: outcome alone does not separate them",
+   "logistic_regression_grouped_cv": {
+    "auc_pooled": 0.8209,
+    "log_loss": 0.1719,
+    "case_weighted_auc": 0.7688,
+    "n_cases": 16,
+    "per_case": {
+     "biden-pardons": 0.7705,
+     "bubblemaps-military-cluster": 0.9569,
+     "draftkings-pm-launch": 1.0,
+     "fed-chair-nomination-2026": 0.7368,
+     "google-yis-2025": 0.2568,
+     "israel-rising-lion-2025-06": 0.7278,
+     "kpmg-earnings-2025-26": 0.8478,
+     "maduro-2026-01": 0.6514,
+     "nobel-peace-2025": 0.9833,
+     "super-bowl-halftime-2026": 0.9745,
+     "taylor-swift-engagement": 0.3043,
+     "trump-pardon-cz-2025": 0.7692,
+     "us-iran-ceasefire-2026-04-07": 0.7331,
+     "us-iran-strike-2026-02-28": 0.8707,
+     "walz-vp-2024": 0.9225,
+     "zachxbt-axiom-2026-02": 0.7958
+    }
+   },
+   "logistic_regression_test": {
+    "auc_pooled": 0.819,
+    "log_loss": 0.1783,
+    "n": 755,
+    "case_weighted_auc": 0.8249,
+    "n_cases": 4,
+    "per_case": {
+     "biden-pardons": 0.7705,
+     "bubblemaps-military-cluster": 0.9548,
+     "kpmg-earnings-2025-26": 0.8478,
+     "us-iran-ceasefire-2026-04-07": 0.7265
+    }
+   },
+   "gradient_boosting_grouped_cv": {
+    "auc_pooled": 0.8822,
+    "log_loss": 0.234,
+    "case_weighted_auc": 0.8419,
+    "n_cases": 16,
+    "per_case": {
+     "biden-pardons": 0.765,
+     "bubblemaps-military-cluster": 0.958,
+     "draftkings-pm-launch": 0.9091,
+     "fed-chair-nomination-2026": 0.7895,
+     "google-yis-2025": 0.6345,
+     "israel-rising-lion-2025-06": 0.9611,
+     "kpmg-earnings-2025-26": 0.9783,
+     "maduro-2026-01": 0.876,
+     "nobel-peace-2025": 1.0,
+     "super-bowl-halftime-2026": 0.957,
+     "taylor-swift-engagement": 0.4565,
+     "trump-pardon-cz-2025": 1.0,
+     "us-iran-ceasefire-2026-04-07": 0.5668,
+     "us-iran-strike-2026-02-28": 0.9035,
+     "walz-vp-2024": 0.8069,
+     "zachxbt-axiom-2026-02": 0.9076
+    }
+   },
+   "gradient_boosting_test": {
+    "auc_pooled": 0.7653,
+    "log_loss": 0.3432,
+    "n": 755,
+    "case_weighted_auc": 0.7797,
+    "n_cases": 4,
+    "per_case": {
+     "biden-pardons": 0.6557,
+     "bubblemaps-military-cluster": 0.9672,
+     "kpmg-earnings-2025-26": 0.8913,
+     "us-iran-ceasefire-2026-04-07": 0.6046
+    }
+   }
+  },
+  "T3": {
+   "n_case_markets": 559,
+   "n_placebo_markets": 2754,
+   "logistic_regression_grouped_cv": {
+    "auc_pooled": 0.7284,
+    "case_weighted_auc": 0.7944,
+    "n_cases": 34,
+    "per_case": {
+     "arbitrum-airdrop-2023": 1.0,
+     "ballon-dor-2026": 0.4697,
+     "biden-pardons": 0.7931,
+     "btc-etf-2024": 0.4,
+     "bubblemaps-military-cluster": 0.9201,
+     "draftkings-pm-launch": 0.8,
+     "election-2024": 0.845,
+     "fed-chair-nomination-2026": 0.7773,
+     "ftx-sbf": 0.8333,
+     "gemini3-release-2025": 0.8763,
+     "google-yis-2025": 0.6386,
+     "israel-rising-lion-2025-06": 0.85,
+     "israel-strike-2025-06-week": 0.75,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.9176,
+     "maduro-2026-01": 0.9722,
+     "mstr-btc-sale": 0.8056,
+     "nobel-peace-2025": 0.7099,
+     "openai-browser-2025-10": 1.0,
+     "openai-gpt52-2025-12": 0.9286,
+     "pope-conclave-2025": 0.7772,
+     "railgun-venezuela-control": 0.8005,
+     "spotify-wrapped-2025": 0.844,
+     "super-bowl-halftime-2025": 0.7394,
+     "super-bowl-halftime-2026": 0.5611,
+     "trump-zelensky-meeting-2025-12": 0.35,
+     "uma-ukraine-minerals-2025": 0.8,
+     "us-iran-ceasefire-2026-03": 0.9802,
+     "us-iran-ceasefire-2026-04-07": 0.8829,
+     "us-iran-strike-2025-06": 0.9861,
+     "us-iran-strike-2026-02-28": 0.9199,
+     "walz-vp-2024": 0.8014,
+     "world-cup-2026-06": 0.4982,
+     "zachxbt-axiom-2026-02": 0.7825
+    }
+   },
+   "logistic_regression_test": {
+    "auc_pooled": 0.7784,
+    "case_weighted_auc": 0.8411,
+    "n_cases": 14,
+    "per_case": {
+     "ballon-dor-2026": 0.4811,
+     "biden-pardons": 0.8208,
+     "btc-etf-2024": 1.0,
+     "bubblemaps-military-cluster": 0.8964,
+     "election-2024": 0.973,
+     "ftx-sbf": 0.6667,
+     "israel-strike-2025-06-week": 1.0,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.8901,
+     "railgun-venezuela-control": 0.7433,
+     "us-iran-ceasefire-2026-03": 0.9704,
+     "us-iran-ceasefire-2026-04-07": 0.8706,
+     "us-iran-strike-2025-06": 0.9583,
+     "world-cup-2026-06": 0.5047
+    }
+   },
+   "gradient_boosting_grouped_cv": {
+    "auc_pooled": 0.8494,
+    "case_weighted_auc": 0.8467,
+    "n_cases": 34,
+    "per_case": {
+     "arbitrum-airdrop-2023": 1.0,
+     "ballon-dor-2026": 0.2881,
+     "biden-pardons": 0.7472,
+     "btc-etf-2024": 1.0,
+     "bubblemaps-military-cluster": 1.0,
+     "draftkings-pm-launch": 0.8,
+     "election-2024": 0.9848,
+     "fed-chair-nomination-2026": 0.7878,
+     "ftx-sbf": 1.0,
+     "gemini3-release-2025": 0.957,
+     "google-yis-2025": 0.7257,
+     "israel-rising-lion-2025-06": 1.0,
+     "israel-strike-2025-06-week": 1.0,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.7527,
+     "maduro-2026-01": 0.9889,
+     "mstr-btc-sale": 0.8333,
+     "nobel-peace-2025": 0.6792,
+     "openai-browser-2025-10": 0.8,
+     "openai-gpt52-2025-12": 0.9286,
+     "pope-conclave-2025": 0.9908,
+     "railgun-venezuela-control": 0.8908,
+     "spotify-wrapped-2025": 0.76,
+     "super-bowl-halftime-2025": 0.6851,
+     "super-bowl-halftime-2026": 0.6044,
+     "trump-zelensky-meeting-2025-12": 0.5,
+     "uma-ukraine-minerals-2025": 0.8,
+     "us-iran-ceasefire-2026-03": 0.9901,
+     "us-iran-ceasefire-2026-04-07": 0.9808,
+     "us-iran-strike-2025-06": 0.9722,
+     "us-iran-strike-2026-02-28": 0.9997,
+     "walz-vp-2024": 0.8925,
+     "world-cup-2026-06": 0.4774,
+     "zachxbt-axiom-2026-02": 0.9713
+    }
+   },
+   "gradient_boosting_test": {
+    "auc_pooled": 0.8524,
+    "case_weighted_auc": 0.7844,
+    "n_cases": 14,
+    "per_case": {
+     "ballon-dor-2026": 0.2684,
+     "biden-pardons": 0.8042,
+     "btc-etf-2024": 0.2,
+     "bubblemaps-military-cluster": 1.0,
+     "election-2024": 0.9592,
+     "ftx-sbf": 0.6667,
+     "israel-strike-2025-06-week": 1.0,
+     "khamenei-removal-2026": 1.0,
+     "kpmg-earnings-2025-26": 0.7692,
+     "railgun-venezuela-control": 0.848,
+     "us-iran-ceasefire-2026-03": 0.9877,
+     "us-iran-ceasefire-2026-04-07": 0.986,
+     "us-iran-strike-2025-06": 1.0,
+     "world-cup-2026-06": 0.492
+    }
+   }
+  }
+ }
+}

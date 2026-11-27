@@ -7,7 +7,7 @@ NB = os.path.join(D, "release", "notebooks")
 md, code = nbf.v4.new_markdown_cell, nbf.v4.new_code_cell
 a = nbf.v4.new_notebook(); a.cells = [
  md("# PMITC v1.0: load, join, plot a case\nLabels are allegations by the named sources (\"flagged by <source>\"), not findings. The tables hold no personal names."),
- code("import pandas as pd, numpy as np, matplotlib.pyplot as plt\nDATA = '../data'\ncases = pd.read_parquet(f'{DATA}/cases.parquet')\nclaims = pd.read_parquet(f'{DATA}/claims.parquet')\nwallets = pd.read_parquet(f'{DATA}/wallets.parquet')\nmarkets = pd.read_parquet(f'{DATA}/markets.parquet')\ncases[['case_id','case_grade','investigation_outcome','n_claims','n_wallets_documented','benchmark_split']].sort_values('n_wallets_documented', ascending=False).head(15)"),
+ code("import pandas as pd, numpy as np, matplotlib.pyplot as plt\nDATA = '../data'\ncases = pd.read_parquet(f'{DATA}/cases.parquet')\nclaims = pd.read_parquet(f'{DATA}/claims.parquet')\nwallets = pd.read_parquet(f'{DATA}/wallets.parquet')\nmarkets = pd.read_parquet(f'{DATA}/markets.parquet')\ncases[['case_id','case_grade','investigation_outcome','n_claims','n_documented_by_case','benchmark_split']].sort_values('n_documented_by_case', ascending=False).head(15)"),
  code("# claims per grade and stance\npd.crosstab(claims.evidence_grade, claims.stance)"),
  code("# documented wallets (suspected and trade-confirmed) per case\nwallets[wallets.is_documented].groupby('case_id').wallet.nunique().sort_values(ascending=False)"),
  md("## One case: the Maduro market\nMinute price path of the Yes token around both news times, with the pre-news buys of documented wallets."),

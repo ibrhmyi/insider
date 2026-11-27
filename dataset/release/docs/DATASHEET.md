@@ -1,6 +1,6 @@
-# Datasheet: Prediction-Market Informed-Trading Casebook (PMITC), v1.0.0
+# Datasheet: Prediction-Market Informed-Trading Casebook (PMITC), v1.0.1
 
-Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules: `PROTOCOL.md` v1.0 with amendments A1 to A16.1. Columns: `CODEBOOK.md`. Run history: `dataset/logs/run2_report.md` to `run7_report.md` in the repository.
+Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules: `PROTOCOL.md` v1.0 with amendments A1 to A19. Columns: `CODEBOOK.md`. Run history: `dataset/logs/run2_report.md` to `run7_report.md` in the repository.
 
 ## Motivation
 - **Purpose.** A citable, source-traced register of publicly documented suspected informed trading on prediction markets, joined to the trades, with honest negatives (matched controls, all other buyers, placebo markets) for analysis and machine learning.
@@ -10,7 +10,7 @@ Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules
 
 ## Composition
 - **Instances:** claims, cases, wallet labels, case markets, placebo markets, fills (wallet legs), all-buyer positions, episodes, controls, rule labels, minute paths, contradictions, money links. Counts are in `README.md` and `MANIFEST.json`.
-- **Labelled positives:** 120 wallets that a source flags as suspected and whose own fills confirm they traded the case's markets (`is_documented`), in 19 cases; 13 more suspected wallets are not trade-confirmed (kept, flagged). 1,313 A13 coordinated-buyer candidates are kept separate (`is_candidate_coordinated`).
+- **Labelled positives:** 119 wallets that a source flags as suspected, whose own fills confirm they traded the case's markets, in informed-trading cases (`is_documented`, A19), in 18 cases. 74 of them come from two cases (52 Feb-28 Iran strike, 22 KPMG), and 87 are cluster members linked by money flows, not flagged one by one. 13 more suspected wallets are not trade-confirmed and one is in a public-data-leak case (kept, not positive). The A13 coordinated-buyer rule is a rule output in `positions` and `weak_labels` (`coordinated_rule_fired`): about 1/3 expected by chance, may include copy-traders, not an allegation.
 - **Sample, not population.** The collection holds what was publicly noticed (PROTOCOL 8). Do not estimate prevalence from it.
 - **Labels:** evidence grades E1 to E6 per claim (a case takes its strongest); wallet polarity; rule labels (E6) kept separately; benchmark split. A label is an allegation, not a finding.
 - **Missing information:** money graph (no archive RPC; A12.2); Kalshi trades and accounts (not public); 24 cases without a market (aggregates, Kalshi, no identifiable market); 16 claims pending page reads.

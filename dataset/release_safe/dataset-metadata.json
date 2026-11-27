@@ -1,0 +1,3473 @@
+{
+ "title": "PMITC: Prediction-Market Informed-Trading Casebook",
+ "subtitle": "Documented suspected insider trading on Polymarket and Kalshi, with trades, placebos and benchmarks",
+ "id": "<kaggle-username>/pmitc-prediction-market-informed-trading-safe",
+ "licenses": [
+  {
+   "name": "CC-BY-4.0"
+  }
+ ],
+ "keywords": [
+  "finance",
+  "prediction markets",
+  "crypto",
+  "anomaly detection",
+  "tabular",
+  "fraud detection"
+ ],
+ "description": "> **release_safe (v1.0.1).** This package omits the fill files with `source = data_api_v2` (Polymarket Data API rows,\n> whose redistribution terms were not verified). All other tables are identical to the full package; tables derived from\n> those rows (`positions`, `episodes`, `controls`, `market_minutes`) still contain their aggregates. Rebuild the omitted\n> files with `python3 scripts/rebuild_data_api_fills.py` (public API; results will differ slightly from the full package\n> because the API keeps adding rows).\n\n# PMITC v1.0: Prediction-Market Informed-Trading Casebook\n\nA source-traced register of publicly documented cases of **suspected** informed trading on prediction markets (court and regulator actions, platform sanctions, analyst investigations, press reports, rule-based screens), joined to trade-level Polymarket data so that the cases can be analysed and used for machine learning: every fill in the case markets, all buyers before the news, matched controls, placebo markets where nobody can know the outcome early, minute paths, and three benchmark tasks.\n\n**Version 1.0.1 (2026-11-27).** Collected under `PROTOCOL.md` v1.0 and amendments A1 to A19. Every column is in `CODEBOOK.md`; the datasheet is `DATASHEET.md`; file hashes are in `../MANIFEST.json`.\n\n> **Labels are allegations, not findings.** A wallet in this dataset is \"flagged by <source>\", never \"an insider\". Only E1 claims are final outcomes, and most E1 claims are Kalshi platform discipline. No table contains a personal name.\n\n## Contents (`data/`)\n\n| Table | Rows | One row is |\n|---|---|---|\n| `cases` | 66 | one underlying event: strongest grade, investigation outcome, counts, benchmark split |\n| `claims` | 123 | one statement by one source at one time: grade, stance, verified flag, source URL |\n| `wallets` | 260 | one (wallet, case) label from a named source: tier, polarity, `label_family`, `trade_confirmed`, `is_documented` |\n| `markets` | 1,118 | one (case, market): Gamma ladder, dates, outcome, volume, `t_news_utc`, `t_news_precise_utc` |\n| `placebo_markets` | 4,495 | one placebo market (4,227) with its matched case market, or an unmatched case-market row |\n| `fills` (8 parquet parts) | 53,430,556 | one wallet leg of one fill: case markets, placebo markets, and labelled wallets elsewhere |\n| `positions` | 6,069,622 | one (market, token, wallet, version) for every buyer before the cut: the population a detector must search |\n| `episodes` | 17,548 | one documented episode or matched control, pre-news features and `_post` outcomes, both versions |\n| `controls` | 16,650 | one matched control with its relaxation flag |\n| `weak_labels` | 2,651,672 | one Polymarket-v1 wallet: ACDC reconstruction, Inca rule, Gate 1/2 counts, coordinated-buyer rule output |\n| `market_minutes` | 1,238,536 | one market, version and minute with fills, 48 h before to 24 h after the cut |\n| `contradictions` | 5 | a claim contradicted by the trades (claims are never edited) |\n| `edges` | 416 | a money link from the seed sources (not expanded; no archive RPC was available) |\n\nCSV copies exist for every table under 50 MB; parquet for all. Types are explicit (`CODEBOOK.md`): UTC timestamps, lower-case `0x` addresses, NULL for missing, stable ids (`case_id`, `claim_id`, `condition_id`, `asset_id`, `wallet`, `episode_id`).\n\n## Label columns (never merged)\n\n`is_documented` (suspected by a source, confirmed by the wallet's own fills, and in an informed-trading case: `label_family = informed_trading`; the default positive), `doc_grade`, `label_family`, `coordinated_rule_fired` (rule A13/A17: **rule output; about 1/3 expected by chance; may include copy-traders; not an allegation**), `acdc_class` (reconstruction, not a label: it misses its 5% validation bar), `inca_flag` (published rule only; broader than Inca's list, 9,285 vs 39), `gate1`, `gate2a`, `gate2b` (frozen screens, A16), `is_control`, `is_placebo_market`.\n\n## Concentration of the positives\n\nThe labels are few and clustered. **74 of the 119 documented wallets come from two cases** (52 in the Feb-28 2026 US strike on Iran, 22 in the KPMG/Deloitte earnings case), and **87 are cluster members** (`L4_cluster_member`): wallets a source links to a flagged wallet by money flows, not each flagged for its own trades. `cases.n_documented_by_case` gives the count per case. Benchmark metrics are therefore reported **per case and case-weighted** (each case counts once), next to pooled values; a pooled score is dominated by the two large cases.\n\n## Two news times\n\nEvery time-dependent table exists twice (`t_news_version`):\n- `day`: 00:00 UTC on the earliest day-precision event or claim date (A6.6, A7);\n- `precise`: an hour- or minute-level time from `data/event_times.csv` with a source URL (A10), or the day time where none is sourced. 16 of 42 market-bearing cases use an exact time.\n\nDay-start times count every trade on the news day as post-news; the precise version fixes that. An exact time is used only if it falls inside the coarse date (A18): Super Bowl LX's halftime time (01:12 UTC, the next UTC day) is rejected, so 16 cases use an exact time (for example the Nobel wallets bought between 00:44 and 03:29 UTC before the 09:00 UTC announcement). Use `precise` by default and report `day` as a sensitivity.\n\n## Benchmarks (`benchmarks/`)\n\nFrozen split (`splits.csv`): grouped by case, ordered in time; `test` = cases first claimed on or after 2026-03-01.\nMetrics are case-weighted (each case counts once) unless marked pooled; per-case values are in `baselines.json`. Test numbers rest on few cases (T1 and T2: 4 cases with documented wallets in scored markets, 32 positives).\n- **T1, within-market ranking** of all pre-news buyers (positives = documented wallets). Test (precise), case-weighted AP: logistic regression 0.075, the Gate 1 rule 0.065, random 0.005; gradient boosting overfits the train cases (0.005). Case-grouped CV inside train: AP 0.32 (LR).\n- **T2, documented episodes vs matched controls.** Base result: matched same-side controls win as often as documented episodes (83.5% vs 84.0%), so outcome-based features do not separate them. Pre-news behaviour separates them partly: test AUC case-weighted 0.83 (logistic regression) and 0.74 (gradient boosting), pooled 0.79 and 0.70; case-grouped CV case-weighted 0.75 and 0.79 (16 cases). Account age and prior activity carry most of it (documented wallets are new). One feature, `share_on_this_ladder_market`, is a construction artifact (AUC 0.97 alone) and is on the leakage list; see `benchmarks/README.md`.\n- **T3, case markets vs placebo markets** from pre-cut flow only: test AUC case-weighted 0.79 (both models; 15 cases), pooled 0.75 (LR) and 0.85 (gradient boosting). Placebo markets differ from case markets in kind (crypto prices, weather), so part of this is market type.\n\nFull results: `benchmarks/baselines.json` (both versions). Notebooks: `notebooks/01_explore.ipynb`, `notebooks/02_baselines.ipynb`.\n\n## Rules for use\n\n1. A label is an allegation, not a finding. Report results as \"wallets flagged by sources\".\n2. One case is one event. The US strike on Iran (Feb 2026) holds about 40% of documented wallets; group by case.\n3. The collection reflects what was noticed and published (PROTOCOL 8): mostly fresh wallets making large, cheap, well-timed bets on viral markets. Do not estimate prevalence from it, and do not train a detector only on it.\n4. Freeze before you test: these cases were public before you built your method; report test-split results separately.\n5. No identity work: do not use the data to identify the people behind wallets.\n\n## Ethics\n\n- No personal names in any data field (tested with a name list stored as hashes and a reviewed \"Name Surname\" scan; `tests/`). Official records are referenced by URL and notice or docket number; URLs chosen by sources may contain names.\n- Market titles that name a person alleged, charged or sanctioned in the sources are withheld (A12.6, A12.7).\n- No attempt is made to identify people behind wallets; wallet-to-person mappings are never made by us.\n- Raw Gamma profiles of the A13 lookups are not published (only `createdAt` is used).\n- **Removal requests:** open an issue at https://github.com/ibrhmyi/insider with the row id (`claim_id`, `wallet` + `case_id`) and the reason; rows whose only source is retracted are removed (PROTOCOL 9).\n- **Bias statement (PROTOCOL 8):** the collection over-represents large, fresh-wallet, long-shot wins on geopolitical and viral markets and under-represents informed trading that looks ordinary. It reflects what analysts and journalists noticed, which is itself shaped by the screens they ran.\n\n## Licensing\n\nPMITC tables: CC-BY-4.0. Polymarket-v1 fills (`source = hf_polymarket_v1`): CC-BY-4.0 (TimeSeventeen). Data API v2 rows (`source = data_api_v2`) are public on-chain trades; Polymarket's API terms could not be verified from the build environment, so these rows are in separate files (`fills_part*_data_api_v2.parquet`) and can be dropped and rebuilt with `dataset/build/pull_market_trades.py` and `build/v1/fills.py`. Repositories without a licence contribute only facts (addresses) with links. Details: `LICENSES_UPSTREAM.md`, `LICENSE.md`.\n\n## Known gaps\n\n- The money graph (A6.8, A8) is not built: no archive Polygon RPC or explorer key (A12.2). `edges` holds seed links only; funding features are empty.\n- The 20% blind re-extraction (A4) is pending: `blind_check_sample.csv` in the repository stays blank for a second extractor.\n- 16 claims are `verified = pending` (search-result text). 22 pages could not be read here (proxy or site bot protection) and are listed in the repository's `dataset/logs/needs_page_read.csv`; none was worked around.\n- Kalshi accounts and trades are not public: Kalshi cases have claims but no wallets or fills.\n- The ACDC reconstruction misses its validation bar (Orcas +188%); `inca_flag` is far broader than Inca's published list.\n- The coordinated-buyer rule (A13) is rule output, not a label: the same rule fires in random placebo windows at about a third of the real-trigger rate (`placebo_rate`), and it cannot tell coordination from copy-trading of visible trades. It is not an allegation against any wallet.\n- Polymarket-v1 records some economic buys as maker sells of the other token (mint matching, A6.4); fills keep the leg sides as recorded.\n\n## How to cite\n\n> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.0.0 [dataset]. Collected under protocol v1.0 with amendments A1 to A16.1. https://github.com/ibrhmyi/insider\n\nBibTeX and CFF: `CITATION.cff`. Please also cite Polymarket-v1 (TimeSeventeen, Hugging Face) for the fills.\n",
+ "resources": [
+  {
+   "path": "data/cases.csv",
+   "description": "One row per case (underlying event). Derived from claims (build/build_cases.py) plus market and wallet counts.",
+   "schema": {
+    "fields": [
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case key Leakage: meta."
+     },
+     {
+      "name": "title",
+      "type": "string",
+      "description": "short title; no names of alleged traders Leakage: meta."
+     },
+     {
+      "name": "category",
+      "type": "string",
+      "description": "topic category Leakage: meta."
+     },
+     {
+      "name": "platform",
+      "type": "string",
+      "description": "platforms in the case's claims, ';'-joined Allowed: polymarket, kalshi, both. Leakage: meta."
+     },
+     {
+      "name": "family",
+      "type": "string",
+      "description": "families in the case's claims, ';'-joined (PROTOCOL 2) Leakage: meta."
+     },
+     {
+      "name": "case_grade",
+      "type": "string",
+      "description": "strongest evidence grade among the case's claims Allowed: E1, E2, E3, E4, E5, E6. Leakage: label."
+     },
+     {
+      "name": "grades_present",
+      "type": "string",
+      "description": "all grades present, ';'-joined Leakage: meta."
+     },
+     {
+      "name": "investigation_outcome",
+      "type": "string",
+      "description": "PROTOCOL A9.2 Allowed: sanctioned, charged, cleared_official, cleared_analyst, disputed, under_investigation, unresolved. Leakage: label."
+     },
+     {
+      "name": "event_date",
+      "type": "string",
+      "description": "earliest event_date as written (partial dates allowed, A6.3) Leakage: meta."
+     },
+     {
+      "name": "event_date_earliest",
+      "type": "datetime",
+      "description": "earliest possible day of event_date Leakage: meta."
+     },
+     {
+      "name": "event_date_precision",
+      "type": "string",
+      "description": "precision of event_date Allowed: day, month, quarter, year, range. Leakage: meta."
+     },
+     {
+      "name": "first_claim_date",
+      "type": "string",
+      "description": "earliest claim_date as written Leakage: meta."
+     },
+     {
+      "name": "first_claim_date_earliest",
+      "type": "datetime",
+      "description": "earliest possible day of the first claim (used for the A15 time split) Leakage: meta."
+     },
+     {
+      "name": "first_claim_date_precision",
+      "type": "string",
+      "description": "precision of first_claim_date Allowed: day, month, quarter, year, range. Leakage: meta."
+     },
+     {
+      "name": "n_claims",
+      "type": "integer",
+      "description": "number of claims Leakage: meta."
+     },
+     {
+      "name": "n_sources",
+      "type": "integer",
+      "description": "distinct source URLs Leakage: meta."
+     },
+     {
+      "name": "n_markets",
+      "type": "integer",
+      "description": "case markets in markets Leakage: meta."
+     },
+     {
+      "name": "n_wallets_suspected",
+      "type": "integer",
+      "description": "suspected wallets (any trade confirmation) Leakage: meta."
+     },
+     {
+      "name": "n_documented_by_case",
+      "type": "integer",
+      "description": "documented wallets in this case (is_documented: suspected, trade_confirmed, informed_trading). Two cases hold 74 of 119 (A19) Leakage: label."
+     },
+     {
+      "name": "n_wallets_coordinated_rule",
+      "type": "integer",
+      "description": "distinct wallets for which the A13 rule fired in this case (rule output, not an allegation; A17) Leakage: label."
+     },
+     {
+      "name": "max_amount_claimed_usd",
+      "type": "numeric",
+      "description": "largest amount any claim states Unit: USD. Leakage: meta."
+     },
+     {
+      "name": "amounts_disagree",
+      "type": "boolean",
+      "description": "claims state different amounts Leakage: meta."
+     },
+     {
+      "name": "benchmark_split",
+      "type": "string",
+      "description": "PROTOCOL A15 split Allowed: train, test. Leakage: meta."
+     },
+     {
+      "name": "status_note",
+      "type": "string",
+      "description": "free note Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/cases.parquet",
+   "description": "One row per case (underlying event). Derived from claims (build/build_cases.py) plus market and wallet counts.",
+   "schema": {
+    "fields": [
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case key Leakage: meta."
+     },
+     {
+      "name": "title",
+      "type": "string",
+      "description": "short title; no names of alleged traders Leakage: meta."
+     },
+     {
+      "name": "category",
+      "type": "string",
+      "description": "topic category Leakage: meta."
+     },
+     {
+      "name": "platform",
+      "type": "string",
+      "description": "platforms in the case's claims, ';'-joined Allowed: polymarket, kalshi, both. Leakage: meta."
+     },
+     {
+      "name": "family",
+      "type": "string",
+      "description": "families in the case's claims, ';'-joined (PROTOCOL 2) Leakage: meta."
+     },
+     {
+      "name": "case_grade",
+      "type": "string",
+      "description": "strongest evidence grade among the case's claims Allowed: E1, E2, E3, E4, E5, E6. Leakage: label."
+     },
+     {
+      "name": "grades_present",
+      "type": "string",
+      "description": "all grades present, ';'-joined Leakage: meta."
+     },
+     {
+      "name": "investigation_outcome",
+      "type": "string",
+      "description": "PROTOCOL A9.2 Allowed: sanctioned, charged, cleared_official, cleared_analyst, disputed, under_investigation, unresolved. Leakage: label."
+     },
+     {
+      "name": "event_date",
+      "type": "string",
+      "description": "earliest event_date as written (partial dates allowed, A6.3) Leakage: meta."
+     },
+     {
+      "name": "event_date_earliest",
+      "type": "datetime",
+      "description": "earliest possible day of event_date Leakage: meta."
+     },
+     {
+      "name": "event_date_precision",
+      "type": "string",
+      "description": "precision of event_date Allowed: day, month, quarter, year, range. Leakage: meta."
+     },
+     {
+      "name": "first_claim_date",
+      "type": "string",
+      "description": "earliest claim_date as written Leakage: meta."
+     },
+     {
+      "name": "first_claim_date_earliest",
+      "type": "datetime",
+      "description": "earliest possible day of the first claim (used for the A15 time split) Leakage: meta."
+     },
+     {
+      "name": "first_claim_date_precision",
+      "type": "string",
+      "description": "precision of first_claim_date Allowed: day, month, quarter, year, range. Leakage: meta."
+     },
+     {
+      "name": "n_claims",
+      "type": "integer",
+      "description": "number of claims Leakage: meta."
+     },
+     {
+      "name": "n_sources",
+      "type": "integer",
+      "description": "distinct source URLs Leakage: meta."
+     },
+     {
+      "name": "n_markets",
+      "type": "integer",
+      "description": "case markets in markets Leakage: meta."
+     },
+     {
+      "name": "n_wallets_suspected",
+      "type": "integer",
+      "description": "suspected wallets (any trade confirmation) Leakage: meta."
+     },
+     {
+      "name": "n_documented_by_case",
+      "type": "integer",
+      "description": "documented wallets in this case (is_documented: suspected, trade_confirmed, informed_trading). Two cases hold 74 of 119 (A19) Leakage: label."
+     },
+     {
+      "name": "n_wallets_coordinated_rule",
+      "type": "integer",
+      "description": "distinct wallets for which the A13 rule fired in this case (rule output, not an allegation; A17) Leakage: label."
+     },
+     {
+      "name": "max_amount_claimed_usd",
+      "type": "numeric",
+      "description": "largest amount any claim states Unit: USD. Leakage: meta."
+     },
+     {
+      "name": "amounts_disagree",
+      "type": "boolean",
+      "description": "claims state different amounts Leakage: meta."
+     },
+     {
+      "name": "benchmark_split",
+      "type": "string",
+      "description": "PROTOCOL A15 split Allowed: train, test. Leakage: meta."
+     },
+     {
+      "name": "status_note",
+      "type": "string",
+      "description": "free note Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/claims.csv",
+   "description": "One row per claim: one statement by one source at one time (PROTOCOL 2, 6). Claims are never edited; contradictions go to contradictions.",
+   "schema": {
+    "fields": [
+     {
+      "name": "claim_id",
+      "type": "string",
+      "description": "CLnnnn, stable Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "platform",
+      "type": "string",
+      "description": "platform Allowed: polymarket, kalshi, both. Leakage: meta."
+     },
+     {
+      "name": "family",
+      "type": "string",
+      "description": "family (PROTOCOL 2) Leakage: meta."
+     },
+     {
+      "name": "subject_type",
+      "type": "string",
+      "description": "what the claim points at Allowed: address, handle, account, cluster, market, aggregate, notice. Leakage: meta."
+     },
+     {
+      "name": "subject",
+      "type": "string",
+      "description": "subject as the source gives it (prefixes kept as prefixes); notice or release ID for official notices; never a personal name Leakage: meta."
+     },
+     {
+      "name": "claim_text",
+      "type": "string",
+      "description": "our paraphrase, under 30 words Leakage: meta."
+     },
+     {
+      "name": "evidence_grade",
+      "type": "string",
+      "description": "PROTOCOL 5 (A12.1 for employer findings) Allowed: E1, E2, E3, E4, E5, E6. Leakage: label."
+     },
+     {
+      "name": "stance",
+      "type": "string",
+      "description": "PROTOCOL A9.1 Allowed: alleges, disputes, clears, context. Leakage: meta."
+     },
+     {
+      "name": "verified",
+      "type": "string",
+      "description": "A6.1: true = page text read and supports the claim Allowed: true, pending, false. Leakage: meta."
+     },
+     {
+      "name": "run",
+      "type": "integer",
+      "description": "collection run that added the row (A6.2) Leakage: meta."
+     },
+     {
+      "name": "amount_claimed_usd",
+      "type": "numeric",
+      "description": "amount the source states Unit: USD. Leakage: meta."
+     },
+     {
+      "name": "n_accounts_claimed",
+      "type": "integer",
+      "description": "accounts the source names Leakage: meta."
+     },
+     {
+      "name": "event_date",
+      "type": "string",
+      "description": "event date as written (A6.3) Leakage: meta."
+     },
+     {
+      "name": "claim_date",
+      "type": "string",
+      "description": "claim date as written (A6.3) Leakage: meta."
+     },
+     {
+      "name": "source_class",
+      "type": "string",
+      "description": "PROTOCOL 3 Allowed: S1, S2, S3, S4, S5. Leakage: meta."
+     },
+     {
+      "name": "source_name",
+      "type": "string",
+      "description": "outlet or author ('X via Y') Leakage: meta."
+     },
+     {
+      "name": "url",
+      "type": "string",
+      "description": "source URL; may contain names chosen by the source (official file names, article slugs) Leakage: meta."
+     },
+     {
+      "name": "post_url",
+      "type": "string",
+      "description": "X post URL recovered from the page (from notes) Leakage: meta."
+     },
+     {
+      "name": "accessed_date",
+      "type": "datetime",
+      "description": "date accessed Leakage: meta."
+     },
+     {
+      "name": "extractor",
+      "type": "string",
+      "description": "who extracted the row Leakage: meta."
+     },
+     {
+      "name": "notes",
+      "type": "string",
+      "description": "free notes Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/claims.parquet",
+   "description": "One row per claim: one statement by one source at one time (PROTOCOL 2, 6). Claims are never edited; contradictions go to contradictions.",
+   "schema": {
+    "fields": [
+     {
+      "name": "claim_id",
+      "type": "string",
+      "description": "CLnnnn, stable Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "platform",
+      "type": "string",
+      "description": "platform Allowed: polymarket, kalshi, both. Leakage: meta."
+     },
+     {
+      "name": "family",
+      "type": "string",
+      "description": "family (PROTOCOL 2) Leakage: meta."
+     },
+     {
+      "name": "subject_type",
+      "type": "string",
+      "description": "what the claim points at Allowed: address, handle, account, cluster, market, aggregate, notice. Leakage: meta."
+     },
+     {
+      "name": "subject",
+      "type": "string",
+      "description": "subject as the source gives it (prefixes kept as prefixes); notice or release ID for official notices; never a personal name Leakage: meta."
+     },
+     {
+      "name": "claim_text",
+      "type": "string",
+      "description": "our paraphrase, under 30 words Leakage: meta."
+     },
+     {
+      "name": "evidence_grade",
+      "type": "string",
+      "description": "PROTOCOL 5 (A12.1 for employer findings) Allowed: E1, E2, E3, E4, E5, E6. Leakage: label."
+     },
+     {
+      "name": "stance",
+      "type": "string",
+      "description": "PROTOCOL A9.1 Allowed: alleges, disputes, clears, context. Leakage: meta."
+     },
+     {
+      "name": "verified",
+      "type": "string",
+      "description": "A6.1: true = page text read and supports the claim Allowed: true, pending, false. Leakage: meta."
+     },
+     {
+      "name": "run",
+      "type": "integer",
+      "description": "collection run that added the row (A6.2) Leakage: meta."
+     },
+     {
+      "name": "amount_claimed_usd",
+      "type": "numeric",
+      "description": "amount the source states Unit: USD. Leakage: meta."
+     },
+     {
+      "name": "n_accounts_claimed",
+      "type": "integer",
+      "description": "accounts the source names Leakage: meta."
+     },
+     {
+      "name": "event_date",
+      "type": "string",
+      "description": "event date as written (A6.3) Leakage: meta."
+     },
+     {
+      "name": "claim_date",
+      "type": "string",
+      "description": "claim date as written (A6.3) Leakage: meta."
+     },
+     {
+      "name": "source_class",
+      "type": "string",
+      "description": "PROTOCOL 3 Allowed: S1, S2, S3, S4, S5. Leakage: meta."
+     },
+     {
+      "name": "source_name",
+      "type": "string",
+      "description": "outlet or author ('X via Y') Leakage: meta."
+     },
+     {
+      "name": "url",
+      "type": "string",
+      "description": "source URL; may contain names chosen by the source (official file names, article slugs) Leakage: meta."
+     },
+     {
+      "name": "post_url",
+      "type": "string",
+      "description": "X post URL recovered from the page (from notes) Leakage: meta."
+     },
+     {
+      "name": "accessed_date",
+      "type": "datetime",
+      "description": "date accessed Leakage: meta."
+     },
+     {
+      "name": "extractor",
+      "type": "string",
+      "description": "who extracted the row Leakage: meta."
+     },
+     {
+      "name": "notes",
+      "type": "string",
+      "description": "free notes Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/contradictions.csv",
+   "description": "Places where the trades disagree with a claim (the claim is never edited), incl. the run-7 amount checks (gap > 10%).",
+   "schema": {
+    "fields": [
+     {
+      "name": "contradiction_id",
+      "type": "string",
+      "description": "CXnnn Leakage: meta."
+     },
+     {
+      "name": "claim_id",
+      "type": "string",
+      "description": "claim (FK claims) Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "field",
+      "type": "string",
+      "description": "claim field Leakage: meta."
+     },
+     {
+      "name": "claimed_value",
+      "type": "string",
+      "description": "value in the claim Leakage: meta."
+     },
+     {
+      "name": "observed_value",
+      "type": "string",
+      "description": "value observed Leakage: meta."
+     },
+     {
+      "name": "evidence",
+      "type": "string",
+      "description": "how it was observed Leakage: meta."
+     },
+     {
+      "name": "evidence_file",
+      "type": "string",
+      "description": "raw file or table Leakage: meta."
+     },
+     {
+      "name": "phase",
+      "type": "string",
+      "description": "run / phase Leakage: meta."
+     },
+     {
+      "name": "found_utc",
+      "type": "datetime",
+      "description": "when recorded Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/contradictions.parquet",
+   "description": "Places where the trades disagree with a claim (the claim is never edited), incl. the run-7 amount checks (gap > 10%).",
+   "schema": {
+    "fields": [
+     {
+      "name": "contradiction_id",
+      "type": "string",
+      "description": "CXnnn Leakage: meta."
+     },
+     {
+      "name": "claim_id",
+      "type": "string",
+      "description": "claim (FK claims) Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "field",
+      "type": "string",
+      "description": "claim field Leakage: meta."
+     },
+     {
+      "name": "claimed_value",
+      "type": "string",
+      "description": "value in the claim Leakage: meta."
+     },
+     {
+      "name": "observed_value",
+      "type": "string",
+      "description": "value observed Leakage: meta."
+     },
+     {
+      "name": "evidence",
+      "type": "string",
+      "description": "how it was observed Leakage: meta."
+     },
+     {
+      "name": "evidence_file",
+      "type": "string",
+      "description": "raw file or table Leakage: meta."
+     },
+     {
+      "name": "phase",
+      "type": "string",
+      "description": "run / phase Leakage: meta."
+     },
+     {
+      "name": "found_utc",
+      "type": "datetime",
+      "description": "when recorded Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/controls.csv",
+   "description": "Matched controls (A6.10, seed 192) with relaxation flags, per t_news version.",
+   "schema": {
+    "fields": [
+     {
+      "name": "t_news_version",
+      "type": "string",
+      "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "episode_id",
+      "type": "string",
+      "description": "documented episode Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "control wallet Leakage: meta."
+     },
+     {
+      "name": "control_type",
+      "type": "string",
+      "description": "same_side or other_side_large_buyer Allowed: same_side, other_side_large_buyer. Leakage: meta."
+     },
+     {
+      "name": "relaxation",
+      "type": "string",
+      "description": "A6.10 relaxation used Allowed: base, window_72h, price_0.10, size_0.25_4x. Leakage: meta."
+     },
+     {
+      "name": "n_eligible",
+      "type": "integer",
+      "description": "eligible controls at that step Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "token Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "token label Leakage: meta."
+     },
+     {
+      "name": "first_buy_ts",
+      "type": "integer",
+      "description": "control's first pre-news buy Unit: Unix s. Leakage: pre."
+     },
+     {
+      "name": "first_buy_price",
+      "type": "numeric",
+      "description": "its price Leakage: pre."
+     },
+     {
+      "name": "size_usdc",
+      "type": "numeric",
+      "description": "its pre-news buy USDC Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "n_buys",
+      "type": "integer",
+      "description": "its pre-news buy legs Leakage: pre."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/controls.parquet",
+   "description": "Matched controls (A6.10, seed 192) with relaxation flags, per t_news version.",
+   "schema": {
+    "fields": [
+     {
+      "name": "t_news_version",
+      "type": "string",
+      "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "episode_id",
+      "type": "string",
+      "description": "documented episode Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "control wallet Leakage: meta."
+     },
+     {
+      "name": "control_type",
+      "type": "string",
+      "description": "same_side or other_side_large_buyer Allowed: same_side, other_side_large_buyer. Leakage: meta."
+     },
+     {
+      "name": "relaxation",
+      "type": "string",
+      "description": "A6.10 relaxation used Allowed: base, window_72h, price_0.10, size_0.25_4x. Leakage: meta."
+     },
+     {
+      "name": "n_eligible",
+      "type": "integer",
+      "description": "eligible controls at that step Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "token Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "token label Leakage: meta."
+     },
+     {
+      "name": "first_buy_ts",
+      "type": "integer",
+      "description": "control's first pre-news buy Unit: Unix s. Leakage: pre."
+     },
+     {
+      "name": "first_buy_price",
+      "type": "numeric",
+      "description": "its price Leakage: pre."
+     },
+     {
+      "name": "size_usdc",
+      "type": "numeric",
+      "description": "its pre-news buy USDC Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "n_buys",
+      "type": "integer",
+      "description": "its pre-news buy legs Leakage: pre."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/edges.csv",
+   "description": "Money links between addresses from the seed sources (funding, Relay handoff, Safe owner, cash-out). Not expanded (A12.2).",
+   "schema": {
+    "fields": [
+     {
+      "name": "src",
+      "type": "string",
+      "description": "sender Leakage: meta."
+     },
+     {
+      "name": "dst",
+      "type": "string",
+      "description": "receiver Leakage: meta."
+     },
+     {
+      "name": "kind",
+      "type": "string",
+      "description": "link type Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "chain",
+      "type": "string",
+      "description": "chain or route Leakage: meta."
+     },
+     {
+      "name": "amount_usd",
+      "type": "numeric",
+      "description": "amount Unit: USD. Leakage: meta."
+     },
+     {
+      "name": "tx",
+      "type": "string",
+      "description": "transaction hash or evidence Leakage: meta."
+     },
+     {
+      "name": "utc",
+      "type": "datetime",
+      "description": "time (NULL where the source gives only a block number) Leakage: meta."
+     },
+     {
+      "name": "block_number",
+      "type": "integer",
+      "description": "Polygon block number where the source gives one instead of a time Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "source file Leakage: meta."
+     },
+     {
+      "name": "source_url",
+      "type": "string",
+      "description": "source URL Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/edges.parquet",
+   "description": "Money links between addresses from the seed sources (funding, Relay handoff, Safe owner, cash-out). Not expanded (A12.2).",
+   "schema": {
+    "fields": [
+     {
+      "name": "src",
+      "type": "string",
+      "description": "sender Leakage: meta."
+     },
+     {
+      "name": "dst",
+      "type": "string",
+      "description": "receiver Leakage: meta."
+     },
+     {
+      "name": "kind",
+      "type": "string",
+      "description": "link type Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "chain",
+      "type": "string",
+      "description": "chain or route Leakage: meta."
+     },
+     {
+      "name": "amount_usd",
+      "type": "numeric",
+      "description": "amount Unit: USD. Leakage: meta."
+     },
+     {
+      "name": "tx",
+      "type": "string",
+      "description": "transaction hash or evidence Leakage: meta."
+     },
+     {
+      "name": "utc",
+      "type": "datetime",
+      "description": "time (NULL where the source gives only a block number) Leakage: meta."
+     },
+     {
+      "name": "block_number",
+      "type": "integer",
+      "description": "Polygon block number where the source gives one instead of a time Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "source file Leakage: meta."
+     },
+     {
+      "name": "source_url",
+      "type": "string",
+      "description": "source URL Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/episodes.csv",
+   "description": "Per (wallet, market, token) episode of documented wallets and their matched controls; pre-news features, then _post outcomes.",
+   "schema": {
+    "fields": [
+     {
+      "name": "row_id",
+      "type": "string",
+      "description": "row id within version Leakage: meta."
+     },
+     {
+      "name": "episode_id",
+      "type": "string",
+      "description": "stable id of a documented episode (hash of case, wallet, market, token); NULL on control rows Leakage: meta."
+     },
+     {
+      "name": "t_news_version",
+      "type": "string",
+      "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "role",
+      "type": "string",
+      "description": "suspected, control_same_side, control_other_side_large_buyer Leakage: label."
+     },
+     {
+      "name": "control_of",
+      "type": "string",
+      "description": "row_id... of the episode this control is matched to (its episode_id via controls) Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "event_slug",
+      "type": "string",
+      "description": "Gamma event Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "token Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "token label Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet Leakage: meta."
+     },
+     {
+      "name": "source_pre",
+      "type": "string",
+      "description": "source of pre-news legs Leakage: pre."
+     },
+     {
+      "name": "account_age_days_at_first_buy",
+      "type": "numeric",
+      "description": "days from first Polymarket-v1 fill to first pre-news buy Unit: days. Leakage: pre."
+     },
+     {
+      "name": "prior_markets",
+      "type": "integer",
+      "description": "distinct Polymarket-v1 markets before the first buy Leakage: pre."
+     },
+     {
+      "name": "prior_net_long_win_rate",
+      "type": "numeric",
+      "description": "win rate on earlier resolved net-long positions Leakage: pre."
+     },
+     {
+      "name": "case_share_of_lifetime_volume",
+      "type": "numeric",
+      "description": "case volume / lifetime Polymarket-v1 volume (uses lifetime: ex-post denominator) Leakage: post."
+     },
+     {
+      "name": "first_price",
+      "type": "numeric",
+      "description": "first pre-news buy price Leakage: pre."
+     },
+     {
+      "name": "vwap",
+      "type": "numeric",
+      "description": "pre-news buy VWAP Leakage: pre."
+     },
+     {
+      "name": "max_price_paid",
+      "type": "numeric",
+      "description": "max pre-news price Leakage: pre."
+     },
+     {
+      "name": "n_buy_fills",
+      "type": "integer",
+      "description": "pre-news buy legs Leakage: pre."
+     },
+     {
+      "name": "median_fill_usdc",
+      "type": "numeric",
+      "description": "median pre-news buy leg Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "fill_size_cv",
+      "type": "numeric",
+      "description": "coefficient of variation of pre-news buy legs Leakage: pre."
+     },
+     {
+      "name": "taker_share",
+      "type": "numeric",
+      "description": "share of pre-news buys as taker Leakage: pre."
+     },
+     {
+      "name": "hour_of_day_first_buy",
+      "type": "integer",
+      "description": "UTC hour of first buy Leakage: pre."
+     },
+     {
+      "name": "pre_buy_usdc",
+      "type": "numeric",
+      "description": "pre-news buy USDC Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "pre_buy_shares",
+      "type": "numeric",
+      "description": "pre-news buy shares Leakage: pre."
+     },
+     {
+      "name": "signal_a_rebuy_1_5x",
+      "type": "boolean",
+      "description": "Signal A Leakage: pre."
+     },
+     {
+      "name": "size_price_slope",
+      "type": "numeric",
+      "description": "slope of buy size on price Leakage: pre."
+     },
+     {
+      "name": "hours_last_buy_to_tnews",
+      "type": "numeric",
+      "description": "hours from last pre-news buy to t_news Unit: hours. Leakage: pre."
+     },
+     {
+      "name": "ladder_rank",
+      "type": "integer",
+      "description": "deadline rank Leakage: static."
+     },
+     {
+      "name": "is_shortest_sufficient",
+      "type": "boolean",
+      "description": "market is the event's shortest deadline that resolved Yes Leakage: post."
+     },
+     {
+      "name": "share_on_this_ladder_market",
+      "type": "numeric",
+      "description": "share of event buys on this market. LEAKY for suspected-vs-control tasks: controls are matched one market at a time, so it is 1 for every control Leakage: label."
+     },
+     {
+      "name": "hours_first_buy_to_tnews",
+      "type": "numeric",
+      "description": "hours from first buy to t_news Unit: hours. Leakage: pre."
+     },
+     {
+      "name": "hours_funding_to_first_trade",
+      "type": "numeric",
+      "description": "empty: money graph not run (A12.2) Leakage: pre."
+     },
+     {
+      "name": "funding_source_type",
+      "type": "string",
+      "description": "empty (A12.2) Leakage: pre."
+     },
+     {
+      "name": "funder_shared_with_labelled",
+      "type": "boolean",
+      "description": "empty (A12.2) Leakage: pre."
+     },
+     {
+      "name": "follower_wallets_60m",
+      "type": "integer",
+      "description": "other wallets buying the token within 60 min after a pre-news buy (may extend past t_news) Leakage: post."
+     },
+     {
+      "name": "follower_buy_usdc_60m",
+      "type": "numeric",
+      "description": "their buy USDC (may extend past t_news) Unit: USDC. Leakage: post."
+     },
+     {
+      "name": "share_sold_before_resolution_post",
+      "type": "numeric",
+      "description": "share of shares sold before resolution Leakage: post."
+     },
+     {
+      "name": "won_post",
+      "type": "boolean",
+      "description": "token won Leakage: post."
+     },
+     {
+      "name": "pnl_post",
+      "type": "numeric",
+      "description": "realised + held winning value Unit: USDC. Leakage: post."
+     },
+     {
+      "name": "redemption_delay_hours_post",
+      "type": "numeric",
+      "description": "hours from resolution to first redemption (suspected only) Unit: hours. Leakage: post."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/episodes.parquet",
+   "description": "Per (wallet, market, token) episode of documented wallets and their matched controls; pre-news features, then _post outcomes.",
+   "schema": {
+    "fields": [
+     {
+      "name": "row_id",
+      "type": "string",
+      "description": "row id within version Leakage: meta."
+     },
+     {
+      "name": "episode_id",
+      "type": "string",
+      "description": "stable id of a documented episode (hash of case, wallet, market, token); NULL on control rows Leakage: meta."
+     },
+     {
+      "name": "t_news_version",
+      "type": "string",
+      "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "role",
+      "type": "string",
+      "description": "suspected, control_same_side, control_other_side_large_buyer Leakage: label."
+     },
+     {
+      "name": "control_of",
+      "type": "string",
+      "description": "row_id... of the episode this control is matched to (its episode_id via controls) Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "event_slug",
+      "type": "string",
+      "description": "Gamma event Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "token Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "token label Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet Leakage: meta."
+     },
+     {
+      "name": "source_pre",
+      "type": "string",
+      "description": "source of pre-news legs Leakage: pre."
+     },
+     {
+      "name": "account_age_days_at_first_buy",
+      "type": "numeric",
+      "description": "days from first Polymarket-v1 fill to first pre-news buy Unit: days. Leakage: pre."
+     },
+     {
+      "name": "prior_markets",
+      "type": "integer",
+      "description": "distinct Polymarket-v1 markets before the first buy Leakage: pre."
+     },
+     {
+      "name": "prior_net_long_win_rate",
+      "type": "numeric",
+      "description": "win rate on earlier resolved net-long positions Leakage: pre."
+     },
+     {
+      "name": "case_share_of_lifetime_volume",
+      "type": "numeric",
+      "description": "case volume / lifetime Polymarket-v1 volume (uses lifetime: ex-post denominator) Leakage: post."
+     },
+     {
+      "name": "first_price",
+      "type": "numeric",
+      "description": "first pre-news buy price Leakage: pre."
+     },
+     {
+      "name": "vwap",
+      "type": "numeric",
+      "description": "pre-news buy VWAP Leakage: pre."
+     },
+     {
+      "name": "max_price_paid",
+      "type": "numeric",
+      "description": "max pre-news price Leakage: pre."
+     },
+     {
+      "name": "n_buy_fills",
+      "type": "integer",
+      "description": "pre-news buy legs Leakage: pre."
+     },
+     {
+      "name": "median_fill_usdc",
+      "type": "numeric",
+      "description": "median pre-news buy leg Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "fill_size_cv",
+      "type": "numeric",
+      "description": "coefficient of variation of pre-news buy legs Leakage: pre."
+     },
+     {
+      "name": "taker_share",
+      "type": "numeric",
+      "description": "share of pre-news buys as taker Leakage: pre."
+     },
+     {
+      "name": "hour_of_day_first_buy",
+      "type": "integer",
+      "description": "UTC hour of first buy Leakage: pre."
+     },
+     {
+      "name": "pre_buy_usdc",
+      "type": "numeric",
+      "description": "pre-news buy USDC Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "pre_buy_shares",
+      "type": "numeric",
+      "description": "pre-news buy shares Leakage: pre."
+     },
+     {
+      "name": "signal_a_rebuy_1_5x",
+      "type": "boolean",
+      "description": "Signal A Leakage: pre."
+     },
+     {
+      "name": "size_price_slope",
+      "type": "numeric",
+      "description": "slope of buy size on price Leakage: pre."
+     },
+     {
+      "name": "hours_last_buy_to_tnews",
+      "type": "numeric",
+      "description": "hours from last pre-news buy to t_news Unit: hours. Leakage: pre."
+     },
+     {
+      "name": "ladder_rank",
+      "type": "integer",
+      "description": "deadline rank Leakage: static."
+     },
+     {
+      "name": "is_shortest_sufficient",
+      "type": "boolean",
+      "description": "market is the event's shortest deadline that resolved Yes Leakage: post."
+     },
+     {
+      "name": "share_on_this_ladder_market",
+      "type": "numeric",
+      "description": "share of event buys on this market. LEAKY for suspected-vs-control tasks: controls are matched one market at a time, so it is 1 for every control Leakage: label."
+     },
+     {
+      "name": "hours_first_buy_to_tnews",
+      "type": "numeric",
+      "description": "hours from first buy to t_news Unit: hours. Leakage: pre."
+     },
+     {
+      "name": "hours_funding_to_first_trade",
+      "type": "numeric",
+      "description": "empty: money graph not run (A12.2) Leakage: pre."
+     },
+     {
+      "name": "funding_source_type",
+      "type": "string",
+      "description": "empty (A12.2) Leakage: pre."
+     },
+     {
+      "name": "funder_shared_with_labelled",
+      "type": "boolean",
+      "description": "empty (A12.2) Leakage: pre."
+     },
+     {
+      "name": "follower_wallets_60m",
+      "type": "integer",
+      "description": "other wallets buying the token within 60 min after a pre-news buy (may extend past t_news) Leakage: post."
+     },
+     {
+      "name": "follower_buy_usdc_60m",
+      "type": "numeric",
+      "description": "their buy USDC (may extend past t_news) Unit: USDC. Leakage: post."
+     },
+     {
+      "name": "share_sold_before_resolution_post",
+      "type": "numeric",
+      "description": "share of shares sold before resolution Leakage: post."
+     },
+     {
+      "name": "won_post",
+      "type": "boolean",
+      "description": "token won Leakage: post."
+     },
+     {
+      "name": "pnl_post",
+      "type": "numeric",
+      "description": "realised + held winning value Unit: USDC. Leakage: post."
+     },
+     {
+      "name": "redemption_delay_hours_post",
+      "type": "numeric",
+      "description": "hours from resolution to first redemption (suspected only) Unit: hours. Leakage: post."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/fills_part001_case_hf_polymarket_v1.parquet",
+   "description": "Every leg of every fill in case and placebo markets, plus every leg of labelled wallets elsewhere. Parquet only (split into parts). (part of table 'fills')",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "which part of the fills table Allowed: case, placebo, label_other. Leakage: meta."
+     },
+     {
+      "name": "leg_id",
+      "type": "string",
+      "description": "unique leg id: <fill_id>:t|m (HF) or the API row id Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "A6.4 Allowed: hf_polymarket_v1, data_api_v2. Leakage: meta."
+     },
+     {
+      "name": "fill_id",
+      "type": "string",
+      "description": "HF <day file>:<row>; API <tx hash>:<row index> Leakage: meta."
+     },
+     {
+      "name": "tx_hash",
+      "type": "string",
+      "description": "transaction hash (Data API rows only) Leakage: meta."
+     },
+     {
+      "name": "ts",
+      "type": "integer",
+      "description": "block time Unit: Unix seconds UTC. Leakage: meta."
+     },
+     {
+      "name": "ts_utc",
+      "type": "datetime",
+      "description": "block time Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "outcome token id Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "label of the traded token Leakage: meta."
+     },
+     {
+      "name": "outcome_seq",
+      "type": "integer",
+      "description": "outcome position (HF 1/2; API 0/1) Leakage: meta."
+     },
+     {
+      "name": "price",
+      "type": "numeric",
+      "description": "price per share Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "usdc",
+      "type": "numeric",
+      "description": "notional Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "shares",
+      "type": "numeric",
+      "description": "shares (HF: usdc / price) Unit: shares. Leakage: meta."
+     },
+     {
+      "name": "fee_usdc",
+      "type": "numeric",
+      "description": "fee (HF only) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet this leg belongs to Leakage: meta."
+     },
+     {
+      "name": "wallet_role",
+      "type": "string",
+      "description": "maker, taker, unknown (API) Allowed: maker, taker, unknown. Leakage: meta."
+     },
+     {
+      "name": "wallet_side",
+      "type": "string",
+      "description": "BUY or SELL of this token by this wallet (A6.4) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "aggressor_side",
+      "type": "string",
+      "description": "taker_direction (HF only) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "maker",
+      "type": "string",
+      "description": "maker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "taker",
+      "type": "string",
+      "description": "taker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "market_slug",
+      "type": "string",
+      "description": "market slug; NULL for withheld markets Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/fills_part002_case_hf_polymarket_v1.parquet",
+   "description": "Every leg of every fill in case and placebo markets, plus every leg of labelled wallets elsewhere. Parquet only (split into parts). (part of table 'fills')",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "which part of the fills table Allowed: case, placebo, label_other. Leakage: meta."
+     },
+     {
+      "name": "leg_id",
+      "type": "string",
+      "description": "unique leg id: <fill_id>:t|m (HF) or the API row id Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "A6.4 Allowed: hf_polymarket_v1, data_api_v2. Leakage: meta."
+     },
+     {
+      "name": "fill_id",
+      "type": "string",
+      "description": "HF <day file>:<row>; API <tx hash>:<row index> Leakage: meta."
+     },
+     {
+      "name": "tx_hash",
+      "type": "string",
+      "description": "transaction hash (Data API rows only) Leakage: meta."
+     },
+     {
+      "name": "ts",
+      "type": "integer",
+      "description": "block time Unit: Unix seconds UTC. Leakage: meta."
+     },
+     {
+      "name": "ts_utc",
+      "type": "datetime",
+      "description": "block time Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "outcome token id Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "label of the traded token Leakage: meta."
+     },
+     {
+      "name": "outcome_seq",
+      "type": "integer",
+      "description": "outcome position (HF 1/2; API 0/1) Leakage: meta."
+     },
+     {
+      "name": "price",
+      "type": "numeric",
+      "description": "price per share Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "usdc",
+      "type": "numeric",
+      "description": "notional Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "shares",
+      "type": "numeric",
+      "description": "shares (HF: usdc / price) Unit: shares. Leakage: meta."
+     },
+     {
+      "name": "fee_usdc",
+      "type": "numeric",
+      "description": "fee (HF only) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet this leg belongs to Leakage: meta."
+     },
+     {
+      "name": "wallet_role",
+      "type": "string",
+      "description": "maker, taker, unknown (API) Allowed: maker, taker, unknown. Leakage: meta."
+     },
+     {
+      "name": "wallet_side",
+      "type": "string",
+      "description": "BUY or SELL of this token by this wallet (A6.4) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "aggressor_side",
+      "type": "string",
+      "description": "taker_direction (HF only) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "maker",
+      "type": "string",
+      "description": "maker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "taker",
+      "type": "string",
+      "description": "taker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "market_slug",
+      "type": "string",
+      "description": "market slug; NULL for withheld markets Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/fills_part004_placebo_hf_polymarket_v1.parquet",
+   "description": "Every leg of every fill in case and placebo markets, plus every leg of labelled wallets elsewhere. Parquet only (split into parts). (part of table 'fills')",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "which part of the fills table Allowed: case, placebo, label_other. Leakage: meta."
+     },
+     {
+      "name": "leg_id",
+      "type": "string",
+      "description": "unique leg id: <fill_id>:t|m (HF) or the API row id Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "A6.4 Allowed: hf_polymarket_v1, data_api_v2. Leakage: meta."
+     },
+     {
+      "name": "fill_id",
+      "type": "string",
+      "description": "HF <day file>:<row>; API <tx hash>:<row index> Leakage: meta."
+     },
+     {
+      "name": "tx_hash",
+      "type": "string",
+      "description": "transaction hash (Data API rows only) Leakage: meta."
+     },
+     {
+      "name": "ts",
+      "type": "integer",
+      "description": "block time Unit: Unix seconds UTC. Leakage: meta."
+     },
+     {
+      "name": "ts_utc",
+      "type": "datetime",
+      "description": "block time Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "outcome token id Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "label of the traded token Leakage: meta."
+     },
+     {
+      "name": "outcome_seq",
+      "type": "integer",
+      "description": "outcome position (HF 1/2; API 0/1) Leakage: meta."
+     },
+     {
+      "name": "price",
+      "type": "numeric",
+      "description": "price per share Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "usdc",
+      "type": "numeric",
+      "description": "notional Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "shares",
+      "type": "numeric",
+      "description": "shares (HF: usdc / price) Unit: shares. Leakage: meta."
+     },
+     {
+      "name": "fee_usdc",
+      "type": "numeric",
+      "description": "fee (HF only) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet this leg belongs to Leakage: meta."
+     },
+     {
+      "name": "wallet_role",
+      "type": "string",
+      "description": "maker, taker, unknown (API) Allowed: maker, taker, unknown. Leakage: meta."
+     },
+     {
+      "name": "wallet_side",
+      "type": "string",
+      "description": "BUY or SELL of this token by this wallet (A6.4) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "aggressor_side",
+      "type": "string",
+      "description": "taker_direction (HF only) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "maker",
+      "type": "string",
+      "description": "maker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "taker",
+      "type": "string",
+      "description": "taker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "market_slug",
+      "type": "string",
+      "description": "market slug; NULL for withheld markets Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/fills_part005_placebo_hf_polymarket_v1.parquet",
+   "description": "Every leg of every fill in case and placebo markets, plus every leg of labelled wallets elsewhere. Parquet only (split into parts). (part of table 'fills')",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "which part of the fills table Allowed: case, placebo, label_other. Leakage: meta."
+     },
+     {
+      "name": "leg_id",
+      "type": "string",
+      "description": "unique leg id: <fill_id>:t|m (HF) or the API row id Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "A6.4 Allowed: hf_polymarket_v1, data_api_v2. Leakage: meta."
+     },
+     {
+      "name": "fill_id",
+      "type": "string",
+      "description": "HF <day file>:<row>; API <tx hash>:<row index> Leakage: meta."
+     },
+     {
+      "name": "tx_hash",
+      "type": "string",
+      "description": "transaction hash (Data API rows only) Leakage: meta."
+     },
+     {
+      "name": "ts",
+      "type": "integer",
+      "description": "block time Unit: Unix seconds UTC. Leakage: meta."
+     },
+     {
+      "name": "ts_utc",
+      "type": "datetime",
+      "description": "block time Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "outcome token id Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "label of the traded token Leakage: meta."
+     },
+     {
+      "name": "outcome_seq",
+      "type": "integer",
+      "description": "outcome position (HF 1/2; API 0/1) Leakage: meta."
+     },
+     {
+      "name": "price",
+      "type": "numeric",
+      "description": "price per share Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "usdc",
+      "type": "numeric",
+      "description": "notional Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "shares",
+      "type": "numeric",
+      "description": "shares (HF: usdc / price) Unit: shares. Leakage: meta."
+     },
+     {
+      "name": "fee_usdc",
+      "type": "numeric",
+      "description": "fee (HF only) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet this leg belongs to Leakage: meta."
+     },
+     {
+      "name": "wallet_role",
+      "type": "string",
+      "description": "maker, taker, unknown (API) Allowed: maker, taker, unknown. Leakage: meta."
+     },
+     {
+      "name": "wallet_side",
+      "type": "string",
+      "description": "BUY or SELL of this token by this wallet (A6.4) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "aggressor_side",
+      "type": "string",
+      "description": "taker_direction (HF only) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "maker",
+      "type": "string",
+      "description": "maker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "taker",
+      "type": "string",
+      "description": "taker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "market_slug",
+      "type": "string",
+      "description": "market slug; NULL for withheld markets Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/fills_part006_placebo_hf_polymarket_v1.parquet",
+   "description": "Every leg of every fill in case and placebo markets, plus every leg of labelled wallets elsewhere. Parquet only (split into parts). (part of table 'fills')",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "which part of the fills table Allowed: case, placebo, label_other. Leakage: meta."
+     },
+     {
+      "name": "leg_id",
+      "type": "string",
+      "description": "unique leg id: <fill_id>:t|m (HF) or the API row id Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "A6.4 Allowed: hf_polymarket_v1, data_api_v2. Leakage: meta."
+     },
+     {
+      "name": "fill_id",
+      "type": "string",
+      "description": "HF <day file>:<row>; API <tx hash>:<row index> Leakage: meta."
+     },
+     {
+      "name": "tx_hash",
+      "type": "string",
+      "description": "transaction hash (Data API rows only) Leakage: meta."
+     },
+     {
+      "name": "ts",
+      "type": "integer",
+      "description": "block time Unit: Unix seconds UTC. Leakage: meta."
+     },
+     {
+      "name": "ts_utc",
+      "type": "datetime",
+      "description": "block time Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "outcome token id Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "label of the traded token Leakage: meta."
+     },
+     {
+      "name": "outcome_seq",
+      "type": "integer",
+      "description": "outcome position (HF 1/2; API 0/1) Leakage: meta."
+     },
+     {
+      "name": "price",
+      "type": "numeric",
+      "description": "price per share Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "usdc",
+      "type": "numeric",
+      "description": "notional Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "shares",
+      "type": "numeric",
+      "description": "shares (HF: usdc / price) Unit: shares. Leakage: meta."
+     },
+     {
+      "name": "fee_usdc",
+      "type": "numeric",
+      "description": "fee (HF only) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet this leg belongs to Leakage: meta."
+     },
+     {
+      "name": "wallet_role",
+      "type": "string",
+      "description": "maker, taker, unknown (API) Allowed: maker, taker, unknown. Leakage: meta."
+     },
+     {
+      "name": "wallet_side",
+      "type": "string",
+      "description": "BUY or SELL of this token by this wallet (A6.4) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "aggressor_side",
+      "type": "string",
+      "description": "taker_direction (HF only) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "maker",
+      "type": "string",
+      "description": "maker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "taker",
+      "type": "string",
+      "description": "taker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "market_slug",
+      "type": "string",
+      "description": "market slug; NULL for withheld markets Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/fills_part007_label_other_hf_polymarket_v1.parquet",
+   "description": "Every leg of every fill in case and placebo markets, plus every leg of labelled wallets elsewhere. Parquet only (split into parts). (part of table 'fills')",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "which part of the fills table Allowed: case, placebo, label_other. Leakage: meta."
+     },
+     {
+      "name": "leg_id",
+      "type": "string",
+      "description": "unique leg id: <fill_id>:t|m (HF) or the API row id Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "A6.4 Allowed: hf_polymarket_v1, data_api_v2. Leakage: meta."
+     },
+     {
+      "name": "fill_id",
+      "type": "string",
+      "description": "HF <day file>:<row>; API <tx hash>:<row index> Leakage: meta."
+     },
+     {
+      "name": "tx_hash",
+      "type": "string",
+      "description": "transaction hash (Data API rows only) Leakage: meta."
+     },
+     {
+      "name": "ts",
+      "type": "integer",
+      "description": "block time Unit: Unix seconds UTC. Leakage: meta."
+     },
+     {
+      "name": "ts_utc",
+      "type": "datetime",
+      "description": "block time Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "outcome token id Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "label of the traded token Leakage: meta."
+     },
+     {
+      "name": "outcome_seq",
+      "type": "integer",
+      "description": "outcome position (HF 1/2; API 0/1) Leakage: meta."
+     },
+     {
+      "name": "price",
+      "type": "numeric",
+      "description": "price per share Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "usdc",
+      "type": "numeric",
+      "description": "notional Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "shares",
+      "type": "numeric",
+      "description": "shares (HF: usdc / price) Unit: shares. Leakage: meta."
+     },
+     {
+      "name": "fee_usdc",
+      "type": "numeric",
+      "description": "fee (HF only) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "wallet this leg belongs to Leakage: meta."
+     },
+     {
+      "name": "wallet_role",
+      "type": "string",
+      "description": "maker, taker, unknown (API) Allowed: maker, taker, unknown. Leakage: meta."
+     },
+     {
+      "name": "wallet_side",
+      "type": "string",
+      "description": "BUY or SELL of this token by this wallet (A6.4) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "aggressor_side",
+      "type": "string",
+      "description": "taker_direction (HF only) Allowed: BUY, SELL. Leakage: meta."
+     },
+     {
+      "name": "maker",
+      "type": "string",
+      "description": "maker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "taker",
+      "type": "string",
+      "description": "taker address (HF only) Leakage: meta."
+     },
+     {
+      "name": "market_slug",
+      "type": "string",
+      "description": "market slug; NULL for withheld markets Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/market_minutes.parquet",
+   "description": "One row per market, version and UTC minute with fills, cut - 48 h to + 24 h, Yes token (A9.3, A10.2, A14).",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "case or placebo Allowed: case, placebo. Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "t_news_version",
+      "type": "string",
+      "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "minute_ts",
+      "type": "integer",
+      "description": "minute start Unit: Unix s. Leakage: meta."
+     },
+     {
+      "name": "minute_utc",
+      "type": "datetime",
+      "description": "minute start Leakage: meta."
+     },
+     {
+      "name": "minutes_from_cut",
+      "type": "integer",
+      "description": "minutes relative to the cut (negative = before) Unit: minutes. Leakage: meta."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "sources in the minute Leakage: meta."
+     },
+     {
+      "name": "n_fills_hf",
+      "type": "integer",
+      "description": "HF fills (taker legs) Leakage: meta."
+     },
+     {
+      "name": "n_legs_api",
+      "type": "integer",
+      "description": "Data API legs Leakage: meta."
+     },
+     {
+      "name": "usdc",
+      "type": "numeric",
+      "description": "volume Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "vwap",
+      "type": "numeric",
+      "description": "volume-weighted price Leakage: meta."
+     },
+     {
+      "name": "last_price",
+      "type": "numeric",
+      "description": "last price Leakage: meta."
+     },
+     {
+      "name": "taker_buy_usdc",
+      "type": "numeric",
+      "description": "aggressor buy volume (HF) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "taker_sell_usdc",
+      "type": "numeric",
+      "description": "aggressor sell volume (HF) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "n_wallets",
+      "type": "integer",
+      "description": "distinct wallets Leakage: meta."
+     },
+     {
+      "name": "n_new_wallets",
+      "type": "integer",
+      "description": "wallets with first Polymarket-v1 fill in the previous 7 days Leakage: meta."
+     },
+     {
+      "name": "n_wallets_age_unknown",
+      "type": "integer",
+      "description": "wallets with no Polymarket-v1 history Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/markets.csv",
+   "description": "One row per (case, market). Ladders are full Gamma events (A6.5). Titles withheld where they name the alleged trader (A12.6).",
+   "schema": {
+    "fields": [
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market condition id, lower-case hex Leakage: meta."
+     },
+     {
+      "name": "question",
+      "type": "string",
+      "description": "market question; NULL when title_withheld Leakage: static."
+     },
+     {
+      "name": "slug",
+      "type": "string",
+      "description": "market slug; NULL when title_withheld Leakage: meta."
+     },
+     {
+      "name": "event_id",
+      "type": "string",
+      "description": "Gamma event id (or withheld-week-<date>) Leakage: meta."
+     },
+     {
+      "name": "event_slug",
+      "type": "string",
+      "description": "Gamma event slug; NULL when title_withheld Leakage: meta."
+     },
+     {
+      "name": "selected_as",
+      "type": "string",
+      "description": "how the market was selected Leakage: meta."
+     },
+     {
+      "name": "found_via",
+      "type": "string",
+      "description": "A6.5 method Leakage: meta."
+     },
+     {
+      "name": "reason",
+      "type": "string",
+      "description": "why the market belongs to the case Leakage: meta."
+     },
+     {
+      "name": "selection_level",
+      "type": "string",
+      "description": "event, market or ladder Allowed: event, market, ladder. Leakage: meta."
+     },
+     {
+      "name": "created_utc",
+      "type": "datetime",
+      "description": "market creation Leakage: static."
+     },
+     {
+      "name": "deadline_utc",
+      "type": "datetime",
+      "description": "market end date Leakage: static."
+     },
+     {
+      "name": "resolved_utc",
+      "type": "datetime",
+      "description": "resolution / close time Leakage: post."
+     },
+     {
+      "name": "outcome",
+      "type": "string",
+      "description": "winning outcome label Leakage: post."
+     },
+     {
+      "name": "outcomes",
+      "type": "string",
+      "description": "outcome labels, ';'-joined Leakage: meta."
+     },
+     {
+      "name": "token_ids",
+      "type": "string",
+      "description": "outcome token ids, ';'-joined Leakage: meta."
+     },
+     {
+      "name": "neg_risk",
+      "type": "boolean",
+      "description": "Gamma negRisk Leakage: meta."
+     },
+     {
+      "name": "volume_gamma",
+      "type": "numeric",
+      "description": "Gamma volume Unit: USD. Leakage: post."
+     },
+     {
+      "name": "volume_hf_usdc",
+      "type": "numeric",
+      "description": "Polymarket-v1 USDC volume Unit: USD. Leakage: post."
+     },
+     {
+      "name": "in_hf",
+      "type": "boolean",
+      "description": "market has fills in Polymarket-v1 Leakage: meta."
+     },
+     {
+      "name": "ladder_rank",
+      "type": "integer",
+      "description": "deadline rank within the event (1 = earliest) Leakage: static."
+     },
+     {
+      "name": "t_news_utc",
+      "type": "datetime",
+      "description": "day-level news time (A6.6, A7) Leakage: label."
+     },
+     {
+      "name": "t_news_method",
+      "type": "string",
+      "description": "claim_min, ff_tier1, ff_tier3 Leakage: meta."
+     },
+     {
+      "name": "t_news_precision",
+      "type": "string",
+      "description": "precision of t_news_utc Allowed: day, month, quarter, year, range, timestamp. Leakage: meta."
+     },
+     {
+      "name": "t_news_precise_utc",
+      "type": "datetime",
+      "description": "exact news time (A10); equals t_news_utc where no exact time is sourced Leakage: label."
+     },
+     {
+      "name": "t_news_precise_precision",
+      "type": "string",
+      "description": "A10.1 Allowed: minute, quarter_hour, hour, window, day_fallback. Leakage: meta."
+     },
+     {
+      "name": "t_news_precise_source",
+      "type": "string",
+      "description": "URL of the event_times row; day_fallback; or rejected_outside_coarse_date (A18) Leakage: meta."
+     },
+     {
+      "name": "t_news_precise_verified",
+      "type": "string",
+      "description": "verified flag of the event_times row Leakage: meta."
+     },
+     {
+      "name": "title_withheld",
+      "type": "boolean",
+      "description": "A12.6 Leakage: meta."
+     },
+     {
+      "name": "is_placebo_market",
+      "type": "boolean",
+      "description": "always false here Leakage: meta."
+     },
+     {
+      "name": "ff_tier",
+      "type": "string",
+      "description": "ForesightFlow tier if listed Leakage: meta."
+     },
+     {
+      "name": "ff_tier2_tnews",
+      "type": "datetime",
+      "description": "ForesightFlow tier-2 proxy (stored, not used) Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/markets.parquet",
+   "description": "One row per (case, market). Ladders are full Gamma events (A6.5). Titles withheld where they name the alleged trader (A12.6).",
+   "schema": {
+    "fields": [
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market condition id, lower-case hex Leakage: meta."
+     },
+     {
+      "name": "question",
+      "type": "string",
+      "description": "market question; NULL when title_withheld Leakage: static."
+     },
+     {
+      "name": "slug",
+      "type": "string",
+      "description": "market slug; NULL when title_withheld Leakage: meta."
+     },
+     {
+      "name": "event_id",
+      "type": "string",
+      "description": "Gamma event id (or withheld-week-<date>) Leakage: meta."
+     },
+     {
+      "name": "event_slug",
+      "type": "string",
+      "description": "Gamma event slug; NULL when title_withheld Leakage: meta."
+     },
+     {
+      "name": "selected_as",
+      "type": "string",
+      "description": "how the market was selected Leakage: meta."
+     },
+     {
+      "name": "found_via",
+      "type": "string",
+      "description": "A6.5 method Leakage: meta."
+     },
+     {
+      "name": "reason",
+      "type": "string",
+      "description": "why the market belongs to the case Leakage: meta."
+     },
+     {
+      "name": "selection_level",
+      "type": "string",
+      "description": "event, market or ladder Allowed: event, market, ladder. Leakage: meta."
+     },
+     {
+      "name": "created_utc",
+      "type": "datetime",
+      "description": "market creation Leakage: static."
+     },
+     {
+      "name": "deadline_utc",
+      "type": "datetime",
+      "description": "market end date Leakage: static."
+     },
+     {
+      "name": "resolved_utc",
+      "type": "datetime",
+      "description": "resolution / close time Leakage: post."
+     },
+     {
+      "name": "outcome",
+      "type": "string",
+      "description": "winning outcome label Leakage: post."
+     },
+     {
+      "name": "outcomes",
+      "type": "string",
+      "description": "outcome labels, ';'-joined Leakage: meta."
+     },
+     {
+      "name": "token_ids",
+      "type": "string",
+      "description": "outcome token ids, ';'-joined Leakage: meta."
+     },
+     {
+      "name": "neg_risk",
+      "type": "boolean",
+      "description": "Gamma negRisk Leakage: meta."
+     },
+     {
+      "name": "volume_gamma",
+      "type": "numeric",
+      "description": "Gamma volume Unit: USD. Leakage: post."
+     },
+     {
+      "name": "volume_hf_usdc",
+      "type": "numeric",
+      "description": "Polymarket-v1 USDC volume Unit: USD. Leakage: post."
+     },
+     {
+      "name": "in_hf",
+      "type": "boolean",
+      "description": "market has fills in Polymarket-v1 Leakage: meta."
+     },
+     {
+      "name": "ladder_rank",
+      "type": "integer",
+      "description": "deadline rank within the event (1 = earliest) Leakage: static."
+     },
+     {
+      "name": "t_news_utc",
+      "type": "datetime",
+      "description": "day-level news time (A6.6, A7) Leakage: label."
+     },
+     {
+      "name": "t_news_method",
+      "type": "string",
+      "description": "claim_min, ff_tier1, ff_tier3 Leakage: meta."
+     },
+     {
+      "name": "t_news_precision",
+      "type": "string",
+      "description": "precision of t_news_utc Allowed: day, month, quarter, year, range, timestamp. Leakage: meta."
+     },
+     {
+      "name": "t_news_precise_utc",
+      "type": "datetime",
+      "description": "exact news time (A10); equals t_news_utc where no exact time is sourced Leakage: label."
+     },
+     {
+      "name": "t_news_precise_precision",
+      "type": "string",
+      "description": "A10.1 Allowed: minute, quarter_hour, hour, window, day_fallback. Leakage: meta."
+     },
+     {
+      "name": "t_news_precise_source",
+      "type": "string",
+      "description": "URL of the event_times row; day_fallback; or rejected_outside_coarse_date (A18) Leakage: meta."
+     },
+     {
+      "name": "t_news_precise_verified",
+      "type": "string",
+      "description": "verified flag of the event_times row Leakage: meta."
+     },
+     {
+      "name": "title_withheld",
+      "type": "boolean",
+      "description": "A12.6 Leakage: meta."
+     },
+     {
+      "name": "is_placebo_market",
+      "type": "boolean",
+      "description": "always false here Leakage: meta."
+     },
+     {
+      "name": "ff_tier",
+      "type": "string",
+      "description": "ForesightFlow tier if listed Leakage: meta."
+     },
+     {
+      "name": "ff_tier2_tnews",
+      "type": "datetime",
+      "description": "ForesightFlow tier-2 proxy (stored, not used) Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/placebo_markets.csv",
+   "description": "One row per placebo market (A14) with its matched case market; case-market rows that could not be matched appear with NULL placebo fields.",
+   "schema": {
+    "fields": [
+     {
+      "name": "placebo_id",
+      "type": "string",
+      "description": "PLnnnnn; NULL for unmatched case-market rows Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "matched case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "case_condition_id",
+      "type": "string",
+      "description": "matched case market (FK markets) Leakage: meta."
+     },
+     {
+      "name": "placebo_condition_id",
+      "type": "string",
+      "description": "placebo market condition id (unique) Leakage: meta."
+     },
+     {
+      "name": "placebo_category",
+      "type": "string",
+      "description": "A14 category Allowed: crypto_price, weather_reading. Leakage: meta."
+     },
+     {
+      "name": "placebo_slug",
+      "type": "string",
+      "description": "placebo market slug Leakage: meta."
+     },
+     {
+      "name": "placebo_token_ids",
+      "type": "string",
+      "description": "outcome token ids Leakage: meta."
+     },
+     {
+      "name": "placebo_outcomes",
+      "type": "string",
+      "description": "outcome labels Leakage: meta."
+     },
+     {
+      "name": "placebo_outcome",
+      "type": "string",
+      "description": "winning outcome Leakage: post."
+     },
+     {
+      "name": "placebo_opens_utc",
+      "type": "datetime",
+      "description": "opens_at Leakage: meta."
+     },
+     {
+      "name": "placebo_close_utc",
+      "type": "datetime",
+      "description": "close_at Leakage: meta."
+     },
+     {
+      "name": "placebo_resolved_utc",
+      "type": "datetime",
+      "description": "resolved_at (often NULL for weather) Leakage: post."
+     },
+     {
+      "name": "placebo_end_utc",
+      "type": "datetime",
+      "description": "resolved_at else close_at (A14.1) Leakage: meta."
+     },
+     {
+      "name": "placebo_volume",
+      "type": "numeric",
+      "description": "Polymarket-v1 USDC volume Unit: USD. Leakage: post."
+     },
+     {
+      "name": "case_volume",
+      "type": "numeric",
+      "description": "case-market volume used for matching Unit: USD. Leakage: post."
+     },
+     {
+      "name": "case_volume_basis",
+      "type": "string",
+      "description": "hf or gamma Allowed: hf, gamma. Leakage: meta."
+     },
+     {
+      "name": "volume_decile",
+      "type": "integer",
+      "description": "case market's volume decile (1-10) Leakage: post."
+     },
+     {
+      "name": "duration_band",
+      "type": "string",
+      "description": "case market's duration band Leakage: meta."
+     },
+     {
+      "name": "resolution_month",
+      "type": "string",
+      "description": "case market's end month YYYY-MM Leakage: meta."
+     },
+     {
+      "name": "placebo_duration_band",
+      "type": "string",
+      "description": "placebo duration band Leakage: meta."
+     },
+     {
+      "name": "placebo_resolution_month",
+      "type": "string",
+      "description": "placebo end month Leakage: meta."
+     },
+     {
+      "name": "relaxation",
+      "type": "string",
+      "description": "A14 relaxation step or reason unmatched Leakage: meta."
+     },
+     {
+      "name": "n_eligible",
+      "type": "integer",
+      "description": "placebos eligible at that step Leakage: meta."
+     },
+     {
+      "name": "case_tnews_fraction_day",
+      "type": "numeric",
+      "description": "position of t_news in the case market's life (0-1) Leakage: meta."
+     },
+     {
+      "name": "case_tnews_fraction_precise",
+      "type": "numeric",
+      "description": "same for t_news_precise Leakage: meta."
+     },
+     {
+      "name": "t_ref_day_utc",
+      "type": "datetime",
+      "description": "placebo cut time, day version (A14) Leakage: label."
+     },
+     {
+      "name": "t_ref_precise_utc",
+      "type": "datetime",
+      "description": "placebo cut time, precise version Leakage: label."
+     },
+     {
+      "name": "benchmark_split",
+      "type": "string",
+      "description": "split of the matched case (A15) Allowed: train, test. Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/placebo_markets.parquet",
+   "description": "One row per placebo market (A14) with its matched case market; case-market rows that could not be matched appear with NULL placebo fields.",
+   "schema": {
+    "fields": [
+     {
+      "name": "placebo_id",
+      "type": "string",
+      "description": "PLnnnnn; NULL for unmatched case-market rows Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "matched case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "case_condition_id",
+      "type": "string",
+      "description": "matched case market (FK markets) Leakage: meta."
+     },
+     {
+      "name": "placebo_condition_id",
+      "type": "string",
+      "description": "placebo market condition id (unique) Leakage: meta."
+     },
+     {
+      "name": "placebo_category",
+      "type": "string",
+      "description": "A14 category Allowed: crypto_price, weather_reading. Leakage: meta."
+     },
+     {
+      "name": "placebo_slug",
+      "type": "string",
+      "description": "placebo market slug Leakage: meta."
+     },
+     {
+      "name": "placebo_token_ids",
+      "type": "string",
+      "description": "outcome token ids Leakage: meta."
+     },
+     {
+      "name": "placebo_outcomes",
+      "type": "string",
+      "description": "outcome labels Leakage: meta."
+     },
+     {
+      "name": "placebo_outcome",
+      "type": "string",
+      "description": "winning outcome Leakage: post."
+     },
+     {
+      "name": "placebo_opens_utc",
+      "type": "datetime",
+      "description": "opens_at Leakage: meta."
+     },
+     {
+      "name": "placebo_close_utc",
+      "type": "datetime",
+      "description": "close_at Leakage: meta."
+     },
+     {
+      "name": "placebo_resolved_utc",
+      "type": "datetime",
+      "description": "resolved_at (often NULL for weather) Leakage: post."
+     },
+     {
+      "name": "placebo_end_utc",
+      "type": "datetime",
+      "description": "resolved_at else close_at (A14.1) Leakage: meta."
+     },
+     {
+      "name": "placebo_volume",
+      "type": "numeric",
+      "description": "Polymarket-v1 USDC volume Unit: USD. Leakage: post."
+     },
+     {
+      "name": "case_volume",
+      "type": "numeric",
+      "description": "case-market volume used for matching Unit: USD. Leakage: post."
+     },
+     {
+      "name": "case_volume_basis",
+      "type": "string",
+      "description": "hf or gamma Allowed: hf, gamma. Leakage: meta."
+     },
+     {
+      "name": "volume_decile",
+      "type": "integer",
+      "description": "case market's volume decile (1-10) Leakage: post."
+     },
+     {
+      "name": "duration_band",
+      "type": "string",
+      "description": "case market's duration band Leakage: meta."
+     },
+     {
+      "name": "resolution_month",
+      "type": "string",
+      "description": "case market's end month YYYY-MM Leakage: meta."
+     },
+     {
+      "name": "placebo_duration_band",
+      "type": "string",
+      "description": "placebo duration band Leakage: meta."
+     },
+     {
+      "name": "placebo_resolution_month",
+      "type": "string",
+      "description": "placebo end month Leakage: meta."
+     },
+     {
+      "name": "relaxation",
+      "type": "string",
+      "description": "A14 relaxation step or reason unmatched Leakage: meta."
+     },
+     {
+      "name": "n_eligible",
+      "type": "integer",
+      "description": "placebos eligible at that step Leakage: meta."
+     },
+     {
+      "name": "case_tnews_fraction_day",
+      "type": "numeric",
+      "description": "position of t_news in the case market's life (0-1) Leakage: meta."
+     },
+     {
+      "name": "case_tnews_fraction_precise",
+      "type": "numeric",
+      "description": "same for t_news_precise Leakage: meta."
+     },
+     {
+      "name": "t_ref_day_utc",
+      "type": "datetime",
+      "description": "placebo cut time, day version (A14) Leakage: label."
+     },
+     {
+      "name": "t_ref_precise_utc",
+      "type": "datetime",
+      "description": "placebo cut time, precise version Leakage: label."
+     },
+     {
+      "name": "benchmark_split",
+      "type": "string",
+      "description": "split of the matched case (A15) Allowed: train, test. Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/positions.parquet",
+   "description": "All-buyer positions before the cut (C2): the full population a detector must search, case and placebo markets.",
+   "schema": {
+    "fields": [
+     {
+      "name": "market_set",
+      "type": "string",
+      "description": "case or placebo Allowed: case, placebo. Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case (placebo: matched case) Leakage: meta."
+     },
+     {
+      "name": "condition_id",
+      "type": "string",
+      "description": "market Leakage: meta."
+     },
+     {
+      "name": "asset_id",
+      "type": "string",
+      "description": "outcome token Leakage: meta."
+     },
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "buyer Leakage: meta."
+     },
+     {
+      "name": "t_news_version",
+      "type": "string",
+      "description": "A10.2 Allowed: day, precise. Leakage: meta."
+     },
+     {
+      "name": "outcome_label",
+      "type": "string",
+      "description": "token label Leakage: meta."
+     },
+     {
+      "name": "t_cut_ts",
+      "type": "integer",
+      "description": "cut time: t_news / t_news_precise (case) or t_ref (placebo) Unit: Unix s. Leakage: label."
+     },
+     {
+      "name": "is_shortest_sufficient",
+      "type": "boolean",
+      "description": "this market is its event's shortest deadline that resolved Yes Leakage: post."
+     },
+     {
+      "name": "n_buy_fills_pre",
+      "type": "integer",
+      "description": "BUY legs before the cut Leakage: pre."
+     },
+     {
+      "name": "buy_usdc_pre",
+      "type": "numeric",
+      "description": "BUY USDC before the cut Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "buy_shares_pre",
+      "type": "numeric",
+      "description": "BUY shares before the cut Leakage: pre."
+     },
+     {
+      "name": "first_buy_ts",
+      "type": "integer",
+      "description": "first pre-cut BUY Unit: Unix s. Leakage: pre."
+     },
+     {
+      "name": "last_buy_ts",
+      "type": "integer",
+      "description": "last pre-cut BUY Unit: Unix s. Leakage: pre."
+     },
+     {
+      "name": "first_buy_price",
+      "type": "numeric",
+      "description": "price of the first pre-cut BUY Leakage: pre."
+     },
+     {
+      "name": "max_buy_price",
+      "type": "numeric",
+      "description": "highest pre-cut BUY price Leakage: pre."
+     },
+     {
+      "name": "median_buy_fill_usdc",
+      "type": "numeric",
+      "description": "median pre-cut BUY leg Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "sell_usdc_pre",
+      "type": "numeric",
+      "description": "SELL USDC before the cut Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "sell_shares_pre",
+      "type": "numeric",
+      "description": "SELL shares before the cut Leakage: pre."
+     },
+     {
+      "name": "taker_share_pre",
+      "type": "numeric",
+      "description": "share of pre-cut BUY legs as taker (HF only) Leakage: pre."
+     },
+     {
+      "name": "source_pre",
+      "type": "string",
+      "description": "sources of pre-cut legs Leakage: pre."
+     },
+     {
+      "name": "vwap_pre",
+      "type": "numeric",
+      "description": "pre-cut BUY VWAP Leakage: pre."
+     },
+     {
+      "name": "is_main_side",
+      "type": "boolean",
+      "description": "token with the wallet's largest pre-cut BUY in this market Leakage: pre."
+     },
+     {
+      "name": "account_age_days_at_first_buy",
+      "type": "numeric",
+      "description": "days from first Polymarket-v1 fill to first pre-cut BUY (NULL if no v1 history) Unit: days. Leakage: pre."
+     },
+     {
+      "name": "first_fill_in_market_ts",
+      "type": "integer",
+      "description": "first pre-cut fill in this market (any side) Unit: Unix s. Leakage: pre."
+     },
+     {
+      "name": "market_usdc_pre",
+      "type": "numeric",
+      "description": "all pre-cut USDC in this market (both sides, both tokens) Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "market_buy_usdc_pre",
+      "type": "numeric",
+      "description": "pre-cut BUY USDC in this market, both tokens (F4) Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "f5_conviction",
+      "type": "numeric",
+      "description": "F5 |net YES USDC| / gross USDC, pre-cut Leakage: pre."
+     },
+     {
+      "name": "vol_to_day",
+      "type": "numeric",
+      "description": "Polymarket-v1 volume, all markets, up to the end of the cut's UTC day (A16 F2 denominator; includes the rest of that day as frozen v1 does) Unit: USDC. Leakage: pre."
+     },
+     {
+      "name": "lifetime_markets_v1",
+      "type": "integer",
+      "description": "lifetime distinct Polymarket-v1 markets (F2 market branch, as frozen v1; A16.1: ex-post count that can only understate the flag) Leakage: pre."
+     },
+     {
+      "name": "f1_days_account_to_first_fill",
+      "type": "numeric",
+      "description": "F1 freshness (A16 substitution) Unit: days. Leakage: pre."
+     },
+     {
+      "name": "f2_share",
+      "type": "numeric",
+      "description": "F2 focus share Leakage: pre."
+     },
+     {
+      "name": "f3_main_vwap",
+      "type": "numeric",
+      "description": "F3 main-side VWAP Leakage: pre."
+     },
+     {
+      "name": "f6_hours_median_buy_to_tnews",
+      "type": "numeric",
+      "description": "F6 hours from USD-weighted median main-side buy to the cut Unit: hours. Leakage: pre."
+     },
+     {
+      "name": "flag_f1",
+      "type": "boolean",
+      "description": "F1 <= 7 days Leakage: pre."
+     },
+     {
+      "name": "flag_f2",
+      "type": "boolean",
+      "description": "F2 share >= 0.8 or markets <= 2 Leakage: pre."
+     },
+     {
+      "name": "flag_f3",
+      "type": "boolean",
+      "description": "F3 <= 0.35 Leakage: pre."
+     },
+     {
+      "name": "flag_f4",
+      "type": "boolean",
+      "description": "F4 >= $2,500 Leakage: pre."
+     },
+     {
+      "name": "flag_f5",
+      "type": "boolean",
+      "description": "F5 >= 0.8 Leakage: pre."
+     },
+     {
+      "name": "flag_f6",
+      "type": "boolean",
+      "description": "F6 <= 72 h Leakage: pre."
+     },
+     {
+      "name": "gate1_score",
+      "type": "integer",
+      "description": "number of F1-F6 flags (NULL outside Polymarket-v1) Leakage: pre."
+     },
+     {
+      "name": "gate1",
+      "type": "boolean",
+      "description": "gate1_score >= 4 (A16) Leakage: label."
+     },
+     {
+      "name": "gate2a",
+      "type": "boolean",
+      "description": "Signal A: a later pre-cut BUY at >= 1.5x the first price Leakage: pre."
+     },
+     {
+      "name": "gate2b",
+      "type": "boolean",
+      "description": "Signal B: largest pre-cut BUY in the event is on the shortest Yes deadline, Yes token (uses resolution: label only) Leakage: post."
+     },
+     {
+      "name": "is_documented",
+      "type": "boolean",
+      "description": "wallet is documented for this case Leakage: label."
+     },
+     {
+      "name": "doc_grade",
+      "type": "string",
+      "description": "wallet's doc_grade Allowed: E1, E2, E3, E4, E5, E6. Leakage: label."
+     },
+     {
+      "name": "coordinated_rule_fired",
+      "type": "boolean",
+      "description": "A13 rule fired for this wallet, token, market, case and version. Rule output; about 1/3 expected by chance; may include copy-traders; not an allegation (A17) Leakage: label."
+     },
+     {
+      "name": "triggering_suspect",
+      "type": "string",
+      "description": "documented wallet of the earliest A13 trigger (NULL if the rule did not fire) Leakage: label."
+     },
+     {
+      "name": "placebo_rate",
+      "type": "numeric",
+      "description": "A13 placebo-to-real ratio of this version (share of hits expected by chance); NULL if the rule did not fire Leakage: label."
+     },
+     {
+      "name": "is_control",
+      "type": "boolean",
+      "description": "selected as a matched control in this market, version Leakage: label."
+     },
+     {
+      "name": "is_placebo_market",
+      "type": "boolean",
+      "description": "market_set = placebo Leakage: label."
+     },
+     {
+      "name": "buy_usdc_post",
+      "type": "numeric",
+      "description": "BUY USDC at or after the cut Unit: USDC. Leakage: post."
+     },
+     {
+      "name": "buy_shares_post",
+      "type": "numeric",
+      "description": "BUY shares at or after the cut Leakage: post."
+     },
+     {
+      "name": "sell_usdc_post",
+      "type": "numeric",
+      "description": "SELL USDC at or after the cut Unit: USDC. Leakage: post."
+     },
+     {
+      "name": "sell_shares_post",
+      "type": "numeric",
+      "description": "SELL shares at or after the cut Leakage: post."
+     },
+     {
+      "name": "won_post",
+      "type": "boolean",
+      "description": "token won Leakage: post."
+     },
+     {
+      "name": "pnl_post",
+      "type": "numeric",
+      "description": "sells - buys + winning shares held (no redemptions, fees) Unit: USDC. Leakage: post."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/wallets.csv",
+   "description": "One row per (wallet, case) label. Labels are allegations by the named source, not findings.",
+   "schema": {
+    "fields": [
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "Polymarket proxy (or owner key) address, lower-case 0x + 40 hex Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "handle",
+      "type": "string",
+      "description": "public username or label as the source gives it Leakage: meta."
+     },
+     {
+      "name": "role",
+      "type": "string",
+      "description": "trader, owner_key, ... Leakage: meta."
+     },
+     {
+      "name": "label_tier",
+      "type": "string",
+      "description": "L2 official-case wallet, L3 analyst full address / resolved handle, L4 cluster member, L4_coordinated (A13 rule), A ambiguous, NC negative control, M manipulation Leakage: meta."
+     },
+     {
+      "name": "polarity",
+      "type": "string",
+      "description": "label polarity Allowed: suspected, ambiguous, negative_control, manipulation, context, candidate. Leakage: label."
+     },
+     {
+      "name": "trade_confirmed",
+      "type": "boolean",
+      "description": "A12.5: >= 1 fill in a market of its case (from fills) Leakage: label."
+     },
+     {
+      "name": "label_family",
+      "type": "string",
+      "description": "A19: manipulation for manipulation rows, else the family of the case's claims Allowed: informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested. Leakage: label."
+     },
+     {
+      "name": "is_documented",
+      "type": "boolean",
+      "description": "polarity = suspected and trade_confirmed and label_family = informed_trading (default positive label, A19) Leakage: label."
+     },
+     {
+      "name": "doc_grade",
+      "type": "string",
+      "description": "strongest grade among the case's claims about accounts, addresses, handles or clusters (not aggregates or markets) Allowed: E1, E2, E3, E4, E5, E6. Leakage: label."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "file or method the row came from Leakage: meta."
+     },
+     {
+      "name": "source_url",
+      "type": "string",
+      "description": "source URL Leakage: meta."
+     },
+     {
+      "name": "verification",
+      "type": "string",
+      "description": "how the address was obtained Leakage: meta."
+     },
+     {
+      "name": "first_case_fill_utc",
+      "type": "datetime",
+      "description": "first fill in a case market Leakage: post."
+     },
+     {
+      "name": "case_buy_usdc",
+      "type": "numeric",
+      "description": "BUY USDC in case markets, all time Unit: USD. Leakage: post."
+     },
+     {
+      "name": "case_redeem_usdc",
+      "type": "numeric",
+      "description": "redemptions in case markets (Data API) Unit: USD. Leakage: post."
+     },
+     {
+      "name": "notes",
+      "type": "string",
+      "description": "free notes Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/wallets.parquet",
+   "description": "One row per (wallet, case) label. Labels are allegations by the named source, not findings.",
+   "schema": {
+    "fields": [
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "Polymarket proxy (or owner key) address, lower-case 0x + 40 hex Leakage: meta."
+     },
+     {
+      "name": "case_id",
+      "type": "string",
+      "description": "case (FK cases) Leakage: meta."
+     },
+     {
+      "name": "handle",
+      "type": "string",
+      "description": "public username or label as the source gives it Leakage: meta."
+     },
+     {
+      "name": "role",
+      "type": "string",
+      "description": "trader, owner_key, ... Leakage: meta."
+     },
+     {
+      "name": "label_tier",
+      "type": "string",
+      "description": "L2 official-case wallet, L3 analyst full address / resolved handle, L4 cluster member, L4_coordinated (A13 rule), A ambiguous, NC negative control, M manipulation Leakage: meta."
+     },
+     {
+      "name": "polarity",
+      "type": "string",
+      "description": "label polarity Allowed: suspected, ambiguous, negative_control, manipulation, context, candidate. Leakage: label."
+     },
+     {
+      "name": "trade_confirmed",
+      "type": "boolean",
+      "description": "A12.5: >= 1 fill in a market of its case (from fills) Leakage: label."
+     },
+     {
+      "name": "label_family",
+      "type": "string",
+      "description": "A19: manipulation for manipulation rows, else the family of the case's claims Allowed: informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested. Leakage: label."
+     },
+     {
+      "name": "is_documented",
+      "type": "boolean",
+      "description": "polarity = suspected and trade_confirmed and label_family = informed_trading (default positive label, A19) Leakage: label."
+     },
+     {
+      "name": "doc_grade",
+      "type": "string",
+      "description": "strongest grade among the case's claims about accounts, addresses, handles or clusters (not aggregates or markets) Allowed: E1, E2, E3, E4, E5, E6. Leakage: label."
+     },
+     {
+      "name": "source",
+      "type": "string",
+      "description": "file or method the row came from Leakage: meta."
+     },
+     {
+      "name": "source_url",
+      "type": "string",
+      "description": "source URL Leakage: meta."
+     },
+     {
+      "name": "verification",
+      "type": "string",
+      "description": "how the address was obtained Leakage: meta."
+     },
+     {
+      "name": "first_case_fill_utc",
+      "type": "datetime",
+      "description": "first fill in a case market Leakage: post."
+     },
+     {
+      "name": "case_buy_usdc",
+      "type": "numeric",
+      "description": "BUY USDC in case markets, all time Unit: USD. Leakage: post."
+     },
+     {
+      "name": "case_redeem_usdc",
+      "type": "numeric",
+      "description": "redemptions in case markets (Data API) Unit: USD. Leakage: post."
+     },
+     {
+      "name": "notes",
+      "type": "string",
+      "description": "free notes Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "data/weak_labels.parquet",
+   "description": "Per wallet in Polymarket-v1: ACDC reconstruction and Inca rule (A6.9, E6), and Gate 1/2 counts (A16). Rule outputs, never merged with claims.",
+   "schema": {
+    "fields": [
+     {
+      "name": "wallet",
+      "type": "string",
+      "description": "address Leakage: meta."
+     },
+     {
+      "name": "n_markets",
+      "type": "integer",
+      "description": "distinct markets (Polymarket-v1) Leakage: meta."
+     },
+     {
+      "name": "n_fills",
+      "type": "integer",
+      "description": "legs Leakage: meta."
+     },
+     {
+      "name": "buy_usdc",
+      "type": "numeric",
+      "description": "BUY USDC Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "sell_usdc",
+      "type": "numeric",
+      "description": "SELL USDC Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "first_fill_utc",
+      "type": "datetime",
+      "description": "first Polymarket-v1 fill Leakage: meta."
+     },
+     {
+      "name": "last_fill_utc",
+      "type": "datetime",
+      "description": "last Polymarket-v1 fill Leakage: meta."
+     },
+     {
+      "name": "n_longshots",
+      "type": "integer",
+      "description": "ACDC longshot bets (reconstruction) Leakage: meta."
+     },
+     {
+      "name": "longshot_win_rate",
+      "type": "numeric",
+      "description": "share of longshots won Leakage: meta."
+     },
+     {
+      "name": "n_longshot_types",
+      "type": "integer",
+      "description": "market types of longshots Leakage: meta."
+     },
+     {
+      "name": "military_longshot_share",
+      "type": "numeric",
+      "description": "share on military slugs Leakage: meta."
+     },
+     {
+      "name": "acdc_class",
+      "type": "string",
+      "description": "reconstruction only: Orca or longshot_wallet; NOT a label (misses the A6.9 5% bar) Allowed: Orca, longshot_wallet. Leakage: label."
+     },
+     {
+      "name": "acdc_military_orca",
+      "type": "boolean",
+      "description": "reconstruction only Leakage: label."
+     },
+     {
+      "name": "realised_pnl",
+      "type": "numeric",
+      "description": "A6.9 realised PnL (no splits, merges, redemptions, fees) Unit: USDC. Leakage: meta."
+     },
+     {
+      "name": "inca_flag",
+      "type": "boolean",
+      "description": "published rule only; broader than Inca's list (9,285 vs 39) (A12.4) Leakage: label."
+     },
+     {
+      "name": "gate1_n",
+      "type": "integer",
+      "description": "positions with gate1 (precise version) Leakage: label."
+     },
+     {
+      "name": "gate2a_n",
+      "type": "integer",
+      "description": "positions with gate2a (precise) Leakage: label."
+     },
+     {
+      "name": "gate2b_n",
+      "type": "integer",
+      "description": "positions with gate2b (precise) Leakage: label."
+     },
+     {
+      "name": "gate1_n_day",
+      "type": "integer",
+      "description": "gate1 (day version) Leakage: label."
+     },
+     {
+      "name": "gate2a_n_day",
+      "type": "integer",
+      "description": "gate2a (day) Leakage: label."
+     },
+     {
+      "name": "gate2b_n_day",
+      "type": "integer",
+      "description": "gate2b (day) Leakage: label."
+     },
+     {
+      "name": "coordinated_rule_fired",
+      "type": "boolean",
+      "description": "A13 rule fired for this wallet in any case, precise version (rule output; about 1/3 expected by chance; may include copy-traders; not an allegation) Leakage: label."
+     },
+     {
+      "name": "coordinated_rule_fired_day",
+      "type": "boolean",
+      "description": "same, day version Leakage: label."
+     },
+     {
+      "name": "triggering_suspect",
+      "type": "string",
+      "description": "documented wallet of the earliest trigger (precise version first) Leakage: label."
+     },
+     {
+      "name": "placebo_rate",
+      "type": "numeric",
+      "description": "placebo-to-real ratio of that version Leakage: label."
+     },
+     {
+      "name": "gate_scope",
+      "type": "string",
+      "description": "case_or_placebo_markets or not_in_case_or_placebo_markets Leakage: meta."
+     },
+     {
+      "name": "evidence_grade",
+      "type": "string",
+      "description": "E6 Allowed: E6. Leakage: meta."
+     },
+     {
+      "name": "data_scope",
+      "type": "string",
+      "description": "data window Leakage: meta."
+     }
+    ]
+   }
+  },
+  {
+   "path": "scripts/rebuild_data_api_fills.py",
+   "description": "rebuild_data_api_fills.py"
+  },
+  {
+   "path": "benchmarks/README.md",
+   "description": "README.md"
+  },
+  {
+   "path": "benchmarks/splits.csv",
+   "description": "Frozen case-grouped, time-ordered split (PROTOCOL A15)"
+  },
+  {
+   "path": "benchmarks/baselines.json",
+   "description": "baselines.json"
+  },
+  {
+   "path": "benchmarks/pmitc_bench.py",
+   "description": "pmitc_bench.py"
+  },
+  {
+   "path": "notebooks/01_explore.ipynb",
+   "description": "01_explore.ipynb"
+  },
+  {
+   "path": "notebooks/02_baselines.ipynb",
+   "description": "02_baselines.ipynb"
+  },
+  {
+   "path": "docs/README.md",
+   "description": "README.md"
+  },
+  {
+   "path": "docs/DATASHEET.md",
+   "description": "DATASHEET.md"
+  },
+  {
+   "path": "docs/CODEBOOK.md",
+   "description": "CODEBOOK.md"
+  },
+  {
+   "path": "docs/PROTOCOL.md",
+   "description": "PROTOCOL.md"
+  },
+  {
+   "path": "docs/CHANGELOG.md",
+   "description": "CHANGELOG.md"
+  },
+  {
+   "path": "docs/LICENSE.md",
+   "description": "LICENSE.md"
+  },
+  {
+   "path": "docs/CITATION.cff",
+   "description": "CITATION.cff"
+  },
+  {
+   "path": "docs/LICENSES_UPSTREAM.md",
+   "description": "LICENSES_UPSTREAM.md"
+  }
+ ],
+ "isPrivate": true
+}

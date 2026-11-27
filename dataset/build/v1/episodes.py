@@ -38,10 +38,10 @@ labelled = set(W["address"])
 exp_p = os.path.join(D, "data", "wallet_labels_expanded.csv")
 expanded = set(pd.read_csv(exp_p, dtype=str)["address"]) if os.path.exists(exp_p) else set()
 weak_flag = {r[0] for r in c.sql(f"SELECT address FROM '{OUT0}/weak_labels.parquet' WHERE acdc_class = 'Orca' OR inca_flag").fetchall()}
-cands = set(W.loc[W["polarity"] == "candidate", "address"])  # A13
+cands = set(pd.read_csv(os.path.join(D, "data", "coordinated_candidates.csv"), dtype=str).candidate_wallet)  # A13 / A17: rule-fired wallets
 excluded = labelled | expanded | weak_flag | cands
 c.execute("CREATE TABLE excl(a VARCHAR)"); c.executemany("INSERT INTO excl VALUES (?)", [(a,) for a in excluded])
-sus = W[(W["polarity"] == "suspected") & (W["trade_confirmed"].astype(str).str.lower() == "true")][["address", "case_id"]].drop_duplicates()
+sus = W[(W["polarity"] == "suspected") & (W["trade_confirmed"].astype(str).str.lower() == "true") & (W["label_family"] == "informed_trading")][["address", "case_id"]].drop_duplicates()
 cand = pd.read_csv(exp_p, dtype=str)[["address"]].assign(case_id="") if expanded else pd.DataFrame(columns=["address", "case_id"])
 
 # --- per (case, market, token, wallet): pre-news BUY aggregates for every wallet in every case market

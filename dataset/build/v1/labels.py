@@ -1,8 +1,9 @@
 """wallet_labels.csv updates for v1.0.
   confirm     PROTOCOL A12.5: trade_confirmed = the address has >= 1 fill (any side, any source) in a market attached to its case;
               also refreshes case_market_traded, first_case_fill_utc and case_buy_usdc from out/v1/fills/fills_case.parquet.
-  candidates  PROTOCOL A13: appends one L4_coordinated / candidate row per (wallet, case) from data/coordinated_candidates.csv.
-Usage: python3 build/v1/labels.py confirm|candidates
+              Also sets label_family (A19): manipulation for polarity manipulation, else the family of the case's claims.
+  drop_rule_rows  PROTOCOL A17: removes L4_coordinated rule rows (the A13 output lives in data/coordinated_candidates.csv).
+Usage: python3 build/v1/labels.py confirm|drop_rule_rows
 """
 import os, sys
 import duckdb, pandas as pd
@@ -25,9 +26,14 @@ if sys.argv[1] == "confirm":
     W["first_case_fill_utc"] = pd.to_datetime(W.first_ts, unit="s", utc=True).dt.strftime("%Y-%m-%dT%H:%M:%SZ").fillna("")
     W["case_buy_usdc"] = W.buy_usdc.round(2).astype(str).replace("nan", "")
     W = W.drop(columns=["n_legs", "first_ts", "buy_usdc"])
+    cl = pd.read_csv(os.path.join(D, "data", "claims.csv"), dtype=str, keep_default_na=False)
+    fam = cl.groupby("case_id").family.agg(lambda s: ";".join(sorted(set(s))))
+    W["label_family"] = [("manipulation" if p_ == "manipulation" else fam.get(c_, "")) for p_, c_ in zip(W.polarity, W.case_id)]
     print(W.groupby(["polarity", "trade_confirmed"]).size())
+elif sys.argv[1] == "drop_rule_rows":
+    n0 = len(W); W = W[W.label_tier != "L4_coordinated"]; print("rule rows removed", n0 - len(W))
 else:
-    W = W[W.label_tier != "L4_coordinated"]
+    raise SystemExit("the 'candidates' mode was retired by PROTOCOL A17")
     C = pd.read_csv(os.path.join(D, "data", "coordinated_candidates.csv"), dtype=str, keep_default_na=False)
     C = C.sort_values(["t_news_version", "trigger_utc"], ascending=[False, True])  # 'precise' first
     rows = []

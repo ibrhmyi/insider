@@ -30,8 +30,8 @@ One row per case (underlying event). Derived from claims (build/build_cases.py) 
 | `n_sources` | int64 |  |  |  | meta | distinct source URLs |
 | `n_markets` | int64 |  |  |  | meta | case markets in markets |
 | `n_wallets_suspected` | int64 |  |  |  | meta | suspected wallets (any trade confirmation) |
-| `n_wallets_documented` | int64 |  |  |  | meta | suspected and trade_confirmed wallets (is_documented) |
-| `n_wallets_candidate` | int64 |  |  |  | meta | A13 coordinated-buyer candidates |
+| `n_documented_by_case` | int64 |  |  |  | label | documented wallets in this case (is_documented: suspected, trade_confirmed, informed_trading). Two cases hold 74 of 119 (A19) |
+| `n_wallets_coordinated_rule` | int64 |  |  |  | label | distinct wallets for which the A13 rule fired in this case (rule output, not an allegation; A17) |
 | `max_amount_claimed_usd` | float64 | USD |  |  | meta | largest amount any claim states |
 | `amounts_disagree` | bool |  |  |  | meta | claims state different amounts |
 | `benchmark_split` | string |  | train, test |  | meta | PROTOCOL A15 split |
@@ -79,8 +79,8 @@ One row per (wallet, case) label. Labels are allegations by the named source, no
 | `label_tier` | string |  |  |  | meta | L2 official-case wallet, L3 analyst full address / resolved handle, L4 cluster member, L4_coordinated (A13 rule), A ambiguous, NC negative control, M manipulation |
 | `polarity` | string |  | suspected, ambiguous, negative_control, manipulation, context, candidate |  | label | label polarity |
 | `trade_confirmed` | bool |  |  |  | label | A12.5: >= 1 fill in a market of its case (from fills) |
-| `is_documented` | bool |  |  |  | label | polarity = suspected and trade_confirmed (default positive label) |
-| `is_candidate_coordinated` | bool |  |  |  | label | A13 coordinated-buyer candidate (never documented) |
+| `label_family` | string |  | informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested |  | label | A19: manipulation for manipulation rows, else the family of the case's claims |
+| `is_documented` | bool |  |  |  | label | polarity = suspected and trade_confirmed and label_family = informed_trading (default positive label, A19) |
 | `doc_grade` | string |  | E1, E2, E3, E4, E5, E6 |  | label | strongest grade among the case's claims about accounts, addresses, handles or clusters (not aggregates or markets) |
 | `source` | string |  |  |  | meta | file or method the row came from |
 | `source_url` | string |  |  |  | meta | source URL |
@@ -122,7 +122,7 @@ One row per (case, market). Ladders are full Gamma events (A6.5). Titles withhel
 | `t_news_precision` | string |  | day, month, quarter, year, range, timestamp |  | meta | precision of t_news_utc |
 | `t_news_precise_utc` | timestamp |  |  |  | label | exact news time (A10); equals t_news_utc where no exact time is sourced |
 | `t_news_precise_precision` | string |  | minute, quarter_hour, hour, window, day_fallback |  | meta | A10.1 |
-| `t_news_precise_source` | string |  |  |  | meta | URL of the event_times row, or day_fallback |
+| `t_news_precise_source` | string |  |  |  | meta | URL of the event_times row; day_fallback; or rejected_outside_coarse_date (A18) |
 | `t_news_precise_verified` | string |  |  |  | meta | verified flag of the event_times row |
 | `title_withheld` | bool |  |  |  | meta | A12.6 |
 | `is_placebo_market` | bool |  |  |  | meta | always false here |
@@ -245,7 +245,9 @@ All-buyer positions before the cut (C2): the full population a detector must sea
 | `gate2b` | bool |  |  |  | post | Signal B: largest pre-cut BUY in the event is on the shortest Yes deadline, Yes token (uses resolution: label only) |
 | `is_documented` | bool |  |  |  | label | wallet is documented for this case |
 | `doc_grade` | string |  | E1, E2, E3, E4, E5, E6 |  | label | wallet's doc_grade |
-| `is_candidate_coordinated` | bool |  |  |  | label | A13 candidate for this case |
+| `coordinated_rule_fired` | bool |  |  |  | label | A13 rule fired for this wallet, token, market, case and version. Rule output; about 1/3 expected by chance; may include copy-traders; not an allegation (A17) |
+| `triggering_suspect` | string |  |  |  | label | documented wallet of the earliest A13 trigger (NULL if the rule did not fire) |
+| `placebo_rate` | float64 |  |  |  | label | A13 placebo-to-real ratio of this version (share of hits expected by chance); NULL if the rule did not fire |
 | `is_control` | bool |  |  |  | label | selected as a matched control in this market, version |
 | `is_placebo_market` | bool |  |  |  | label | market_set = placebo |
 | `buy_usdc_post` | float64 | USDC |  |  | post | BUY USDC at or after the cut |
@@ -352,6 +354,10 @@ Per wallet in Polymarket-v1: ACDC reconstruction and Inca rule (A6.9, E6), and G
 | `gate1_n_day` | int64 |  |  |  | label | gate1 (day version) |
 | `gate2a_n_day` | int64 |  |  |  | label | gate2a (day) |
 | `gate2b_n_day` | int64 |  |  |  | label | gate2b (day) |
+| `coordinated_rule_fired` | bool |  |  |  | label | A13 rule fired for this wallet in any case, precise version (rule output; about 1/3 expected by chance; may include copy-traders; not an allegation) |
+| `coordinated_rule_fired_day` | bool |  |  |  | label | same, day version |
+| `triggering_suspect` | string |  |  |  | label | documented wallet of the earliest trigger (precise version first) |
+| `placebo_rate` | float64 |  |  |  | label | placebo-to-real ratio of that version |
 | `gate_scope` | string |  |  |  | meta | case_or_placebo_markets or not_in_case_or_placebo_markets |
 | `evidence_grade` | string |  | E6 |  | meta | E6 |
 | `data_scope` | string |  |  |  | meta | data window |

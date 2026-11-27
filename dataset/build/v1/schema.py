@@ -24,8 +24,8 @@ TABLES["cases"] = dict(desc="One row per case (underlying event). Derived from c
     col("first_claim_date_earliest", DT, "earliest possible day of the first claim (used for the A15 time split)"),
     col("first_claim_date_precision", S, "precision of first_claim_date", allowed="day;month;quarter;year;range"),
     col("n_claims", I, "number of claims"), col("n_sources", I, "distinct source URLs"), col("n_markets", I, "case markets in markets"),
-    col("n_wallets_suspected", I, "suspected wallets (any trade confirmation)"), col("n_wallets_documented", I, "suspected and trade_confirmed wallets (is_documented)"),
-    col("n_wallets_candidate", I, "A13 coordinated-buyer candidates"), col("max_amount_claimed_usd", FL, "largest amount any claim states", unit="USD"),
+    col("n_wallets_suspected", I, "suspected wallets (any trade confirmation)"), col("n_documented_by_case", I, "documented wallets in this case (is_documented: suspected, trade_confirmed, informed_trading). Two cases hold 74 of 119 (A19)", leak="label"),
+    col("n_wallets_coordinated_rule", I, "distinct wallets for which the A13 rule fired in this case (rule output, not an allegation; A17)", leak="label"), col("max_amount_claimed_usd", FL, "largest amount any claim states", unit="USD"),
     col("amounts_disagree", B, "claims state different amounts"), col("benchmark_split", S, "PROTOCOL A15 split", allowed="train;test"),
     col("status_note", S, "free note")])
 TABLES["claims"] = dict(desc="One row per claim: one statement by one source at one time (PROTOCOL 2, 6). Claims are never edited; contradictions go to contradictions.", cols=[
@@ -45,8 +45,8 @@ TABLES["wallets"] = dict(desc="One row per (wallet, case) label. Labels are alle
     col("label_tier", S, "L2 official-case wallet, L3 analyst full address / resolved handle, L4 cluster member, L4_coordinated (A13 rule), A ambiguous, NC negative control, M manipulation"),
     col("polarity", S, "label polarity", allowed="suspected;ambiguous;negative_control;manipulation;context;candidate", leak="label"),
     col("trade_confirmed", B, "A12.5: >= 1 fill in a market of its case (from fills)", leak="label"),
-    col("is_documented", B, "polarity = suspected and trade_confirmed (default positive label)", leak="label"),
-    col("is_candidate_coordinated", B, "A13 coordinated-buyer candidate (never documented)", leak="label"),
+    col("label_family", S, "A19: manipulation for manipulation rows, else the family of the case's claims", allowed="informed_trading;public_data_leak;manipulation;negative_control;oracle_manipulation;pre_taped_leak;resolution_event;contested", leak="label"),
+    col("is_documented", B, "polarity = suspected and trade_confirmed and label_family = informed_trading (default positive label, A19)", leak="label"),
     col("doc_grade", S, "strongest grade among the case's claims about accounts, addresses, handles or clusters (not aggregates or markets)", allowed=GR, leak="label"),
     col("source", S, "file or method the row came from"), col("source_url", S, "source URL"), col("verification", S, "how the address was obtained"),
     col("first_case_fill_utc", T, "first fill in a case market", source="fills", leak="post"), col("case_buy_usdc", FL, "BUY USDC in case markets, all time", unit="USD", leak="post"),
@@ -63,7 +63,7 @@ TABLES["markets"] = dict(desc="One row per (case, market). Ladders are full Gamm
     col("t_news_utc", T, "day-level news time (A6.6, A7)", leak="label"), col("t_news_method", S, "claim_min, ff_tier1, ff_tier3"),
     col("t_news_precision", S, "precision of t_news_utc", allowed="day;month;quarter;year;range;timestamp"),
     col("t_news_precise_utc", T, "exact news time (A10); equals t_news_utc where no exact time is sourced", leak="label"),
-    col("t_news_precise_precision", S, "A10.1", allowed="minute;quarter_hour;hour;window;day_fallback"), col("t_news_precise_source", S, "URL of the event_times row, or day_fallback"),
+    col("t_news_precise_precision", S, "A10.1", allowed="minute;quarter_hour;hour;window;day_fallback"), col("t_news_precise_source", S, "URL of the event_times row; day_fallback; or rejected_outside_coarse_date (A18)"),
     col("t_news_precise_verified", S, "verified flag of the event_times row"), col("title_withheld", B, "A12.6"), col("is_placebo_market", B, "always false here"),
     col("ff_tier", S, "ForesightFlow tier if listed"), col("ff_tier2_tnews", T, "ForesightFlow tier-2 proxy (stored, not used)")])
 TABLES["placebo_markets"] = dict(desc="One row per placebo market (A14) with its matched case market; case-market rows that could not be matched appear with NULL placebo fields.", cols=[
@@ -115,7 +115,10 @@ POS = [col("market_set", S, "case or placebo", allowed="case;placebo", pk=True),
     col("gate2a", B, "Signal A: a later pre-cut BUY at >= 1.5x the first price", leak="pre"),
     col("gate2b", B, "Signal B: largest pre-cut BUY in the event is on the shortest Yes deadline, Yes token (uses resolution: label only)", leak="post"),
     col("is_documented", B, "wallet is documented for this case", leak="label"), col("doc_grade", S, "wallet's doc_grade", allowed=GR, leak="label"),
-    col("is_candidate_coordinated", B, "A13 candidate for this case", leak="label"), col("is_control", B, "selected as a matched control in this market, version", leak="label"),
+    col("coordinated_rule_fired", B, "A13 rule fired for this wallet, token, market, case and version. Rule output; about 1/3 expected by chance; may include copy-traders; not an allegation (A17)", leak="label"),
+    col("triggering_suspect", S, "documented wallet of the earliest A13 trigger (NULL if the rule did not fire)", leak="label"),
+    col("placebo_rate", FL, "A13 placebo-to-real ratio of this version (share of hits expected by chance); NULL if the rule did not fire", leak="label"),
+    col("is_control", B, "selected as a matched control in this market, version", leak="label"),
     col("is_placebo_market", B, "market_set = placebo", leak="label"),
     col("buy_usdc_post", FL, "BUY USDC at or after the cut", unit="USDC", leak="post"), col("buy_shares_post", FL, "BUY shares at or after the cut", leak="post"),
     col("sell_usdc_post", FL, "SELL USDC at or after the cut", unit="USDC", leak="post"), col("sell_shares_post", FL, "SELL shares at or after the cut", leak="post"),
@@ -159,6 +162,10 @@ TABLES["weak_labels"] = dict(desc="Per wallet in Polymarket-v1: ACDC reconstruct
     col("gate1_n", I, "positions with gate1 (precise version)", leak="label"), col("gate2a_n", I, "positions with gate2a (precise)", leak="label"),
     col("gate2b_n", I, "positions with gate2b (precise)", leak="label"), col("gate1_n_day", I, "gate1 (day version)", leak="label"),
     col("gate2a_n_day", I, "gate2a (day)", leak="label"), col("gate2b_n_day", I, "gate2b (day)", leak="label"),
+    col("coordinated_rule_fired", B, "A13 rule fired for this wallet in any case, precise version (rule output; about 1/3 expected by chance; may include copy-traders; not an allegation)", leak="label"),
+    col("coordinated_rule_fired_day", B, "same, day version", leak="label"),
+    col("triggering_suspect", S, "documented wallet of the earliest trigger (precise version first)", leak="label"),
+    col("placebo_rate", FL, "placebo-to-real ratio of that version", leak="label"),
     col("gate_scope", S, "case_or_placebo_markets or not_in_case_or_placebo_markets"), col("evidence_grade", S, "E6", allowed="E6"), col("data_scope", S, "data window")])
 TABLES["market_minutes"] = dict(desc="One row per market, version and UTC minute with fills, cut - 48 h to + 24 h, Yes token (A9.3, A10.2, A14).", cols=[
     col("market_set", S, "case or placebo", allowed="case;placebo", pk=True), col("case_id", S, "case", pk=True), col("condition_id", S, "market", pk=True),
