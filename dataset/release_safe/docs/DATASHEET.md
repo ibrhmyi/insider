@@ -1,4 +1,4 @@
-# Datasheet: Prediction-Market Informed-Trading Casebook (PMITC), v1.2.0
+# Datasheet: Prediction-Market Informed-Trading Casebook (PMITC), v1.2.1
 
 Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules: `PROTOCOL.md` v1.0 with amendments A1 to A24. Columns: `CODEBOOK.md`. Run history: `dataset/logs/run2_report.md` to `run7_report.md` in the repository.
 

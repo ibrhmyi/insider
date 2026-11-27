@@ -1,7 +1,7 @@
-cff-version: 1.2.0
+cff-version: 1.2.1
 message: "If you use this dataset, please cite it as below."
 title: "Prediction-Market Informed-Trading Casebook (PMITC)"
-version: 1.2.0
+version: 1.2.1
 date-released: 2026-11-26
 authors:
   - family-names: Yildiz
