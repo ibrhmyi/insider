@@ -14,7 +14,7 @@ from econ_view import legs_sql  # A34: economic view by default
 D = os.path.join(os.path.dirname(__file__), "..", "..")
 WORK, TMPD = sys.argv[1:3]
 F = os.path.join(D, "out", "v1", "fills"); OUT = os.path.join(D, "out", "v1")
-c = duckdb.connect(); c.sql(f"SET memory_limit='5GB'; SET temp_directory='{TMPD}'; SET enable_progress_bar=false; SET preserve_insertion_order=false; SET threads=3")
+c = duckdb.connect(); c.sql(f"SET memory_limit='9GB'; SET temp_directory='{TMPD}'; SET enable_progress_bar=false; SET preserve_insertion_order=false; SET threads=3")
 from cuts import build_cuts  # shared with directional.py (A34.2)
 M, mk = build_cuts(D)
 # Optional bucketing (disk allowance): PMITC_POS_BUCKET="b/NB" keeps whole Gamma events (else whole markets) of bucket b; every table here is
