@@ -321,3 +321,27 @@ Minutes with no fills are left out. The table covers the outcome token of each m
 - *Boundary dedup:* no Data API case-market row at or before the Polymarket-v1 end time (2026-04-28 11:00:40 UTC) for a market present in Polymarket-v1, and no pair of legs across sources with the same market, wallet, side, size and time within 60 s of that boundary.
 - *Right of reply:* `claims` gets a `right_of_reply` column (NULL unless a subject's reply is received; adding it edits no claim).
 - *Neutral naming:* label values and titles use "suspected", "flagged by <source>", "documented"; no label value contains "insider"; no title contains "ultimate".
+
+**A25 (2026-11-27, run 10, before any run-10 table is computed). Per-market news times.**
+- Every case market gets `t_news_market_utc` (exact) and `t_news_market_method`:
+  1. `scheduled_start`: the market's own scheduled event time from Gamma, `gameStartTime` (a match) or `eventStartTime` (for example an earnings release), when present;
+  2. `market_deadline`: otherwise, if the case's day-level `t_news` is coarser than a day (month, quarter, year, range) and the market's Gamma deadline (`endDate`; catalog `close_at` for withheld markets) falls inside that coarse range, the deadline: the moment that resolves that market;
+  3. `case_time`: otherwise the case time (`t_news_precise_utc`).
+- The cut times used by every time-dependent table become per market: the `precise` version uses `t_news_market_utc`; the `day` version uses 00:00 UTC of that day for methods 1-2 and the case-level `t_news_utc` for method 3. The case-level columns `t_news_utc` and `t_news_precise_utc` are kept unchanged. A per-market time is used even when it is later than the case-level day (that is its purpose: a month-level case date can precede most of its matches or releases). Gamma's scheduled times are structural, not sourced by a press report; they are recorded as such.
+- Placebo and twin `t_ref` follow from the case market's cut as in A14/A22 (the position of the cut in the case market's life).
+- Everything time-dependent is rebuilt: coordinated-buyer rule, episodes, controls, positions, minute paths, hard negatives, label sets (A26), benchmarks.
+
+**A26 (2026-11-27, run 10). Strict needs a pre-news buy; training and evaluation labels.**
+- `label_strict` additionally requires at least one BUY by the wallet in a market of its case before that market's precise cut (A25). Wallets that meet the rest of A20's strict rule but have no such buy get `strict_no_prenews = true` and are not strict.
+- Benchmarks: `label_standard` is the main training label. `label_strict` is evaluation-only: models are trained on `label_standard` positives and evaluated on `label_strict` positives (other documented wallets dropped from the test fold). `label_broad` trains and evaluates on itself. Results are reported case-weighted.
+
+**A27 (2026-11-27, run 10, before any run-10 benchmark). Selection-controlled tasks.**
+- **T1s** (headline): as T1, but in each case market the candidates are only the pre-news buyers (main token) whose pre-cut BUY USDC lies within [0.5 x the smallest, 2 x the largest] pre-cut BUY of that market's positives of the evaluated label set. It removes "size" as a free signal.
+- **T2s** (headline): documented episodes vs controls drawn by A6.10 **plus the same account-age band** (days from the wallet's first Polymarket-v1 fill to its first pre-cut buy: unknown, < 1, 1-7, 7-30, 30-180, >= 180). The band is never relaxed; the A6.10 relaxations apply to the other criteria.
+- **T2-open**: A6.10 controls where Orca- and Inca-flagged wallets may be controls (labelled, graph-expanded and coordinated-rule wallets stay excluded).
+- `episodes` and `controls` get `control_design` (`standard`, `age_matched`, `open`), part of the primary key. Seed 192.
+- T1 and T2 remain as secondary tasks (logistic regression and baselines only); gradient boosting with case-grouped tuning is run on T1s, T2s, T2-open and T3. Every task is reported per label set.
+
+**A28 (2026-11-27, run 10). Multi-account family.**
+- A source that alleges common control of several accounts (shared ownership, multi-accounting, wash or self-dealing) **without** alleging that the trades used non-public information gets `label_family = multi_account` for the wallets it names, by a stance note in a new claim (claims are never edited); `multi_account` is excluded from all label sets.
+- Applied to `world-cup-2026-06` after reading the source in run 10: the source (Lookonchain via crypto.news, 2026-06-21) calls the trader "a suspected insider" and offers the shared Binance deposit address as evidence that one person controls the three wallets, plus their win records. That alleges informed trading with common control as supporting evidence, so the rule does not apply and the family stays `informed_trading`. The reading is recorded as a context claim.
