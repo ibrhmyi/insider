@@ -48,7 +48,7 @@ for s in SETS_RUN:
                   LEFT JOIN comp k ON k.condition_id = lower(l.condition_id) AND k.asset_id = l.asset_id""")
         # candidate (wallet, market) groups: a SELL with no raw holding (the sequential balance is never below the raw one, so only these can change)
         c.sql(f"""CREATE OR REPLACE TABLE cand AS SELECT DISTINCT wallet, condition_id FROM (
-                    SELECT wallet, condition_id, wallet_side, comp_asset_id,
+                    SELECT wallet, condition_id, wallet_side, comp_asset_id, shares,
                            sum(CASE WHEN wallet_side = 'BUY' THEN shares ELSE -shares END) OVER (PARTITION BY wallet, condition_id, asset_id ORDER BY ts, leg_id
                                ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) rb FROM L WHERE wallet <> '')
                   WHERE wallet_side = 'SELL' AND comp_asset_id IS NOT NULL AND coalesce(rb, 0) < shares - {EPS}""")  # A34.1: partial sells too
