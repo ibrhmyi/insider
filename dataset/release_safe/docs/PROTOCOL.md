@@ -276,3 +276,48 @@ Minutes with no fills are left out. The table covers the outcome token of each m
 - `wallets` gets `label_family`: `manipulation` for `polarity = manipulation`, otherwise the family of the case's claims (`informed_trading`, `public_data_leak`, `oracle_resolution`, `negative_control`, ...; ';'-joined if a case has several).
 - `is_documented` = `polarity = suspected` and `trade_confirmed` and `label_family = informed_trading`. This drops one wallet (`spotify-wrapped-2025`, a public-data leak) from the positives: 119 documented wallets. Benchmarks and baselines are recomputed; the A15 split does not change.
 - Benchmark results are reported per case and case-weighted (each case counts once) as well as pooled.
+
+**A20 (2026-11-27, run 9, before any label set is computed). Three nested label sets.**
+- *Claim-wallet links* (`data/claim_wallet_links.csv`, built from existing rows only; no claim is edited). A claim names a wallet when
+  (a) the wallet's full address appears in the claim's subject, text or notes (`address_in_claim`);
+  (b) the claim's subject contains a handle resolved to the wallet under A6.7 / A11 (`resolved_handle`), or the handle recorded with the wallet by its label source (`label_source_handle`);
+  (c) the wallet's label `source_url` is the claim's `url` or `post_url`, i.e. the address was taken from that claim's own source (`source_url`);
+  (d) a recorded check matched the wallet's fills to the figures of an official claim (`official_figures_match`, `logs/handle_checks.csv`).
+  Aggregate and market claims never name a wallet.
+- `wallet_grade` = the strongest grade among the claims that name the wallet; NULL (`link_only`) if none does (cluster members linked only by money flows).
+- `label_broad` = `trade_confirmed` and `label_family = informed_trading` and `doc_grade` in E1-E5 (equals `is_documented`).
+- `label_standard` = `label_broad` and `doc_grade` in E1-E4 (includes cluster members).
+- `label_strict` = `label_standard` and (`wallet_grade` in E1-E3, or the wallet is named by (a), (b) or (c) in an E4 claim whose subject is an address, handle, account or cluster of named addresses). `strict_basis` records which.
+- The sets are nested by construction (strict ⊆ standard ⊆ broad); a test checks it. They appear in `wallets` and in `episodes` (suspected rows) and `positions` (case markets).
+
+**A21 (2026-11-27, run 9, before any hard negative is selected). Hard negatives.**
+- *Suspect profile:* a position (wallet, market, token, version) with pre-cut BUY of at least $1,000 at a pre-cut VWAP of 0.35 or less, whose wallet's Gamma profile was created at most 14 days before its first pre-cut BUY on that token (A13 pre-filter: a wallet whose first Polymarket-v1 fill is more than 14 days before that BUY cannot qualify and is not looked up).
+- Rules (`hard_negative_rule`), applied to wallets not in `wallets` and for which the A13 rule did not fire:
+  - `lookalike_loser`: suspect profile on the **losing** token of a resolved case or twin market (A22);
+  - `cleared_case_lookalike`: suspect profile, any outcome, in a market of a case whose `investigation_outcome` is `cleared_official` or `cleared_analyst` (ballon-dor-2026, railgun-venezuela-control, survivor-50-2026);
+  - `placebo_lookalike_winner`: suspect profile on the **winning** token of a placebo market (A14).
+  - `cleared_case_wallet`: every wallet in `wallets` of a cleared case (wallet level).
+- `positions` gets `hard_negative` and `hard_negative_rule`; `wallets` gets them for `cleared_case_wallet`; all rows are in `data/hard_negatives.csv`. A hard negative is never a positive; it is a negative that looks like a positive before the news.
+
+**A22 (2026-11-27, run 9, before any twin market is selected). Same-category comparison ("twin") markets.**
+- *Pool:* resolved two-token markets of the Polymarket-v1 catalog that are not attached to any case, not placebo markets (A14), and not in the same Gamma event (`neg_risk_market_id`) as any case market, and whose slug shares no event slug with a case market. These are markets that appear in no claim.
+- *Matching:* each case market with a catalog category is matched to up to 5 twins with the same `category_refined`, volume decile (A14 deciles), duration band (A14 bands) and resolution year. Relaxation, recorded in `relaxation`: year ±1, then adjacent duration band (year ±1), then adjacent decile (year ±1), then any year (same category, decile, band). Case markets with no catalog category (Data API era) or zero volume are not matched (recorded).
+- Seed 192; case markets in (`case_id`, `condition_id`) order; each twin used at most once. `t_ref` per version as A14.
+- Twin fills come from a Polymarket-v1 pass over the twin markets only (`build/hf_pass_v9.py`, layer B). Twins get positions and minute paths (`market_set = twin`).
+- T3 becomes case vs twin markets; the A14 placebo version is kept as **T3b**, labelled market-type sensitive.
+
+**A23 (2026-11-27, run 9, before any run-9 benchmark is computed). Benchmark protocol.**
+- *Folds:* leave-one-case-out over every case with at least 3 `label_standard` wallets in the task's rows (the same case list for all label sets of a task), plus the A15 time split. Reported per fold, as mean, standard deviation, minimum and maximum over the leave-one-case-out folds, and the time split separately.
+- *Label sets:* every task runs on `label_strict`, `label_standard`, `label_broad`. In a run on a smaller set, documented wallets outside the set are dropped from evaluation (neither positive nor negative).
+- *Baselines:* prevalence (constant score; AP equals prevalence, AUC 0.5), the Gate 1 rule (`gate1_score`, ties by size), a one-feature heuristic (younger account = higher score, `account_age_days`), logistic regression (standardised, L2, C = 1). Gradient boosting is reported only with case-grouped hyperparameter tuning (inner leave-cases-out CV on the training cases over max_depth {3, none}, learning_rate {0.05, 0.1}, max_iter {100, 300}, l2_regularization {0, 1}); where it scores below the prevalence baseline, the report says so.
+- The random baseline is dropped (its expectation is the prevalence); the run-9 report explains the run-7/run-8 random-baseline change from 100 random draws.
+- T3 per label set uses the case markets where a wallet of the set bought before the cut; T3 "all" uses every matched case market.
+- *Known shortcuts:* a feature that separates classes for a construction reason (how controls, placebos or twins were drawn) is listed in `benchmarks/README.md` and excluded; the univariate AUC of every feature is reported.
+
+**A24 (2026-11-27, run 9). Consistency, schema and naming.**
+- *Fills:* one schema for both sources. Columns a source does not provide are NULL, never filled: on Data API rows `wallet_role`, `aggressor_side`, `maker`, `taker`, `fee_usdc` are NULL and `role_fields_available = false`.
+- *Units in names:* every numeric amount, size, price, time or duration column carries its unit (`_usdc`, `_shares`, `_price_usdc`, `_utc`, `_unix`, `_hours`, `_days`, `_minutes`); counts start with `n_`; ratios end in `_share`, `_rate` or `_ratio`.
+- *Keys:* every table declares a primary key (a surrogate `*_id` where no natural key exists) and every key and foreign key is tested.
+- *Boundary dedup:* no Data API case-market row at or before the Polymarket-v1 end time (2026-04-28 11:00:40 UTC) for a market present in Polymarket-v1, and no pair of legs across sources with the same market, wallet, side, size and time within 60 s of that boundary.
+- *Right of reply:* `claims` gets a `right_of_reply` column (NULL unless a subject's reply is received; adding it edits no claim).
+- *Neutral naming:* label values and titles use "suspected", "flagged by <source>", "documented"; no label value contains "insider"; no title contains "ultimate".

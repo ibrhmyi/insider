@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.0 (2026-11-27, run 9): public release
+- A20: three nested label sets in `wallets`, `episodes`, `positions`: `label_strict` (linked to an E1-E3 claim, or named in an E4 claim), `label_standard` (case grade E1-E4, includes cluster members), `label_broad` (E1-E5 = `is_documented`); `wallet_grade` and the new table `claim_wallet_links`.
+- A21: hard negatives (`hard_negatives` table; `positions.hard_negative`, `wallets.hard_negative`): look-alike losers in case and twin markets, look-alikes in cleared cases, look-alike winners in placebo markets, wallets of cleared cases.
+- A22: same-category twin markets (`twin_markets`), with fills, positions and minute paths; T3 is now case vs twin, the placebo version is T3b.
+- A23: leave-one-case-out benchmarks plus the time split, three label sets, prevalence / Gate 1 / account-age / logistic-regression baselines, tuned gradient boosting, univariate audit and known shortcuts. The random baseline is dropped (explained in the run-9 report).
+- A24: units in column names, a primary key on every table, Data API fills with NULL role fields and `role_fields_available`, boundary dedup test, `claims.right_of_reply`, neutral naming.
+- Exact time for the Caracas first reports (05:30 UTC) for the Maduro and Railgun-Venezuela cases; CL0088 verified.
+- Docs: dataset card with HF configs, `DATA_PROTECTION.md`, `EXTRACTION.md`, `CONTRIBUTING.md` and issue templates, pinned `requirements.txt`, three notebooks, upload copies for Kaggle, Hugging Face and Zenodo.
+
 ## v1.0.1 (2026-11-27, run 8): release fixes
 - A17: the coordinated-buyer rule (A13) is a rule label, not a wallet label. The 1,338 `L4_coordinated` rows left `wallets`; `positions` and `weak_labels` gain `coordinated_rule_fired`, `triggering_suspect`, `placebo_rate`. Rule-fired wallets' histories outside case markets are no longer in `fills`.
 - A18: an exact news time must fall inside the coarse date that set the day-level time; Super Bowl LX's (01:12 UTC on the next day) does not, so its day date is kept and a contradiction is recorded (CX005). Kalshi notices keep their printed years.

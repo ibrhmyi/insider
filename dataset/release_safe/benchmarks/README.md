@@ -1,30 +1,37 @@
-# PMITC v1.0 benchmark tasks
+# PMITC v1.1 benchmark tasks
 
-Rules: PROTOCOL A15. `splits.csv` is frozen: splits are grouped by case (no case in two splits) and ordered in time
-(`test` = cases whose first claim is on or after **2026-03-01**). Placebo markets take the split of their matched case
-(each placebo is used once, A14). Every task runs on both news-time versions; `precise` (A10) is the headline.
-Run: `python3 pmitc_bench.py` (writes `baselines.json`, seed 192), or `notebooks/02_baselines.ipynb`.
+Rules: PROTOCOL A15 and A23. Run `python3 pmitc_bench.py` (writes `baselines.json`, seed 192; about an hour with gradient-boosting tuning) or `python3 pmitc_bench.py --quick`; `notebooks/03_benchmarks.ipynb` shows the results.
 
-Labels are allegations by named sources (`is_documented` = suspected by a source, confirmed by the wallet's own fills, in an informed-trading case (A19)).
-They are sparse and clustered: 74 of the 119 documented wallets come from two cases (52 Feb-28 Iran strike, 22 KPMG), and 87 are cluster members linked by money flows rather than flagged one by one. They are also biased toward what was noticed (PROTOCOL 8). Every metric is reported per case and case-weighted (each case counts once) next to the pooled value.
-Treat scores as "how well a method finds wallets that sources flagged", not as insider-detection accuracy.
+Labels are allegations by named sources. Positives are sparse and clustered: 74 of the 119 `label_broad` wallets come from two cases (52 Feb-28 2026 Iran strike, 22 KPMG), and 87 are cluster members linked by money flows. Every task therefore runs on three nested label sets (`label_strict` ⊆ `label_standard` ⊆ `label_broad`, A20) and every metric is reported per fold, per case and case-weighted. In a run on a smaller set, documented wallets outside the set are dropped (neither positive nor negative).
 
-## T1: within-market ranking
-- **Unit:** one row per (case market, wallet) from `positions` (`market_set = case`, `is_main_side = true`, one version).
-- **Task:** rank all pre-news buyers of each case market. Positives: `is_documented`. Only markets with at least one positive are scored.
-- **Metrics:** average precision, precision@k and recall@k (k = 10, 100) per market, averaged within each case, then over cases.
-- **Baselines:** random, a rule (`gate1_score`, ties by size), logistic regression, gradient boosting (trained on `train` with negatives subsampled, seed 192).
-- **Do not use (leakage):** `is_documented`, `doc_grade`, `coordinated_rule_fired`, `triggering_suspect`, `placebo_rate`, `is_control`, `gate1` (a label), `gate2b` and `is_shortest_sufficient` (use the resolution), every `_post` column, ids, absolute times (`t_cut_ts`, `first_buy_ts`, `last_buy_ts` except as differences to the cut), `source_pre`.
+## Folds
+- **Leave-one-case-out** over every case with at least 3 `label_standard` wallets in the task's rows: the model is trained on all other cases and tested on that case. Reported as mean, SD, minimum and maximum over folds. A fold with no positive of the label set in its test case is skipped (strict has fewer folds).
+- **Time split** (A15, `splits.csv`): train = cases first claimed before 2026-03-01, test = on or after.
 
-## T2: episode classification
-- **Unit:** `episodes` rows: documented episodes (`role = suspected`) vs their matched controls (`control_same_side`, `control_other_side_large_buyer`).
-- **Metrics:** AUC (pooled and case-weighted) and log loss, case-grouped 5-fold CV, and train -> test.
-- **Base result to report:** matched same-side controls win about as often as documented episodes (`won_post` by role), so outcome-based features cannot separate them; the task asks whether behaviour before the news can.
-- **Do not use:** `share_on_this_ladder_market` (construction artifact: controls are sampled one market at a time, so it is always 1 for them; alone it gives AUC 0.97), `role`, `episode_id`, `control_of`, `wallet`, `case_share_of_lifetime_volume` (lifetime denominator), `is_shortest_sufficient`, `follower_*_60m` (window can cross t_news), every `_post` column, and the empty funding columns.
+## Baselines
+- `prevalence`: constant score (AP equals prevalence; AUC 0.5). It replaces the random baseline, whose expectation is the prevalence and whose single draws vary widely (run 9 report: random AP over 100 seeds on the old test split had mean 0.020, SD 0.044).
+- `gate1_rule`: the frozen Gate 1 score (ties by size); for T3 the market's Gate 1 rate.
+- `account_age_heuristic`: younger account (first Polymarket-v1 fill) ranks higher (T1, T2).
+- `logistic_regression`: standardised, L2, C = 1.
+- `gradient_boosting_tuned`: HistGradientBoosting tuned by inner leave-cases-out CV on the training cases (grid in `baselines.json`), precise version only. Flagged `below_prevalence` when it scores under the prevalence baseline.
 
-## T3: market-level detection
-- **Unit:** case markets with matched placebos vs those placebo markets (A14), features from pre-cut flow only (`market_minutes` with `minutes_from_cut < 0`, `positions` before the cut).
-- **Metric:** AUC, pooled and case-weighted (case-grouped CV and train -> test).
-- **Do not use:** `market_set` / `is_placebo_market` (the label), any minute at or after the cut, `_post` columns, `placebo_category`, total volume and resolution fields, question or slug text. Placebo categories (crypto prices, weather) differ from case markets in kind, so a high AUC partly measures market type; report it next to the matched-volume design, not as detection power.
+## Tasks
+- **T1, within-market ranking.** Unit: (case market, wallet) on the wallet's main token, from `positions`. Rank all pre-news buyers; positives = the label set. Metric: per-market AP (and P@10, R@10, R@100), averaged within case, then over cases.
+- **T2, episode classification.** Unit: `episodes` rows, documented episodes vs their matched controls (same side and large other-side buyers). Metric: AUC within each test case, case-weighted. Base result: matched same-side controls win about as often as documented episodes, so outcomes cannot separate them.
+- **T3, case vs twin markets** (A22): case markets where a wallet of the label set bought before the cut, vs their same-category, same-volume-decile, same-duration, same-year twins, from pre-cut flow (`market_minutes` before the cut, `positions`). Metric: AUC, case-weighted. `all_case_markets` runs every matched case market.
+- **T3b, case vs placebo markets** (A14): the same with crypto-price and weather placebos. **Market-type sensitive**: placebos differ from case markets in kind, so a high score partly measures market type.
 
-Results: `baselines.json` (both versions), summarised in `../docs/README.md`.
+## Leakage: do not use
+- T1: `is_documented`, `doc_grade`, `label_*`, `hard_negative*`, `coordinated_rule_fired`, `triggering_suspect`, `placebo_rate`, `is_control`, `is_placebo_market`, `is_twin_market`, `gate1` (a label), `gate2b` and `is_shortest_sufficient` (use the resolution), every `_post` column, ids, absolute times (`t_cut_unix`, `first_buy_unix`, `last_buy_unix`) except as differences to the cut, `source_pre`, `vol_to_day_usdc` (includes the rest of the cut's day).
+- T2: `share_on_this_ladder_market`, `role`, `episode_id`, `control_of`, `wallet`, `label_*`, `case_share_of_lifetime_volume` (lifetime denominator), `is_shortest_sufficient`, `n_follower_wallets_60m` / `follower_buy_usdc_60m` (window can pass t_news), every `_post` column, the empty funding columns.
+- T3/T3b: `market_set`, `is_placebo_market`, `is_twin_market`, any minute at or after the cut, `_post` columns, category fields, resolution, outcome and total-volume fields, question and slug text.
+
+## Known shortcuts (features that separate classes for construction reasons)
+- **T2 `share_on_this_ladder_market`**: controls are sampled one market at a time, so the value is 1 for every control; alone it gives AUC about 0.97. Excluded.
+- **T2 `hours_first_buy_to_tnews`**: controls are matched on first-buy time (24-72 h), so this feature is controlled by design; its univariate AUC should be near 0.5 (reported).
+- **T2 `account_age_days_at_first_buy`, `n_prior_markets`**: not a construction artifact, but the source bias: sources flag fresh wallets, so these features find what sources look for. A detector that only learns "new wallet" learns the selection rule of the press.
+- **T3b (all features)**: placebo markets are crypto and weather markets; volume shape and buyer mix differ by market type.
+- **T3 volume features**: twins are matched on total-volume decile only; pre-cut volume can still differ by market age and by where the cut falls.
+The univariate AUC of every feature per task and label set is in `baselines.json` (`univariate_auc`).
+
+Results: `baselines.json` (both news-time versions, all label sets, per fold), summarised in the dataset card.

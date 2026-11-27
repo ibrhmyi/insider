@@ -1,4 +1,4 @@
-# PMITC v1: the full build
+# Target schema (planning note, run 4)
 
 v0.1 is a list of known cases. v1 covers the whole universe: every position anyone has taken on Polymarket, scored against a null distribution built from markets where inside information is impossible. Known cases become one label column among many, not the whole dataset.
 

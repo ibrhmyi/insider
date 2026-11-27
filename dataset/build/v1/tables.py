@@ -6,7 +6,7 @@ import hashlib, json, os, re, shutil, sys
 import duckdb, numpy as np, pandas as pd, pyarrow as pa, pyarrow.parquet as pq
 
 sys.path.insert(0, os.path.dirname(__file__))
-from schema import TABLES  # noqa
+from schema import TABLES, RENAME  # noqa
 
 D = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(D, "release", "data"); os.makedirs(OUT, exist_ok=True)
@@ -22,6 +22,7 @@ def is_text(s):
 
 
 def cast(name, df):
+    df = df.rename(columns=RENAME.get(name, {}))  # A24: units in names
     spec = TABLES[name]["cols"]; names = [c["name"] for c in spec]
     missing = [n for n in names if n not in df.columns]; extra = [c for c in df.columns if c not in names]
     assert not missing and not extra, f"{name}: missing {missing} extra {extra}"
@@ -68,6 +69,7 @@ def write(name, df):
 # ---------- small tables
 mk = rd("data/markets.csv"); mk["condition_id"] = mk.condition_id.str.lower()
 cl = rd("data/claims.csv"); W = rd("data/wallet_labels.csv"); cs = rd("data/cases.csv")
+cl["right_of_reply"] = ""  # A24: no reply received yet
 cl["post_url"] = cl.notes.map(lambda n: (re.search(r"post_url=(\S+?)(?:;|\s|$)", n) or [None, None])[1])
 write("claims", nul(cl))
 RANK = {g: i for i, g in enumerate("E1 E2 E3 E4 E5 E6".split())}
@@ -76,7 +78,10 @@ dg = direct.groupby("case_id").evidence_grade.agg(lambda s: min(s, key=RANK.get)
 W = W.rename(columns={"address": "wallet"})
 W = W[W.label_tier != "L4_coordinated"]  # A17: rule output is not a wallet label
 W["is_documented"] = (W.polarity == "suspected") & (W.trade_confirmed == "true") & (W.label_family == "informed_trading")  # A19
-W["doc_grade"] = np.where(W.polarity.isin(["suspected", "ambiguous"]), W.case_id.map(dg), None)
+HN = rd("data/hard_negatives.csv")  # A21
+cw = set(zip(HN[HN.rule == "cleared_case_wallet"].wallet, HN[HN.rule == "cleared_case_wallet"].case_id))
+W["hard_negative"] = [(a, k) in cw for a, k in zip(W.wallet, W.case_id)]
+W["hard_negative_rule"] = np.where(W.hard_negative, "cleared_case_wallet", "")
 W = W.drop(columns=["case_market_traded", "case_check_note"])
 wallets = write("wallets", nul(W))
 split = {r.case_id: ("test" if r.first_claim_date_earliest >= "2026-03-01" else "train") for r in cs.itertuples()}
@@ -96,12 +101,19 @@ for c_ in ["question", "slug", "event_slug"]:
     mk.loc[mk.title_withheld == "true", c_] = ""
 write("markets", nul(mk))
 pl = rd("data/placebo_markets.csv"); pl["benchmark_split"] = pl.case_id.map(split)
+pl.insert(0, "placebo_row_id", [f"PR{i:05d}" for i in range(1, len(pl) + 1)])
 write("placebo_markets", nul(pl))
 write("contradictions", nul(rd("data/contradictions.csv")))
 ed = rd("data/wallet_edges.csv")
 blk = ed.utc.str.extract(r"^block (\d+)$")[0]
 ed["block_number"] = blk.fillna(""); ed.loc[blk.notna(), "utc"] = ""  # some sources give a block number instead of a time
+ed.insert(0, "edge_id", [f"ED{i:04d}" for i in range(1, len(ed) + 1)])
 write("edges", nul(ed))
+tw = rd("data/twin_markets.csv"); tw["benchmark_split"] = tw.case_id.map(split)  # A22
+tw.insert(0, "twin_row_id", [f"TR{i:05d}" for i in range(1, len(tw) + 1)])
+write("twin_markets", nul(tw))
+write("hard_negatives", nul(HN))
+write("claim_wallet_links", nul(rd("data/claim_wallet_links.csv")))
 # ---------- large tables via parquet
 c = duckdb.connect(); c.sql("SET memory_limit='4GB'; SET enable_progress_bar=false")
 # controls / episodes (both versions)
@@ -111,27 +123,42 @@ for v in ["day", "precise"]:
     e = pd.read_parquet(os.path.join(V1, f"episodes_{v}.parquet"))
     ep_ids[v] = e
 epi = pd.concat(ep_ids.values(), ignore_index=True)
+LS = wallets[["wallet", "case_id", "label_strict", "label_standard", "label_broad"]]
+epi = epi.merge(LS, on=["wallet", "case_id"], how="left")
+for x in ["label_strict", "label_standard", "label_broad"]:  # A20: only suspected rows carry a label set
+    epi[x] = epi[x].fillna(False).astype(bool) & (epi.role == "suspected")
 write("controls", ctrl)
-write("episodes", epi.drop(columns=[x for x in epi.columns if x not in [k["name"] for k in TABLES["episodes"]["cols"]]]))
-# positions with label columns
-pos = pd.read_parquet(os.path.join(V1, "positions.parquet"))
+write("episodes", epi.drop(columns=[x for x in epi.columns if x not in [k["name"] for k in TABLES["episodes"]["cols"]] and x not in RENAME["episodes"]]))
+# positions with label columns, assembled in DuckDB and streamed to parquet (pandas does not fit the memory limit)
+DT = {"string": "VARCHAR", "int64": "BIGINT", "float64": "DOUBLE", "bool": "BOOLEAN"}
 doc = wallets[wallets.is_documented][["wallet", "case_id", "doc_grade"]].assign(is_documented=True)
 fr = CC.sort_values("trigger_utc").drop_duplicates(["candidate_wallet", "case_id", "condition_id", "asset_id", "t_news_version"])
 fr = fr.rename(columns={"candidate_wallet": "wallet", "trigger_wallet": "triggering_suspect"})[["wallet", "case_id", "condition_id", "asset_id", "t_news_version", "triggering_suspect"]]
-fr = fr.assign(coordinated_rule_fired=True, placebo_rate=fr.t_news_version.map(lambda v: PR[v]["placebo_to_real_ratio"]), market_set="case")
-pos = pos.merge(doc, on=["wallet", "case_id"], how="left").merge(fr, on=["market_set", "wallet", "case_id", "condition_id", "asset_id", "t_news_version"], how="left")
-pos.loc[pos.market_set == "placebo", ["is_documented", "doc_grade"]] = [False, None]
-ctl = ctrl[["t_news_version", "case_id", "condition_id", "wallet"]].drop_duplicates().assign(is_control=True)
-pos = pos.merge(ctl, on=["t_news_version", "case_id", "condition_id", "wallet"], how="left")
-pos.loc[pos.market_set == "placebo", "is_control"] = False
-for x in ["is_documented", "coordinated_rule_fired", "is_control"]:
-    pos[x] = pos[x].fillna(False).astype(bool)
-pos["is_placebo_market"] = pos.market_set == "placebo"
-pos = cast("positions", pos)
-pq.write_table(pa.Table.from_pandas(pos, schema=schema_of("positions"), preserve_index=False), os.path.join(OUT, "positions.parquet"), compression="zstd")
-print("positions", len(pos), flush=True)
+fr = fr.assign(placebo_rate=fr.t_news_version.map(lambda v: PR[v]["placebo_to_real_ratio"]))
+hn = HN[HN.rule != "cleared_case_wallet"][["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "rule"]].rename(columns={"rule": "hard_negative_rule"})
+ctl = ctrl[["t_news_version", "case_id", "condition_id", "wallet"]].drop_duplicates()
+for nm, df in [("doc_df", doc), ("fr_df", fr), ("ls_df", LS), ("hn_df", hn), ("ctl_df", ctl)]:
+    c.register(nm, df)
+c.sql(f"""CREATE TEMP VIEW pos_v AS SELECT p.*, d.doc_grade AS doc_grade_d, (d.wallet IS NOT NULL) AS doc_hit,
+            (f.wallet IS NOT NULL) AS coordinated_rule_fired, f.triggering_suspect, f.placebo_rate,
+            coalesce(l.label_strict, false) ls_s, coalesce(l.label_standard, false) ls_t, coalesce(l.label_broad, false) ls_b,
+            h.hard_negative_rule, (h.hard_negative_rule IS NOT NULL) AS hard_negative, (k.wallet IS NOT NULL) AS ctl_hit
+          FROM '{V1}/positions.parquet' p
+          LEFT JOIN doc_df d ON d.wallet = p.wallet AND d.case_id = p.case_id
+          LEFT JOIN fr_df f ON p.market_set = 'case' AND f.wallet = p.wallet AND f.case_id = p.case_id AND f.condition_id = p.condition_id AND f.asset_id = p.asset_id AND f.t_news_version = p.t_news_version
+          LEFT JOIN ls_df l ON l.wallet = p.wallet AND l.case_id = p.case_id
+          LEFT JOIN hn_df h ON h.market_set = p.market_set AND h.case_id = p.case_id AND h.condition_id = p.condition_id AND h.asset_id = p.asset_id AND h.wallet = p.wallet AND h.t_news_version = p.t_news_version
+          LEFT JOIN ctl_df k ON k.t_news_version = p.t_news_version AND k.case_id = p.case_id AND k.condition_id = p.condition_id AND k.wallet = p.wallet""")
+expr = dict(is_documented="(market_set = 'case' AND doc_hit)", doc_grade="CASE WHEN market_set = 'case' THEN doc_grade_d END",
+            label_strict="(market_set = 'case' AND ls_s)", label_standard="(market_set = 'case' AND ls_t)", label_broad="(market_set = 'case' AND ls_b)",
+            is_control="(market_set = 'case' AND ctl_hit)", is_placebo_market="(market_set = 'placebo')", is_twin_market="(market_set = 'twin')")
+inv = {v: k for k, v in RENAME["positions"].items()}
+sel = ", ".join(f"CAST({expr.get(col['name'], inv.get(col['name'], col['name']))} AS {DT[col['dtype']]}) AS {col['name']}" for col in TABLES["positions"]["cols"])
+c.sql(f"COPY (SELECT {sel} FROM pos_v ORDER BY market_set, case_id, condition_id, t_news_version, wallet, asset_id) TO '{OUT}/positions.parquet' (FORMAT parquet, COMPRESSION zstd)")
+print("positions", c.sql(f"SELECT count(*) FROM '{OUT}/positions.parquet'").fetchall(), flush=True)
 # weak labels + gate counts
-gc = pos[pos.market_set.isin(["case", "placebo"])].groupby(["wallet", "t_news_version"])[["gate1", "gate2a", "gate2b"]].sum().unstack()
+gc = c.sql(f"""SELECT wallet, t_news_version, sum(gate1::INT) gate1, sum(gate2a::INT) gate2a, sum(gate2b::INT) gate2b
+               FROM '{OUT}/positions.parquet' GROUP BY 1, 2""").df().set_index(["wallet", "t_news_version"]).unstack()
 gc.columns = [f"{a}_n" + ("" if b == "precise" else "_day") for a, b in gc.columns]
 wl = pd.read_parquet(os.path.join(D, "out", "weak_labels.parquet")).rename(columns={"address": "wallet"})
 wl = wl.merge(gc.reset_index(), on="wallet", how="left")
@@ -141,12 +168,12 @@ wl["coordinated_rule_fired"] = wl.wallet.isin(set(CC[CC.t_news_version == "preci
 wl["coordinated_rule_fired_day"] = wl.wallet.isin(set(CC[CC.t_news_version == "day"].candidate_wallet))
 wl["triggering_suspect"] = wl.wallet.map(first.trigger_wallet)
 wl["placebo_rate"] = wl.wallet.map(first.t_news_version).map(lambda v: PR[v]["placebo_to_real_ratio"] if isinstance(v, str) else np.nan)
-wl["gate_scope"] = np.where(wl.gate1_n.notna(), "case_or_placebo_markets", "not_in_case_or_placebo_markets")
+wl["gate_scope"] = np.where(wl.gate1_n.notna(), "case_placebo_or_twin_markets", "not_in_case_placebo_or_twin_markets")
 wl["acdc_class"] = wl.acdc_class.replace("", None)
 wl = cast("weak_labels", wl)
 pq.write_table(pa.Table.from_pandas(wl, schema=schema_of("weak_labels"), preserve_index=False), os.path.join(OUT, "weak_labels.parquet"), compression="zstd")
 print("weak_labels", len(wl), flush=True)
-del wl, pos
+del wl
 mm = pd.read_parquet(os.path.join(V1, "market_minutes.parquet")).rename(columns={})
 write("market_minutes", mm)
 # fills: written by build/v1/fills_release.py (streaming COPY)

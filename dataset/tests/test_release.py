@@ -77,6 +77,12 @@ def test_foreign_keys():
     pos = load("positions", ["market_set", "case_id", "condition_id"]).drop_duplicates()
     assert set(map(tuple, pos[pos.market_set == "case"][["case_id", "condition_id"]].values)) <= mkeys
     pl = load("placebo_markets"); assert set(pos[pos.market_set == "placebo"].condition_id) <= set(pl.placebo_condition_id.dropna())
+    tw = load("twin_markets"); assert set(pos[pos.market_set == "twin"].condition_id) <= set(tw.twin_condition_id.dropna())
+    assert set(zip(tw.case_id, tw.case_condition_id)) <= mkeys and set(zip(pl.case_id, pl.case_condition_id)) <= mkeys
+    hn = load("hard_negatives"); assert set(hn.case_id) <= cases
+    wk = set(zip(load("wallets").wallet, load("wallets").case_id))
+    lk = load("claim_wallet_links"); assert set(lk.claim_id) <= set(load("claims").claim_id) and set(zip(lk.wallet, lk.case_id)) <= wk
+    assert set(load("cases").case_id) == cases and set(mk.case_id) <= cases
     assert set(load("contradictions").claim_id) <= set(load("claims").claim_id)
 
 
@@ -143,13 +149,13 @@ def test_name_surname_pattern_reviewed():
 @pytest.mark.parametrize("v", ["day", "precise"])
 def test_no_pre_news_feature_uses_post_news_fill(v):
     """Leakage: positions/episodes/controls pre features only use fills before the cut (both versions)."""
-    p = load("positions", ["t_news_version", "first_buy_ts", "last_buy_ts", "t_cut_ts", "first_fill_in_market_ts"])
+    p = load("positions", ["t_news_version", "first_buy_unix", "last_buy_unix", "t_cut_unix", "first_fill_in_market_unix"])
     p = p[p.t_news_version == v]
-    assert (p.first_buy_ts < p.t_cut_ts).all() and (p.last_buy_ts < p.t_cut_ts).all() and (p.first_fill_in_market_ts < p.t_cut_ts).all()
+    assert (p.first_buy_unix < p.t_cut_unix).all() and (p.last_buy_unix < p.t_cut_unix).all() and (p.first_fill_in_market_unix < p.t_cut_unix).all()
     e = load("episodes"); e = e[e.t_news_version == v]
     assert (e.hours_first_buy_to_tnews.dropna() > 0).all() and (e.hours_last_buy_to_tnews.dropna() > 0).all()
     # recompute buy_usdc_pre for documented positions from fills with ts < cut
-    pp = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "t_cut_ts", "buy_usdc_pre", "is_documented"])
+    pp = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "t_cut_unix", "buy_usdc_pre", "is_documented"])
     pp = pp[(pp.t_news_version == v) & pp.is_documented]
     if WITHHELD:  # only positions whose pre-cut legs are all in shipped files can be recomputed
         src = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "source_pre"])
@@ -157,7 +163,7 @@ def test_no_pre_news_feature_uses_post_news_fill(v):
         pp = pp[pp.source_pre == "hf_polymarket_v1"].drop(columns="source_pre")
     con = duckdb.connect(); con.register("pp", pp)
     d = con.sql(f"""SELECT pp.buy_usdc_pre, sum(f.usdc) re FROM pp JOIN read_parquet('{R}/fills_part*_case_*.parquet') f
-                    ON f.condition_id = pp.condition_id AND f.asset_id = pp.asset_id AND f.wallet = pp.wallet AND f.wallet_side = 'BUY' AND f.ts < pp.t_cut_ts
+                    ON f.condition_id = pp.condition_id AND f.asset_id = pp.asset_id AND f.wallet = pp.wallet AND f.wallet_side = 'BUY' AND f.ts_unix < pp.t_cut_unix
                     GROUP BY pp.case_id, pp.condition_id, pp.asset_id, pp.wallet, pp.buy_usdc_pre""").df()
     assert len(d) == len(pp) and ((d.buy_usdc_pre - d.re).abs() < 1e-6 * (1 + d.re)).all()
 
@@ -204,3 +210,52 @@ def test_withheld_sources_absent():
     for s in WITHHELD:
         assert not glob.glob(os.path.join(R, f"fills_part*_{s}.parquet"))
         assert duckdb.sql(f"SELECT count(*) FROM read_parquet('{R}/fills_part*.parquet') WHERE source = '{s}'").fetchall()[0][0] == 0
+
+
+def test_label_sets_nested():
+    """A20: strict <= standard <= broad = is_documented, in wallets, episodes and positions."""
+    for t in ["wallets", "episodes", "positions"]:
+        d = load(t, ["label_strict", "label_standard", "label_broad"] + (["is_documented"] if t != "episodes" else []))
+        assert (~d.label_strict | d.label_standard).all() and (~d.label_standard | d.label_broad).all(), t
+        if t != "episodes":
+            assert (d.label_broad == d.is_documented).all(), t
+
+
+def test_hard_negatives_are_never_positives():
+    p = load("positions", ["hard_negative", "is_documented", "coordinated_rule_fired"])
+    assert not (p.hard_negative & (p.is_documented | p.coordinated_rule_fired)).any()
+    w = load("wallets"); assert not (w.hard_negative & w.label_broad).any()
+
+
+def test_api_rows_have_null_role_fields():
+    """A24: one fills schema; fields a source lacks are NULL with role_fields_available = false."""
+    bad = duckdb.sql(f"""SELECT count(*) FROM read_parquet('{R}/fills_part*.parquet') WHERE (source = 'data_api_v2') AND
+                         (role_fields_available OR wallet_role IS NOT NULL OR aggressor_side IS NOT NULL OR maker IS NOT NULL OR taker IS NOT NULL OR fee_usdc IS NOT NULL)""").fetchall()[0][0]
+    assert bad == 0
+    assert duckdb.sql(f"SELECT count(*) FROM read_parquet('{R}/fills_part*.parquet') WHERE source = 'hf_polymarket_v1' AND NOT role_fields_available").fetchall()[0][0] == 0
+
+
+def test_no_duplicates_at_source_boundary():
+    """A24: no Data API case row at or before the Polymarket-v1 end for a market in Polymarket-v1; no cross-source twins within 60 s."""
+    if WITHHELD:
+        pytest.skip("Data API rows withheld in this package")
+    q = f"read_parquet('{R}/fills_part*.parquet')"
+    early = duckdb.sql(f"""SELECT count(*) FROM {q} a WHERE a.source = 'data_api_v2' AND a.market_set = 'case' AND a.ts_unix <= 1777374040
+                           AND a.condition_id IN (SELECT DISTINCT condition_id FROM {q} WHERE source = 'hf_polymarket_v1')""").fetchall()[0][0]
+    assert early == 0
+    dup = duckdb.sql(f"""WITH a AS (SELECT * FROM {q} WHERE source = 'data_api_v2' AND ts_unix BETWEEN 1777374040 - 3600 AND 1777374040 + 3600),
+                              h AS (SELECT * FROM {q} WHERE source = 'hf_polymarket_v1' AND ts_unix BETWEEN 1777374040 - 3600 AND 1777374040 + 3600)
+                         SELECT count(*) FROM a JOIN h ON a.condition_id = h.condition_id AND a.wallet = h.wallet AND a.wallet_side = h.wallet_side
+                              AND abs(a.usdc - h.usdc) < 0.01 AND abs(a.ts_unix - h.ts_unix) <= 60""").fetchall()[0][0]
+    assert dup == 0
+
+
+UNIT = re.compile(r"(usdc|usd|shares|utc|unix|hours|days|minutes|price|share|rate|ratio|score|rank|decile|seq|number|year|hour_of_day|win_rate|cv_ratio)")
+
+
+@pytest.mark.parametrize("t", list(TABLES))
+def test_numeric_columns_carry_units(t):
+    """A24: numeric amount, size, price, time or duration columns name their unit; counts start with n_."""
+    bad = [c["name"] for c in TABLES[t]["cols"] if c["dtype"] in ("int64", "float64") and not c["name"].startswith("n_") and not UNIT.search(c["name"])
+           and not c["name"].startswith(("f2_", "gate1_", "f5_"))]
+    assert not bad, (t, bad)

@@ -21,13 +21,13 @@ for t, spec in TABLES.items():
     L.append("")
 open(os.path.join(REL, "docs", "CODEBOOK.md"), "w").write("\n".join(L) + "\n")
 files = []
-for p in sorted(glob.glob(os.path.join(REL, "**", "*"), recursive=True)):
+for p in sorted(glob.glob(os.path.join(REL, "**", "*"), recursive=True, include_hidden=True)):
     if os.path.isdir(p) or p.endswith("MANIFEST.json") or "/.ipynb_checkpoints/" in p or "__pycache__" in p or p.endswith(".pyc"):
         continue
     rel = os.path.relpath(p, REL)
     rows = pq.ParquetFile(p).metadata.num_rows if p.endswith(".parquet") else (sum(1 for _ in open(p, "rb")) - 1 if p.endswith(".csv") else None)
     files.append(dict(path=rel, rows=rows, bytes=os.path.getsize(p), sha256=hashlib.sha256(open(p, "rb").read()).hexdigest()))
-json.dump(dict(name="PMITC", version="1.0.1", package=os.path.basename(REL), withheld_sources=["data_api_v2"] if os.path.basename(REL) == "release_safe" else [],
+json.dump(dict(name="PMITC", version="1.1.0", package=os.path.basename(REL), withheld_sources=["data_api_v2"] if os.path.basename(REL) == "release_safe" else [],
                wallets_confirmed_only_by_withheld_sources=json.load(open(os.path.join(D, "out", "v1", "safe_api_only_wallets.json"))) if os.path.basename(REL) == "release_safe" else [], hf_source="TimeSeventeen/Polymarket-v1 @ 6d1bcd5279cbbd8e833feaeba9a56a0aee139144",
                generated_by="build/v1/codebook.py", files=files), open(os.path.join(REL, "MANIFEST.json"), "w"), indent=1)
 print(len(files), "files in manifest")

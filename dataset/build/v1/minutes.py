@@ -18,13 +18,16 @@ rows = [mk.assign(market_set="case", t_news_version=v, t_cut=ep(mk[col]), yes_la
         for v, col in [("day", "t_news_utc"), ("precise", "t_news_precise_utc")]]
 rows += [pl.assign(market_set="placebo", condition_id=pl.placebo_condition_id, t_news_version=v, t_cut=ep(pl[f"t_ref_{v}_utc"]), yes_label=pl.placebo_outcomes.map(yes))[
          ["market_set", "case_id", "condition_id", "t_news_version", "t_cut", "yes_label"]] for v in ["day", "precise"]]
+tw = pd.read_csv(os.path.join(D, "data", "twin_markets.csv"), dtype=str, keep_default_na=False); tw = tw[tw.twin_condition_id != ""]
+rows += [tw.assign(market_set="twin", condition_id=tw.twin_condition_id, t_news_version=v, t_cut=ep(tw[f"t_ref_{v}_utc"]), yes_label=tw.twin_outcomes.map(yes))[
+         ["market_set", "case_id", "condition_id", "t_news_version", "t_cut", "yes_label"]] for v in ["day", "precise"]]
 c.register("mk_df", pd.concat(rows)); c.sql("CREATE TABLE mk AS SELECT * FROM mk_df")
 c.sql(f"CREATE TABLE ff AS SELECT wallet, first_fill_v1_ts ffts FROM '{D}/out/v1/wallet_history.parquet'")
 c.sql(f"""COPY (
   WITH l AS (
     SELECT m.market_set, m.case_id, l.condition_id, m.t_news_version, m.t_cut, l.source, l.wallet, l.wallet_role, l.aggressor_side, l.ts, l.price, l.usdc,
            (l.ts // 60) * 60 AS minute_ts
-    FROM read_parquet(['{F}/fills_case.parquet', '{F}/fills_placebo.parquet']) l JOIN mk m ON m.condition_id = l.condition_id AND m.market_set = l.market_set
+    FROM read_parquet(['{F}/fills_case.parquet', '{F}/fills_placebo.parquet', '{F}/fills_twin.parquet']) l JOIN mk m ON m.condition_id = l.condition_id AND m.market_set = l.market_set
     WHERE l.outcome_label = m.yes_label AND l.ts >= m.t_cut - 48 * 3600 AND l.ts < m.t_cut + 24 * 3600)
   SELECT market_set, case_id, condition_id, t_news_version, minute_ts, to_timestamp(minute_ts) minute_utc,
          ((minute_ts - any_value(t_cut)) / 60)::INTEGER AS minutes_from_cut, string_agg(DISTINCT source, ';') source,

@@ -6,7 +6,7 @@ import glob, os, shutil, subprocess, sys
 D = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SRC, DST = os.path.join(D, "release"), os.path.join(D, "release_safe")
 shutil.rmtree(DST, ignore_errors=True)
-for p in glob.glob(os.path.join(SRC, "**", "*"), recursive=True):
+for p in glob.glob(os.path.join(SRC, "**", "*"), recursive=True, include_hidden=True):
     rel = os.path.relpath(p, SRC); q = os.path.join(DST, rel)
     if os.path.isdir(p) or "__pycache__" in p or p.endswith(".pyc") or rel in ("MANIFEST.json", "dataset-metadata.json", "docs/README.md"):
         continue

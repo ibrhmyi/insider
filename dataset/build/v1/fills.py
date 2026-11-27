@@ -18,9 +18,10 @@ c = duckdb.connect(); c.sql(f"SET memory_limit='9GB'; SET temp_directory='{TMPD}
 mk = list(csv.DictReader(open(os.path.join(D, "data", "markets.csv"))))
 case = sorted({r["condition_id"].lower() for r in mk}); withheld = sorted({r["condition_id"].lower() for r in mk if r.get("title_withheld") == "true"})
 plc = sorted({r["placebo_condition_id"] for r in csv.DictReader(open(os.path.join(D, "data", "placebo_markets.csv"))) if r.get("placebo_condition_id")})
+twn = sorted({r["twin_condition_id"] for r in csv.DictReader(open(os.path.join(D, "data", "twin_markets.csv"))) if r.get("twin_condition_id")})  # A22
 labels = sorted({r["address"].lower() for r in csv.DictReader(open(os.path.join(D, "data", "wallet_labels.csv")))})
 hfp = sorted({x.strip().lower() for x in open(os.path.join(D, "logs", "hf_pass_label_addresses.txt")) if x.strip()})
-for name, vals in [("cm", case), ("wh", withheld), ("pm", plc), ("lab", labels), ("hfp", hfp)]:
+for name, vals in [("cm", case), ("wh", withheld), ("pm", plc), ("tm", twn), ("lab", labels), ("hfp", hfp)]:
     c.execute(f"CREATE TABLE {name}(v VARCHAR PRIMARY KEY)"); c.executemany(f"INSERT INTO {name} VALUES (?)", [(v,) for v in vals])
 
 COLS = ["source", "fill_id", "leg_id", "tx_hash", "ts", "condition_id", "asset_id", "outcome_label", "outcome_seq", "price", "usdc", "shares",
@@ -87,12 +88,17 @@ c.sql(f"""COPY (SELECT 'placebo' market_set, {sel} FROM ({LEG.format(src="read_p
           WHERE condition_id IN (SELECT v FROM pm) AND condition_id NOT IN (SELECT v FROM cm)
           ORDER BY condition_id, ts, leg_id) TO '{OUT}/fills_placebo.parquet' (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 500000)""")
 print("placebo", c.sql(f"SELECT count(*) FROM '{OUT}/fills_placebo.parquet'").fetchall(), flush=True)
+# twin markets (A22): Polymarket-v1 pass over the twins only (layer B9 of build/hf_pass_v9.py)
+c.sql(f"""COPY (SELECT 'twin' market_set, {sel} FROM ({LEG.format(src="read_parquet('" + WORK + "/B9/*.parquet', union_by_name=true)")})
+          WHERE condition_id IN (SELECT v FROM tm) AND condition_id NOT IN (SELECT v FROM cm)
+          ORDER BY condition_id, ts, leg_id) TO '{OUT}/fills_twin.parquet' (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 500000)""")
+print("twin", c.sql(f"SELECT count(*) FROM '{OUT}/fills_twin.parquet'").fetchall(), flush=True)
 # labelled wallets elsewhere: HF A legs (wallets in the pass list) + API wallet activity
 c.sql(f"""COPY (SELECT 'label_other' market_set, {sel} FROM (
             SELECT * FROM ({LEG.format(src="read_parquet('" + WORK + "/A/*.parquet', union_by_name=true)")})
               WHERE wallet IN (SELECT v FROM lab) AND wallet IN (SELECT v FROM hfp)
             UNION ALL SELECT * FROM read_parquet('{API}/w_*.parquet'))
-          WHERE condition_id NOT IN (SELECT v FROM cm) AND condition_id NOT IN (SELECT v FROM pm)
+          WHERE condition_id NOT IN (SELECT v FROM cm) AND condition_id NOT IN (SELECT v FROM pm) AND condition_id NOT IN (SELECT v FROM tm)
           ORDER BY wallet, ts, leg_id) TO '{OUT}/fills_label_other.parquet' (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 500000)""")
 print("label_other", c.sql(f"SELECT count(*) FROM '{OUT}/fills_label_other.parquet'").fetchall(), flush=True)
 # counts per case (logs/fills_counts_by_case.csv)

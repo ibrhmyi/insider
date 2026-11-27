@@ -10,16 +10,23 @@ c = duckdb.connect(); c.sql(f"SET memory_limit='3GB'; SET threads=2; SET enable_
 for f in glob.glob(os.path.join(OUT, "fills_part*")):
     os.remove(f)
 n_part = total = 0
-for ms in ["case", "placebo", "label_other"]:
+for ms in ["case", "placebo", "twin", "label_other"]:
     for src in ["hf_polymarket_v1", "data_api_v2"]:
         q = f"(SELECT * FROM '{V1}/fills_{ms}.parquet' WHERE source = '{src}')"
+        if not os.path.exists(f"{V1}/fills_{ms}.parquet"):
+            continue
         n = c.sql(f"SELECT count(*) FROM {q}").fetchall()[0][0]
         for off in range(0, n, PART_ROWS):
             n_part += 1
             out = os.path.join(OUT, f"fills_part{n_part:03d}_{ms}_{src}.parquet")
-            c.sql(f"""COPY (SELECT market_set, leg_id, source, fill_id, tx_hash, ts::BIGINT ts, to_timestamp(ts) ts_utc, condition_id, asset_id, outcome_label,
-                         outcome_seq::BIGINT outcome_seq, price::DOUBLE price, usdc::DOUBLE usdc, shares::DOUBLE shares, fee_usdc::DOUBLE fee_usdc, wallet,
-                         wallet_role, wallet_side, aggressor_side, maker, taker, market_slug FROM {q} LIMIT {PART_ROWS} OFFSET {off})
+            c.sql(f"""COPY (SELECT market_set, leg_id, source, fill_id, tx_hash, ts::BIGINT ts_unix, to_timestamp(ts) ts_utc, condition_id, asset_id, outcome_label,
+                         outcome_seq::BIGINT outcome_seq, price::DOUBLE price_usdc, usdc::DOUBLE usdc, shares::DOUBLE shares,
+                         CASE WHEN source = 'data_api_v2' THEN NULL ELSE fee_usdc::DOUBLE END fee_usdc, wallet,
+                         CASE WHEN source = 'data_api_v2' THEN NULL ELSE wallet_role END wallet_role,
+                         (source = 'hf_polymarket_v1') role_fields_available, wallet_side,
+                         CASE WHEN source = 'data_api_v2' THEN NULL ELSE aggressor_side END aggressor_side,
+                         CASE WHEN source = 'data_api_v2' THEN NULL ELSE maker END maker, CASE WHEN source = 'data_api_v2' THEN NULL ELSE taker END taker,
+                         market_slug FROM {q} LIMIT {PART_ROWS} OFFSET {off})
                       TO '{out}' (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 500000)""")
             total += min(PART_ROWS, n - off)
 print("fills", total, "rows in", n_part, "parts")

@@ -1,0 +1,14 @@
+# PMITC v1.1: pinned versions used to build and test the release (Python 3.13)
+pandas==3.0.5
+pyarrow==26.0.1
+duckdb==2.0.1
+numpy==2.5.3
+scikit-learn==1.9.1
+matplotlib==3.11.2
+nbformat==5.11.1
+nbconvert==7.17.2
+jupyter==1.1.1
+ipykernel==7.4.0
+huggingface_hub==2.5.0
+pytest==9.1.1
+datasets==5.2.0

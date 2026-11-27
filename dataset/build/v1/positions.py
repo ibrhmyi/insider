@@ -36,10 +36,18 @@ for r in pl.itertuples():
         rows.append(dict(market_set="placebo", case_id=r.case_id, condition_id=r.placebo_condition_id, t_news_version=v,
                          t_cut=getattr(r, f"t_ref_{v}_utc"), event_id=None, yes_label="Yes" if "Yes" in outs else outs[0],
                          is_shortest_sufficient=False, winning_outcome=r.placebo_outcome, resolved_utc=r.placebo_end_utc))
+tw = pd.read_csv(os.path.join(D, "data", "twin_markets.csv"), dtype=str, keep_default_na=False)
+tw = tw[tw.twin_condition_id != ""]
+for r in tw.itertuples():  # A22: twin markets, cut at t_ref
+    outs = r.twin_outcomes.split(";")
+    for v in ["day", "precise"]:
+        rows.append(dict(market_set="twin", case_id=r.case_id, condition_id=r.twin_condition_id, t_news_version=v,
+                         t_cut=getattr(r, f"t_ref_{v}_utc"), event_id=None, yes_label="Yes" if "Yes" in outs else outs[0],
+                         is_shortest_sufficient=False, winning_outcome=r.twin_outcome, resolved_utc=r.twin_end_utc))
 M = pd.DataFrame(rows); M["t_cut_ts"] = ep(M.t_cut); M["resolved_ts"] = ep(M.resolved_utc)
 c.register("M_df", M.drop(columns=["t_cut", "resolved_utc"])); c.sql("CREATE TABLE M AS SELECT * FROM M_df")
 c.sql(f"""CREATE VIEW legs AS SELECT market_set, condition_id, asset_id, outcome_label, ts, price, usdc, shares, wallet, wallet_role, wallet_side, source
-          FROM read_parquet(['{F}/fills_case.parquet', '{F}/fills_placebo.parquet']) WHERE wallet IS NOT NULL AND wallet <> ''""")
+          FROM read_parquet(['{F}/fills_case.parquet', '{F}/fills_placebo.parquet', '{F}/fills_twin.parquet']) WHERE wallet IS NOT NULL AND wallet <> ''""")
 c.sql("""CREATE VIEW L AS SELECT m.market_set, m.case_id, m.condition_id, m.t_news_version, m.t_cut_ts, m.yes_label, m.event_id,
                  m.is_shortest_sufficient, m.winning_outcome, l.asset_id, l.outcome_label, l.ts, l.price, l.usdc, l.shares, l.wallet,
                  l.wallet_role, l.wallet_side, l.source,

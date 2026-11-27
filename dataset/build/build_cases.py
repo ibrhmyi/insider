@@ -24,7 +24,7 @@ NEW = {  # case_id: (title, category)
  "polymarket-referrals-aggregate": ("Polymarket referrals to law enforcement", "aggregate"),
  "polysights-flags-aggregate": ("Polysights flagged trades (Bloomberg analysis)", "aggregate"),
  "pope-conclave-2025": ("Papal conclave, May 2025", "award_leak"),
- "solidus-multichain": ("Solidus Labs multichain insider clusters", "aggregate"),
+ "solidus-multichain": ("Solidus Labs multichain clusters of suspected informed trading", "aggregate"),
  "super-bowl-halftime-2025": ("Super Bowl LIX halftime performers", "celebrity"),
  "survivor-50-2026": ("Survivor 50 winner (pre-taped show)", "celebrity"),
  "tariff-decisions-2026": ("Tariff decision markets", "political_decision"),

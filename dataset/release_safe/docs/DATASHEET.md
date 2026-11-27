@@ -1,6 +1,6 @@
-# Datasheet: Prediction-Market Informed-Trading Casebook (PMITC), v1.0.1
+# Datasheet: Prediction-Market Informed-Trading Casebook (PMITC), v1.1.0
 
-Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules: `PROTOCOL.md` v1.0 with amendments A1 to A19. Columns: `CODEBOOK.md`. Run history: `dataset/logs/run2_report.md` to `run7_report.md` in the repository.
+Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules: `PROTOCOL.md` v1.0 with amendments A1 to A24. Columns: `CODEBOOK.md`. Run history: `dataset/logs/run2_report.md` to `run7_report.md` in the repository.
 
 ## Motivation
 - **Purpose.** A citable, source-traced register of publicly documented suspected informed trading on prediction markets, joined to the trades, with honest negatives (matched controls, all other buyers, placebo markets) for analysis and machine learning.
@@ -10,6 +10,8 @@ Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules
 
 ## Composition
 - **Instances:** claims, cases, wallet labels, case markets, placebo markets, fills (wallet legs), all-buyer positions, episodes, controls, rule labels, minute paths, contradictions, money links. Counts are in `README.md` and `MANIFEST.json`.
+- **Label sets (A20):** `label_strict` (linked to an E1-E3 claim or named in an E4 claim), `label_standard` (case grade E1-E4, includes cluster members), `label_broad` (E1-E5). Counts in the dataset card.
+- **Hard negatives (A21) and twin markets (A22):** look-alike negatives and same-category comparison markets that appear in no claim.
 - **Labelled positives:** 119 wallets that a source flags as suspected, whose own fills confirm they traded the case's markets, in informed-trading cases (`is_documented`, A19), in 18 cases. 74 of them come from two cases (52 Feb-28 Iran strike, 22 KPMG), and 87 are cluster members linked by money flows, not flagged one by one. 13 more suspected wallets are not trade-confirmed and one is in a public-data-leak case (kept, not positive). The A13 coordinated-buyer rule is a rule output in `positions` and `weak_labels` (`coordinated_rule_fired`): about 1/3 expected by chance, may include copy-traders, not an allegation.
 - **Sample, not population.** The collection holds what was publicly noticed (PROTOCOL 8). Do not estimate prevalence from it.
 - **Labels:** evidence grades E1 to E6 per claim (a case takes its strongest); wallet polarity; rule labels (E6) kept separately; benchmark split. A label is an allegation, not a finding.
@@ -32,7 +34,7 @@ Headings follow Gebru et al. (2021), *Datasheets for Datasets*. Collection rules
 
 ## Uses
 - **Intended:** benchmark detection methods (T1 to T3); study pre-news trading around documented events; audit public allegations against fills.
-- **Not intended:** identifying people; estimating prevalence; training a detector only on these cases; treating E2 to E6 as findings.
+- **Not intended (see also `DATA_PROTECTION.md`):** identifying people; estimating prevalence; training a detector only on these cases; treating E2 to E6 as findings.
 - **Freeze rule:** report results on cases added after your method's freeze date separately.
 
 ## Distribution
