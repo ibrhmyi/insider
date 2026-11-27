@@ -392,3 +392,14 @@ def test_market_maker_flag_consistent():
     p = duckdb.sql(f"SELECT DISTINCT wallet, is_market_maker FROM read_parquet('{R}/positions.parquet')").df()
     assert duckdb.sql("SELECT count(*) FROM p WHERE is_market_maker AND wallet NOT IN (SELECT wallet FROM w)").fetchall()[0][0] == 0
     assert p.groupby("wallet").is_market_maker.nunique().max() == 1
+
+
+def test_directional_entry_columns():
+    """A34.3: entry columns only on directional positions, and always before the cut."""
+    q = f"read_parquet('{R}/positions.parquet')"
+    bad = duckdb.sql(f"""SELECT count(*) FROM {q} WHERE (is_directional_position AND (directional_first_buy_utc IS NULL OR NOT directional_hours_first_buy_to_cut > 0
+                              OR epoch(directional_first_buy_utc) >= t_cut_unix OR directional_vwap_pre NOT BETWEEN 0 AND 1))
+                          OR (NOT is_directional_position AND (directional_first_buy_utc IS NOT NULL OR directional_vwap_pre IS NOT NULL))""").fetchall()[0][0]
+    assert bad == 0
+    e = load("episodes", ["role", "directional_first_buy_utc", "directional_hours_first_buy_to_cut"])
+    assert e.directional_first_buy_utc.notna().all() and (e.directional_hours_first_buy_to_cut > 0).all()
