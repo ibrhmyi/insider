@@ -1,21 +1,22 @@
 {
  "seed": 192,
  "n_episodes": 461,
- "n_controls": 7288,
+ "n_controls": 7358,
  "n_pre_rows": 1596123,
  "n_excluded_addresses": 12337,
- "episodes_with_same_side_controls": 390,
+ "episodes_with_same_side_controls": 407,
  "relaxation_counts": {
-  "size_0.25_4x": 253,
+  "size_0.25_4x": 270,
   "base": 49,
   "price_0.10": 49,
   "window_72h": 39
  },
- "n_episodes_without_same_side": 71,
- "n_episode_rows": 7749,
+ "n_episodes_without_same_side": 54,
+ "n_episodes_relaxed_band": 17,
+ "n_episode_rows": 7819,
  "rows_by_role": {
-  "control_other_side_large_buyer": 4135,
-  "control_same_side": 3153,
+  "control_other_side_large_buyer": 4159,
+  "control_same_side": 3199,
   "suspected": 461
  },
  "suspected_episodes_by_case": {
@@ -30,12 +31,12 @@
   "zachxbt-axiom-2026-02": 9,
   "maduro-2026-01": 8,
   "israel-rising-lion-2025-06": 3,
-  "taylor-swift-engagement": 2,
   "mstr-btc-sale": 2,
+  "taylor-swift-engagement": 2,
   "nobel-peace-2025": 2,
   "trump-pardon-cz-2025": 1,
   "world-cup-2026-06": 1,
-  "draftkings-pm-launch": 1,
-  "fed-chair-nomination-2026": 1
+  "fed-chair-nomination-2026": 1,
+  "draftkings-pm-launch": 1
  }
 }
