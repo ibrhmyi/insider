@@ -237,7 +237,7 @@ hist = c.sql(f"""WITH p AS (SELECT wallet, condition_id, asset_id, min(first_ts)
 X = X.merge(hist, on="row_id", how="left")
 X["prior_markets"] = X["prior_markets"].fillna(0).astype(int)  # no earlier market in Polymarket-v1 -> 0
 if MODE == "winrate_matched":  # A33 self-check: the matching band equals the band of the episode's own feature
-    chk = X[X.role == "suspected"].merge(ep[["case_id", "condition_id", "asset_id", "wallet", "wr_band"]], on=["case_id", "condition_id", "asset_id", "wallet"])
+    chk = X[X.role == "suspected"]  # carries wr_band from the episode rows
     mism = int((chk.prior_net_long_win_rate.map(band) != chk.wr_band).sum())
     print("A33 band self-check: suspected rows", len(chk), "mismatches", mism, flush=True)
     assert mism == 0
