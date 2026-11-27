@@ -35,19 +35,21 @@ def coarse_end(t0, prec, ev):
     return None
 
 
+import re
+DEADLINE_Q = re.compile(r"\b(by|before)\s+(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|end of|\d{4}|q[1-4])", re.I)  # A25.2
 cases = pd.read_csv(os.path.join(D, "data", "cases.csv"), dtype=str, keep_default_na=False).set_index("case_id")
 out = []
 for r in mk.itertuples():
     g = G.get(r.condition_id.lower(), {})
     sched = ts(g.get("gameStartTime") or g.get("eventStartTime") or "")
     t0 = ts(r.t_news_utc)
-    if pd.notna(sched):
+    if pd.notna(sched) and not DEADLINE_Q.search(r.question or ""):
         t, meth = sched, "scheduled_start"
     else:
         t, meth = ts(r.t_news_precise_utc), "case_time"
         if r.t_news_precision in ("month", "quarter", "year", "range"):
             end = coarse_end(t0, r.t_news_precision, cases.loc[r.case_id, "event_date"] if r.case_id in cases.index else "")
-            dl = ts(g.get("endDate") or r.deadline_utc)
+            dl = sched if pd.notna(sched) else ts(g.get("endDate") or r.deadline_utc)  # A25.2: a deadline-form start is the deadline
             if end is not None and pd.notna(dl) and t0 <= dl < end:
                 t, meth = dl, "market_deadline"
     if meth != "case_time" and r.t_news_precise_precision != "day_fallback":  # A25.1

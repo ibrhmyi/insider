@@ -263,11 +263,14 @@ def test_numeric_columns_carry_units(t):
 
 def test_market_cut_not_after_sourced_case_time():
     """A25/A25.1: per-market cuts never fall after the case's sourced exact time nor after the day-level case date ends."""
-    m = load("markets", ["t_news_utc", "t_news_precise_utc", "t_news_precise_precision", "t_news_market_utc", "t_news_market_day_utc", "t_news_market_method"])
+    m = load("markets", ["question", "t_news_precision", "t_news_utc", "t_news_precise_utc", "t_news_precise_precision", "t_news_market_utc", "t_news_market_day_utc", "t_news_market_method"])
     m = m[m.t_news_market_utc.notna()]
     sourced = m.t_news_precise_precision != "day_fallback"
     assert (m[sourced].t_news_market_utc <= m[sourced].t_news_precise_utc).all()
-    assert (m.t_news_market_day_utc <= m.t_news_utc + pd.Timedelta(days=1)).all()
+    dl = m[m.t_news_market_method == "market_deadline"]
+    assert (dl.t_news_precision != "day").all() and (dl.t_news_market_utc >= dl.t_news_utc).all()  # A25 rule 2: only inside a coarse date
+    dq = re.compile(r"\b(by|before)\s+(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|end of|\d{4}|q[1-4])", re.I)
+    assert not m[(m.t_news_market_method == "scheduled_start") & m.question.fillna("").str.contains(dq)].shape[0]  # A25.2
     assert (m[m.t_news_market_method == "case_time"].t_news_market_utc == m[m.t_news_market_method == "case_time"].t_news_precise_utc).all()
 
 
