@@ -30,6 +30,10 @@ def cell(task, s, model):
 
 
 XU = B["excluded_unreliable"]
+# Maduro strict fold (one positive): tasks where logistic regression ranks the wallet below all its controls
+MAD = sorted(t for t in ["T1s", "T2s", "T2w", "T2open", "T1", "T2"] if B["precise"]["label_strict"][t]["summary"].get("logistic_regression", {}).get("fold_values", {}).get("loco:maduro-2026-01") == 0.0)
+MAD_TXT = (f"- In the strict leave-one-case-out fold for Maduro (one positive: the wallet in the charged, E2 case), logistic regression ranks that wallet below all of its matched controls (AUC 0.0 in {', '.join(MAD)}): the pattern learned from the cluster-heavy training cases does not match the strongest-evidence case."
+           if MAD else "- In the strict Maduro fold (one positive), results rest on a single wallet; see the per-fold values in `baselines.json`.")
 
 
 bench_rows = []
@@ -124,6 +128,8 @@ Base result for T2: matched same-side controls win about as often as documented 
 - The money graph is not built (no archive Polygon RPC); funding features are empty.
 - {int((claims.verified == "pending").sum())} claims are pending (pages blocked or unread); the blind second-extractor check (A4) is pending.
 - Rule outputs (coordinated-buyer rule, Gate 1, ACDC, Inca) are screens with known false-positive rates, not labels.
+{MAD_TXT}
+- Positions and episodes need a BUY fill before the cut (A6.10), so 3 of 112 `label_standard` wallets have none: one bought only after the news, two traded only by SELL legs before it (one of them possibly an economic buy through split-then-sell, which the fills cannot show without the CTF mint layer).
 
 ## Ethics, data protection and removal
 
