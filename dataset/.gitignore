@@ -9,3 +9,4 @@ release_safe/data/fills_part*.parquet
 release_safe/data/positions.parquet
 release_safe/data/weak_labels.parquet
 upload/
+logs/gamma_raw/profile_*.json
