@@ -58,7 +58,8 @@ c.sql(f"""CREATE TABLE pre AS
   WHERE l.wallet_side = 'BUY' AND l.ts < m.t_news AND l.wallet <> ''
   GROUP BY ALL""")
 # A34.2: an episode (and a control candidate) needs a directional pre-news position on that token, net of full sets
-c.sql(f"""CREATE TABLE DIRE AS SELECT case_id, condition_id, wallet, directional_asset_id asset_id, directional_shares_pre, full_sets_pre_shares, directional_cost_usdc_pre
+c.sql(f"""CREATE TABLE DIRE AS SELECT case_id, condition_id, wallet, directional_asset_id asset_id, directional_shares_pre, full_sets_pre_shares, directional_cost_usdc_pre,
+                 directional_first_buy_utc, directional_first_buy_price, directional_vwap_pre, directional_hours_first_buy_to_cut
           FROM '{OUT}/directional.parquet' WHERE market_set = 'case' AND t_news_version = '{VER}' AND directional_shares_pre > 1e-6""")
 c.sql("CREATE OR REPLACE TABLE pre AS SELECT p.* FROM pre p JOIN DIRE d ON d.case_id = p.case_id AND d.condition_id = lower(p.condition_id) AND d.wallet = p.wallet AND d.asset_id = p.asset_id")
 n_pre = c.sql("SELECT count(*) FROM pre").fetchall()[0][0]
@@ -287,7 +288,8 @@ keep = ["row_id", "role", "control_of", "case_id", "condition_id", "event_slug",
         "is_shortest_sufficient", "share_on_this_ladder_market", "hours_first_buy_to_tnews", "hours_funding_to_first_trade",
         "funding_source_type", "funder_shared_with_labelled", "follower_wallets_60m", "follower_buy_usdc_60m",
         "share_sold_before_resolution_post", "won_post", "pnl_post", "redemption_delay_hours_post", "relaxed_band",
-        "econ_inferred_buy_usdc_pre", "raw_view_prenews_buy", "directional_shares_pre", "full_sets_pre_shares", "directional_cost_usdc_pre"]
+        "econ_inferred_buy_usdc_pre", "raw_view_prenews_buy", "directional_shares_pre", "full_sets_pre_shares", "directional_cost_usdc_pre",
+        "directional_first_buy_utc", "directional_first_buy_price", "directional_vwap_pre", "directional_hours_first_buy_to_cut"]
 X = X.rename(columns={})[keep]
 X = X.merge(ep[["episode_id", "case_id", "condition_id", "asset_id", "wallet"]], on=["case_id", "condition_id", "asset_id", "wallet"], how="left")
 X.loc[X.role != "suspected", "episode_id"] = None

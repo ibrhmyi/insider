@@ -3,7 +3,8 @@
 directional token = larger H; directional_shares_pre = |H_yes - H_no|; directional_cost_usdc_pre = FIFO cost of the excess shares
 (sells consume the oldest lots, full sets pair with the oldest remaining lots, the excess is the newest remaining lots).
 For FIFO without overselling, the remaining lots are the buys beyond cumulative bought = total sold, so the excess is the last
-directional_shares shares bought. Writes out/v1/directional.parquet. Usage: python3 build/v1/directional.py <tmp_dir>"""
+directional_shares shares bought (a FIFO accounting figure, not an entry time or price). A34.3: entry columns from the econ BUYs of the
+directional token before the cut (first buy time and price, VWAP, hours from first buy to the cut). Writes out/v1/directional.parquet. Usage: python3 build/v1/directional.py <tmp_dir>"""
 import os, sys
 import duckdb
 
@@ -22,7 +23,7 @@ K = "market_set, case_id, condition_id, t_news_version, wallet"
 parts = []
 for b in range(NB):
     c.sql(f"""CREATE OR REPLACE TABLE LB AS SELECT l.market_set, m.case_id, lower(l.condition_id) condition_id, m.t_news_version, l.wallet, l.asset_id,
-                     l.wallet_side, l.shares, l.price, l.ts, l.leg_id
+                     l.wallet_side, l.shares, l.price, l.usdc, l.ts, l.leg_id, m.t_cut_ts
               FROM legs l JOIN M m ON m.condition_id = lower(l.condition_id) AND m.market_set = l.market_set
               WHERE l.ts < m.t_cut_ts AND hash(lower(l.condition_id)) % {NB} = {b}""")
     out = os.path.join(sys.argv[1], f"directional_{b}.parquet")
@@ -36,10 +37,15 @@ for b in range(NB):
                              sum(LB.shares) OVER (PARTITION BY LB.market_set, LB.case_id, LB.condition_id, LB.t_news_version, LB.wallet ORDER BY LB.ts, LB.leg_id
                                                   ROWS UNBOUNDED PRECEDING) cum, X.btot, X.dshares
                       FROM LB JOIN X USING ({K}) WHERE LB.asset_id = X.directional_asset_id AND LB.wallet_side = 'BUY' AND X.dshares > 1e-6),
-             C AS (SELECT {K}, sum(price * greatest(least(cum, btot) - greatest(cum - shares, btot - dshares), 0)) cost FROM LOTS GROUP BY ALL)
+             C AS (SELECT {K}, sum(price * greatest(least(cum, btot) - greatest(cum - shares, btot - dshares), 0)) cost FROM LOTS GROUP BY ALL),
+             E AS (SELECT LB.market_set, LB.case_id, LB.condition_id, LB.t_news_version, LB.wallet, min(LB.ts) fts, arg_min(LB.price, LB.ts) fprice,
+                          sum(LB.usdc) / nullif(sum(LB.shares), 0) vwap, any_value(LB.t_cut_ts) tcut
+                   FROM LB JOIN X USING ({K}) WHERE LB.asset_id = X.directional_asset_id AND LB.wallet_side = 'BUY' AND X.dshares > 1e-6 GROUP BY ALL)  -- A34.3
         SELECT X.market_set, X.case_id, X.condition_id, X.t_news_version, X.wallet, X.directional_asset_id,
-               X.dshares directional_shares_pre, X.hmin full_sets_pre_shares, coalesce(C.cost, 0) directional_cost_usdc_pre
-        FROM X LEFT JOIN C USING ({K})) TO '{out}' (FORMAT parquet, COMPRESSION zstd)""")
+               X.dshares directional_shares_pre, X.hmin full_sets_pre_shares, coalesce(C.cost, 0) directional_cost_usdc_pre,
+               to_timestamp(E.fts) directional_first_buy_utc, E.fprice directional_first_buy_price, E.vwap directional_vwap_pre,
+               (E.tcut - E.fts) / 3600.0 directional_hours_first_buy_to_cut
+        FROM X LEFT JOIN C USING ({K}) LEFT JOIN E USING ({K})) TO '{out}' (FORMAT parquet, COMPRESSION zstd)""")
     parts.append(out); print("bucket", b, flush=True)
 c.sql(f"COPY (SELECT * FROM read_parquet({parts})) TO '{OUT}/directional.parquet' (FORMAT parquet, COMPRESSION zstd)")
 for p in parts:
