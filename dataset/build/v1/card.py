@@ -22,13 +22,18 @@ fmt = lambda x: "n/a" if x is None else f"{x:.3f}"
 
 def cell(task, s, model):
     r = B["precise"][s][task]["summary"].get(model)
-    if not r or r["loco_mean"] is None:
+    if not r or r.get("loco_min") is None:
         return "n/a"
+    if r.get("reporting") == "per_fold_only_A32":  # A32: fewer than 6 folds -> range of fold values only
+        return f"folds {fmt(r['loco_min'])}-{fmt(r['loco_max'])} ({r['n_loco_folds']}) / {fmt(r['time_split'])}"
     return f"{fmt(r['loco_mean'])} ± {fmt(r['loco_sd'])} ({r['n_loco_folds']}) / {fmt(r['time_split'])}"
 
 
+XU = B["excluded_unreliable"]
+
+
 bench_rows = []
-for task, metric in [("T1s", "AP"), ("T2s", "AUC"), ("T2open", "AUC"), ("T1", "AP"), ("T2", "AUC"), ("T3", "AUC"), ("T3b", "AUC")]:
+for task, metric in [("T1s", "AP"), ("T2s", "AUC"), ("T2w", "AUC"), ("T2open", "AUC"), ("T1", "AP"), ("T2", "AUC"), ("T3", "AUC"), ("T3b", "AUC")]:
     for model in ["prevalence", "gate1_rule", "account_age_heuristic", "logistic_regression", "gradient_boosting_tuned"]:
         if model in B["precise"]["label_strict"][task]["summary"] or model in B["precise"]["label_standard"][task]["summary"]:
             bench_rows.append(f"| {task} | {metric} | {model} | " + " | ".join(cell(task, s, model) for s in ["label_standard", "label_strict", "label_broad"]) + " |")
@@ -49,7 +54,7 @@ configs:
 {chr(10).join(yaml_cfg)}
 ---
 
-# PMITC v1.2: Prediction-Market Informed-Trading Casebook
+# PMITC v1.2.1: Prediction-Market Informed-Trading Casebook
 
 PMITC is a source-traced register of **publicly documented, suspected** informed trading on prediction markets (Polymarket and Kalshi): {len(cases)} cases and {len(claims)} claims from courts, regulators, platforms, researchers, journalists and on-chain analysts, each graded E1 (adjudicated) to E6 (rule-based screen), joined to the trades. For every case market it ships every fill, every buyer before the news, matched controls, hard negatives, same-category "twin" markets and placebo markets where nobody can know the outcome early, so that detection methods can be trained and tested honestly. **Every label is an allegation by a named source ("flagged by <source>"), not a finding.** No table contains a personal name.
 
@@ -60,7 +65,7 @@ PMITC is a source-traced register of **publicly documented, suspected** informed
 ## Quick start
 
 ```python
-import pandas as pd; positions = pd.read_parquet("data/positions.parquet", filters=[("t_news_version", "==", "precise")])
+import pandas as pd; positions = pd.read_parquet("data/positions.parquet", filters=[("t_news_version", "==", "precise"), ("t_news_reliable", "==", True)])  # A29 default
 from datasets import load_dataset; wallets = load_dataset("<hf-user>/pmitc", "wallets", split="train")   # Hugging Face
 print(positions.groupby("market_set").label_strict.sum(), wallets.num_rows)
 ```
@@ -87,13 +92,15 @@ Every column has a type, unit, allowed values, source and leakage note in `docs/
 
 ## News times
 
-Every time-dependent table exists for two cut times (`t_news_version`): `day` and `precise`. Cuts are **per market** (A25): a Gamma scheduled start (matches, earnings releases), a market deadline inside a coarse case date, or else the case time; the case-level `t_news_utc` (00:00 UTC of the earliest documented day) and `t_news_precise_utc` (a sourced minute- or hour-level time, A10, inside the coarse date, A18) are kept. {n_exact} of {markets.case_id.nunique()} market-bearing cases have an exact time; the rest fall back to the day.
+Every time-dependent table exists for two cut times (`t_news_version`): `day` and `precise`. Cuts are **per market** (A25): a Gamma scheduled start (matches, earnings releases), a market deadline inside a coarse case date, or else the case time; the case-level `t_news_utc` (00:00 UTC of the earliest documented day) and `t_news_precise_utc` (a sourced minute- or hour-level time, A10, inside the coarse date, A18) are kept. {n_exact} of {markets.case_id.nunique()} market-bearing cases have an exact time; the rest fall back to the day. A scheduled start is used only if it is before the market's close (A30).
 
-## Benchmarks (PROTOCOL A23, A26, A27; `benchmarks/`)
+**`t_news_reliable` (A29).** Cases dated only to a month or a year, with no sourced exact time, have no trustworthy cut: their markets carry `t_news_reliable = false` (the A25 deadline time, where used, is kept as `markets.t_news_deadline_rule_utc`). **Default analyses and every benchmark use `t_news_reliable = true` only.** This removes {XU['n_cases']} cases, {XU['n_markets']} of {XU['n_markets_total']} markets and {XU['positives_removed']['label_standard']} of {XU['positives_total']['label_standard']} `label_standard` wallets ({XU['positives_removed']['label_strict']} of {XU['positives_total']['label_strict']} strict, {XU['positives_removed']['label_broad']} of {XU['positives_total']['label_broad']} broad): {", ".join(f"`{c}`" for c in XU['cases'])}. Range-dated cases are not covered by the rule and stay reliable.
 
-Leave-one-case-out over cases with at least 3 `label_standard` wallets, plus a time split (test = cases first claimed on or after 2026-03-01). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
+## Benchmarks (PROTOCOL A23, A26, A27, A29, A32, A33; `benchmarks/`)
 
-**Headline tasks control for how sources select cases (A27):** **T1s** ranks pre-news buyers only within the size band of the market's positives (size alone no longer separates them); **T2s** matches controls on account-age band as well as time, price and size; **T2-open** lets Orca/Inca-flagged wallets be controls. Secondary: T1 (all buyers), T2 (standard controls), T3 (case vs same-category twin markets), T3b (case vs crypto/weather placebo markets; market-type sensitive).
+Leave-one-case-out over cases with at least 3 `label_standard` wallets, plus a time split (test = cases first claimed on or after 2026-03-01). Only `t_news_reliable = true` markets (A29). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. **With fewer than 6 folds (A32) a cell gives only the range of fold values** ("folds min-max (n) / time split"); per-fold values are in `baselines.json`. This applies to every `label_strict` cell. Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
+
+**Headline tasks control for how sources select cases (A27):** **T1s** ranks pre-news buyers only within the size band of the market's positives (size alone no longer separates them); **T2s** matches controls on account-age band as well as time, price and size; **T2w** matches on account-age and prior win-rate bands (A33); both retry with the adjacent band before dropping an episode (`relaxed_band`); **T2-open** lets Orca/Inca-flagged wallets be controls. Secondary: T1 (all buyers), T2 (standard controls), T3 (case vs same-category twin markets), T3b (case vs crypto/weather placebo markets; market-type sensitive).
 
 | Task | Metric | Model | label_standard | label_strict (eval only) | label_broad |
 |---|---|---|---|---|---|
@@ -128,7 +135,7 @@ CC-BY-4.0 for PMITC tables and docs; MIT for code. Polymarket-v1 (TimeSeventeen,
 
 ## How to cite
 
-> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.2.0 [dataset]. Protocol v1.0 with amendments A1 to A28. https://github.com/ibrhmyi/insider
+> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.2.1 [dataset]. Protocol v1.0 with amendments A1 to A33. https://github.com/ibrhmyi/insider
 
 See `docs/CITATION.cff`. Please also cite Polymarket-v1 for the fills.
 """

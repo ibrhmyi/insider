@@ -18,7 +18,7 @@ for g in G:
     ax.scatter(s.t, [G.index(g)] * len(s), s=30 + 12 * s.n, color=col[g], alpha=0.8, edgecolor="white", linewidth=0.6, label=f"{g} ({len(s)})")
 ax.set_yticks(range(len(G))); ax.set_yticklabels(["E1 adjudicated / sanction", "E2 charged", "E3 official inquiry", "E4 analyst, transaction-level", "E5 pattern claim", "E6 rule-based screen"])
 ax.invert_yaxis(); ax.grid(axis="x", alpha=0.3)
-ax.set_title(f"PMITC v1.2: {len(c)} cases (event dates from mid-2022) of suspected informed trading by event date and strongest evidence grade\n(dot size = documented wallets; labels are allegations by the named sources, not findings)", fontsize=10)
+ax.set_title(f"PMITC v1.2.1: {len(c)} cases (event dates from mid-2022) of suspected informed trading by event date and strongest evidence grade\n(dot size = documented wallets; labels are allegations by the named sources, not findings)", fontsize=10)
 for k, (_, r) in enumerate(c.sort_values("n", ascending=False).head(4).iterrows()):
     ax.annotate(f"{r.case_id} ({int(r.n)})", (r.t, G.index(r.case_grade)), xytext=(-150 + 40 * k, 22 + 14 * k), textcoords="offset points", fontsize=7,
                 color="#333", arrowprops=dict(arrowstyle="-", color="#999", lw=0.6))

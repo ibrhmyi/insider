@@ -14,8 +14,9 @@ import duckdb, numpy as np, pandas as pd
 
 D = os.path.join(os.path.dirname(__file__), "..", "..")
 WORK, VER = sys.argv[1], sys.argv[2]
-MODE = sys.argv[3] if len(sys.argv) > 3 else "standard"  # A27: standard | age_matched | open
-assert MODE in ("standard", "age_matched", "open")
+MODE = sys.argv[3] if len(sys.argv) > 3 else "standard"  # A27: standard | age_matched | open; A33: winrate_matched
+assert MODE in ("standard", "age_matched", "open", "winrate_matched")
+BANDED = MODE in ("age_matched", "winrate_matched")
 OUT0 = os.path.join(D, "out")
 OUT = os.path.join(D, "out", "v1")
 LEGS = os.path.join(OUT, "fills", "fills_case.parquet")
@@ -73,16 +74,35 @@ ffw = c.sql("SELECT * FROM ffw WHERE wallet IN (SELECT DISTINCT wallet FROM pre)
 ep["ffts"] = ep.wallet.map(ffw); ep["age_band"] = age_band(ep)
 pre_df = c.sql("SELECT * FROM pre WHERE wallet NOT IN (SELECT a FROM excl)").df()
 pre_df["ffts"] = pre_df.wallet.map(ffw); pre_df["age_band"] = age_band(pre_df)
+AGE_ORDER = [n for _, _, n in BANDS]; WR_ORDER = ["lt_0.25", "0.25_0.5", "0.5_0.75", "ge_0.75"]
+def near(b, order):  # A33: the band and its neighbours; unknown / none have no neighbour
+    if b not in order:
+        return {b}
+    i = order.index(b); return set(order[max(0, i - 1): i + 2])
+if MODE == "winrate_matched":  # A33: prior win-rate band, computed as episodes.prior_net_long_win_rate, for episodes and candidates in episode markets
+    em = ep[["case_id", "condition_id"]].drop_duplicates(); c.register("em_df", em)
+    c.register("ep_q", ep[["wallet", "condition_id", "first_buy_ts"]])
+    c.sql("""CREATE TABLE q AS SELECT DISTINCT wallet, condition_id, first_buy_ts FROM (
+               SELECT p.wallet, p.condition_id, p.first_buy_ts FROM pre p JOIN em_df USING (case_id, condition_id) WHERE p.wallet NOT IN (SELECT a FROM excl)
+               UNION ALL SELECT wallet, condition_id, first_buy_ts FROM ep_q)""")
+    wr = c.sql(f"""WITH p AS (SELECT wallet, condition_id, asset_id, min(first_ts) fts, sum(buy_shares) bs, sum(sell_shares) ss
+                     FROM read_parquet('{WORK}/P/*.parquet') WHERE wallet IN (SELECT DISTINCT wallet FROM q) GROUP BY 1, 2, 3),
+                   r AS (SELECT asset_id, condition_id, any_value(outcome_label) ol, any_value(winning_outcome_label) wl, any_value(resolution_status) st
+                         FROM '{OUT0}/hf_market_catalog.parquet' GROUP BY 1, 2)
+                   SELECT q.wallet, q.condition_id, q.first_buy_ts,
+                          avg(CASE WHEN r.st = 'resolved' AND r.wl IS NOT NULL AND p.bs > p.ss THEN (r.ol = r.wl)::INT END) wr
+                   FROM q JOIN p ON p.wallet = q.wallet AND p.fts < q.first_buy_ts AND p.condition_id <> q.condition_id
+                   LEFT JOIN r ON r.asset_id = p.asset_id AND r.condition_id = p.condition_id GROUP BY 1, 2, 3""").df()
+    wr = wr.set_index(["wallet", "condition_id", "first_buy_ts"]).wr
+    band = lambda x: "none" if pd.isna(x) else ("lt_0.25" if x < 0.25 else "0.25_0.5" if x < 0.5 else "0.5_0.75" if x < 0.75 else "ge_0.75")
+    for df_ in (ep, pre_df):
+        df_["wr_band"] = [band(wr.get((a, b, t_), np.nan)) for a, b, t_ in zip(df_.wallet, df_.condition_id, df_.first_buy_ts)]
+    print("win-rate bands (episodes)", ep.wr_band.value_counts().to_dict(), flush=True)
 pre_by = {k: g for k, g in pre_df.groupby(["case_id", "condition_id"])}
 LADDER = [("base", 86400, 0.05, (0.5, 2.0)), ("window_72h", 3 * 86400, 0.05, (0.5, 2.0)),
           ("price_0.10", 3 * 86400, 0.10, (0.5, 2.0)), ("size_0.25_4x", 3 * 86400, 0.10, (0.25, 4.0))]
 ctrl = []
-for _, e in ep.iterrows():
-    g = pre_by.get((e["case_id"], e["condition_id"]))
-    if g is None:
-        continue
-    if MODE == "age_matched":  # never relaxed
-        g = g[g["age_band"] == e["age_band"]]
+def pick(g, e):
     same = g[g["asset_id"] == e["asset_id"]]
     picked, used = pd.DataFrame(), "none_available"
     for name, win, dp, (lo, hi) in LADDER:
@@ -91,15 +111,34 @@ for _, e in ep.iterrows():
         if len(q) >= 10 or name == LADDER[-1][0]:
             picked, used = q, name
             break
+    return picked, used
+for _, e in ep.iterrows():
+    g0 = g = pre_by.get((e["case_id"], e["condition_id"]))
+    if g is None:
+        continue
+    relaxed = False
+    if BANDED:  # exact band(s) first
+        m = g0["age_band"] == e["age_band"]
+        if MODE == "winrate_matched":
+            m &= g0["wr_band"] == e["wr_band"]
+        g = g0[m]
+    picked, used = pick(g, e)
+    if BANDED and len(picked) == 0:  # A33: one retry with the adjacent band(s)
+        m = g0["age_band"].isin(near(e["age_band"], AGE_ORDER))
+        if MODE == "winrate_matched":
+            m &= g0["wr_band"].isin(near(e["wr_band"], WR_ORDER))
+        g2 = g0[m]; p2, u2 = pick(g2, e)
+        if len(p2):
+            g, picked, used, relaxed = g2, p2, u2, True
     if len(picked) > 10:
         picked = picked.iloc[rng.choice(len(picked), 10, replace=False)]
     for _, r in picked.iterrows():
-        ctrl.append(dict(episode_id=e["episode_id"], control_type="same_side", relaxation=used, n_eligible=len(picked),
+        ctrl.append(dict(episode_id=e["episode_id"], control_type="same_side", relaxation=used, n_eligible=len(picked), relaxed_band=relaxed,
                          **{k: r[k] for k in ("case_id", "condition_id", "asset_id", "outcome_label", "wallet", "first_buy_ts",
                                                "first_buy_price", "size_usdc", "n_buys")}))
     other = g[(g["asset_id"] != e["asset_id"]) & (abs(g["first_buy_ts"] - e["first_buy_ts"]) <= 86400)].nlargest(10, "size_usdc")
     for _, r in other.iterrows():
-        ctrl.append(dict(episode_id=e["episode_id"], control_type="other_side_large_buyer", relaxation="base", n_eligible=len(other),
+        ctrl.append(dict(episode_id=e["episode_id"], control_type="other_side_large_buyer", relaxation="base", n_eligible=len(other), relaxed_band=relaxed,
                          **{k: r[k] for k in ("case_id", "condition_id", "asset_id", "outcome_label", "wallet", "first_buy_ts",
                                                "first_buy_price", "size_usdc", "n_buys")}))
 ctrl = pd.DataFrame(ctrl)
@@ -108,15 +147,16 @@ ctrl.to_parquet(os.path.join(OUT, f"controls_{VER}_{MODE}.parquet"), index=False
 summ = dict(seed=SEED, n_episodes=len(ep), n_controls=len(ctrl), n_pre_rows=n_pre, n_excluded_addresses=len(excluded),
             episodes_with_same_side_controls=int(ctrl[ctrl.control_type == "same_side"].episode_id.nunique()) if len(ctrl) else 0,
             relaxation_counts=ctrl[ctrl.control_type == "same_side"].groupby("episode_id").relaxation.first().value_counts().to_dict() if len(ctrl) else {},
-            n_episodes_without_same_side=int(len(ep) - (ctrl[ctrl.control_type == "same_side"].episode_id.nunique() if len(ctrl) else 0)))
+            n_episodes_without_same_side=int(len(ep) - (ctrl[ctrl.control_type == "same_side"].episode_id.nunique() if len(ctrl) else 0)),
+            n_episodes_relaxed_band=int(ctrl[ctrl.relaxed_band].episode_id.nunique()) if len(ctrl) else 0)
 print(summ, flush=True)
 
 # --- episode feature rows: suspected episodes + their controls (one row per wallet x case x market x token)
 rows = ep.assign(role="suspected", control_of="")
 if len(ctrl):
     cr = ctrl.rename(columns={"episode_id": "control_of"}).assign(role=lambda d: "control_" + d["control_type"])
-    rows = pd.concat([rows, cr[["case_id", "condition_id", "asset_id", "outcome_label", "wallet", "first_buy_ts", "first_buy_price",
-                                "size_usdc", "n_buys", "role", "control_of"]]], ignore_index=True)
+    rows = pd.concat([rows.assign(relaxed_band=False), cr[["case_id", "condition_id", "asset_id", "outcome_label", "wallet", "first_buy_ts", "first_buy_price",
+                                "size_usdc", "n_buys", "role", "control_of", "relaxed_band"]]], ignore_index=True)
 rows = rows.drop_duplicates(["case_id", "condition_id", "asset_id", "wallet", "role", "control_of"])
 rows["row_id"] = ["ER%06d" % i for i in range(1, len(rows) + 1)]
 c.register("rows_df", rows[["row_id", "case_id", "condition_id", "asset_id", "wallet", "role", "control_of", "first_buy_ts"]])
@@ -214,7 +254,7 @@ keep = ["row_id", "role", "control_of", "case_id", "condition_id", "event_slug",
         "pre_buy_usdc", "pre_buy_shares", "signal_a_rebuy_1_5x", "size_price_slope", "hours_last_buy_to_tnews", "ladder_rank",
         "is_shortest_sufficient", "share_on_this_ladder_market", "hours_first_buy_to_tnews", "hours_funding_to_first_trade",
         "funding_source_type", "funder_shared_with_labelled", "follower_wallets_60m", "follower_buy_usdc_60m",
-        "share_sold_before_resolution_post", "won_post", "pnl_post", "redemption_delay_hours_post"]
+        "share_sold_before_resolution_post", "won_post", "pnl_post", "redemption_delay_hours_post", "relaxed_band"]
 X = X.rename(columns={})[keep]
 X = X.merge(ep[["episode_id", "case_id", "condition_id", "asset_id", "wallet"]], on=["case_id", "condition_id", "asset_id", "wallet"], how="left")
 X.loc[X.role != "suspected", "episode_id"] = None

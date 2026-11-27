@@ -295,13 +295,66 @@ def test_strict_requires_prenews_buy():
 def test_control_designs():
     """A27: three control designs; suspected episodes identical across designs; age-matched controls share the episode's age band."""
     e = load("episodes", ["t_news_version", "control_design", "role", "episode_id"])
-    assert set(e.control_design) == {"standard", "age_matched", "open"}
+    assert set(e.control_design) == {"standard", "age_matched", "winrate_matched", "open"}
     s = e[e.role == "suspected"].groupby(["t_news_version", "control_design"]).episode_id.apply(frozenset)
     for v in ["day", "precise"]:
-        assert s[v]["standard"] == s[v]["age_matched"] == s[v]["open"]
+        assert s[v]["standard"] == s[v]["age_matched"] == s[v]["winrate_matched"] == s[v]["open"]
 
 
 def test_label_sets_exclude_non_informed_families():
     """A19/A28: only informed_trading wallets carry a label set."""
     w = load("wallets", ["label_family", "label_broad"])
     assert (w[w.label_broad].label_family == "informed_trading").all()
+
+
+def test_relaxed_band_only_in_banded_designs():
+    """A33: relaxed_band only on control rows of age_matched / winrate_matched."""
+    e = load("episodes", ["control_design", "role", "relaxed_band"])
+    assert not e[e.role == "suspected"].relaxed_band.any()
+    assert not e[e.control_design.isin(["standard", "open"])].relaxed_band.any()
+    c = load("controls", ["control_design", "relaxed_band"])
+    assert not c[c.control_design.isin(["standard", "open"])].relaxed_band.any()
+
+
+def test_t_news_reliable():
+    """A29: unreliable iff a month- or year-dated case without a sourced exact time; the flag is the same in every table."""
+    m = load("markets", ["case_id", "t_news_precision", "t_news_precise_precision", "t_news_reliable", "t_news_market_method", "t_news_deadline_rule_utc", "t_news_market_utc"])
+    exp = ~(m.t_news_precision.isin(["month", "year"]) & (m.t_news_precise_precision == "day_fallback"))
+    assert (m.t_news_reliable == exp).all()
+    dl = m[m.t_news_market_method == "market_deadline"]
+    assert (dl.t_news_deadline_rule_utc == dl.t_news_market_utc).all() and m[m.t_news_market_method != "market_deadline"].t_news_deadline_rule_utc.isna().all()
+    rel = m.groupby("case_id").t_news_reliable.first()
+    for t in ["episodes", "market_minutes"]:
+        d = load(t, ["case_id", "t_news_reliable"]).drop_duplicates()
+        assert (d.t_news_reliable.values == d.case_id.map(rel).fillna(True).values).all(), t
+    d = duckdb.sql(f"SELECT DISTINCT case_id, t_news_reliable FROM read_parquet('{R}/positions.parquet')").df()
+    assert (d.t_news_reliable.values == d.case_id.map(rel).fillna(True).values).all()
+
+
+def test_scheduled_starts_before_close():
+    """A30: every scheduled-start cut is in logs/scheduled_start_check.csv with a close after it."""
+    ck = pd.read_csv(os.path.join(D, "logs", "scheduled_start_check.csv"))
+    m = load("markets", ["case_id", "condition_id", "t_news_market_method"])
+    s = m[m.t_news_market_method == "scheduled_start"].merge(ck, on=["case_id", "condition_id"], how="left")
+    assert s.decision.eq("scheduled_start").all() and (pd.to_datetime(s.scheduled_start_utc) < pd.to_datetime(s.close_utc)).all()
+    bad = ck[ck.disagreement.astype(str) == "True"]
+    assert not set(zip(bad.case_id, bad.condition_id)) & set(zip(s.case_id, s.condition_id))
+
+
+def test_links_only_from_alleging_claims():
+    """A31: claim_wallet_links only from claims with stance alleges or confirms."""
+    L = load("claim_wallet_links", ["claim_id"]); c = load("claims", ["claim_id", "stance"])
+    assert set(L.claim_id) <= set(c[c.stance.isin(["alleges", "confirms"])].claim_id)
+
+
+def test_few_fold_results_have_no_headline_number():
+    """A32: below 6 folds the summary carries fold values and min/max, no mean or SD."""
+    B = json.load(open(os.path.join(PKG, "benchmarks", "baselines.json")))
+    n = 0
+    for v in ["precise", "day"]:
+        for s_ in B["label_sets"]:
+            for t, r in B[v][s_].items():
+                for m, x in r["summary"].items():
+                    if x["n_loco_folds"] < B["min_folds_for_summary"]:
+                        assert "loco_mean" not in x and "loco_sd" not in x and "fold_values" in x, (v, s_, t, m); n += 1
+    assert n > 0

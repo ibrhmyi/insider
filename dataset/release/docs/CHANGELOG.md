@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.1 (2026-11-27, run 11): last fixes
+Amendments A29-A33 (the run-11 request numbered them A28-A32; A28 was already taken by the run-10 multi-account family).
+- A29: `t_news_reliable` in `markets`, `positions`, `episodes` and `market_minutes`: false for every market of a month- or year-dated case without a sourced exact time; `markets.t_news_deadline_rule_utc` keeps the A25 deadline time. Default analyses and every benchmark use reliable rows only.
+- A30: a scheduled start is used only if it is before the market's close (Gamma `closedTime`, else `resolved_utc`); all 91 candidates checked in `logs/scheduled_start_check.csv` (0 disagreements; no cut changed).
+- A31: only claims with stance `alleges` or `confirms` create `claim_wallet_links` (6 links from context claim CL0124 removed; no label changed).
+- A32: below 6 leave-one-case-out folds, results are reported per fold with min and max only (all `label_strict` results).
+- A33: control design `winrate_matched` (task T2w, headline): controls also share the prior win-rate band; age-matched designs (T2s, T2w) retry with the adjacent band before dropping an episode (`relaxed_band` in `episodes` and `controls`).
+
 ## v1.2.0 (2026-11-27, run 10): final fixes
 - A25: per-market news times. `markets.t_news_market_utc` (precise) and `markets.t_news_market_day_utc` (day) with `t_news_market_method`: a Gamma scheduled start (matches, earnings releases), a market deadline inside a coarse case date, else the case time; never later than a sourced exact case time (A25.1); a deadline-form question ("by <date>") never takes a scheduled-start cut (A25.2). Case-level `t_news_utc` and `t_news_precise_utc` are kept. Every time-dependent table (positions, minute paths, episodes, controls, coordinated rule, label sets, hard negatives, placebo and twin `t_ref`) is rebuilt with the per-market cut. This also fixes stale precise `t_ref` values for the Maduro and Railgun-Venezuela placebos and twins left by run 9.
 - A26: `label_strict` additionally requires a buy before the precise news time; `wallets.strict_no_prenews` marks the rest. `label_standard` is the main training label (case-weighted); `label_strict` is evaluation-only.

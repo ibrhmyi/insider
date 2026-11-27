@@ -1,9 +1,11 @@
-"""PMITC v1.2 benchmark tasks (PROTOCOL A15, A23, A26, A27). Runs on the released files only (../data).
+"""PMITC v1.2.1 benchmark tasks (PROTOCOL A15, A23, A26, A27, A29, A32, A33). Runs on the released files only (../data).
   python3 pmitc_bench.py [--data ../data] [--out baselines.json] [--quick]
 Folds: leave-one-case-out over cases with >= 3 label_standard wallets in the task's rows, plus the A15 time split (splits.csv).
 Label sets: label_strict, label_standard, label_broad (A20). A26: models train on label_standard (label_broad for the broad run); label_strict is
 evaluation-only. Documented wallets outside the evaluated set are dropped from evaluation (and outside the training set from training).
-Headline tasks (A27): T1s (rank within the positives' size band), T2s (controls also matched on account-age band), T2-open (Orca/Inca wallets may be controls).
+Headline tasks (A27, A33): T1s (rank within the positives' size band), T2s (controls also matched on account-age band), T2w (account-age and
+prior win-rate bands), T2-open (Orca/Inca wallets may be controls). A29: every task uses only rows with t_news_reliable = true.
+A32: a task / label set with fewer than 6 leave-one-case-out folds is reported per fold with min and max only (no mean, SD or headline number).
 Secondary: T1, T2 (logistic regression and baselines only), T3 (case vs twin), T3b (case vs placebo; market-type sensitive).
 Baselines: prevalence, Gate 1 rule, account-age heuristic, logistic regression; gradient boosting with case-grouped tuning (precise only).
 Seed 192.
@@ -45,7 +47,7 @@ SHORTCUTS = {
     "T2.hours_first_buy_to_tnews": "controls are matched on first-buy time within 24-72 h, so this cannot separate classes much (kept; check its univariate AUC)",
     "T3b.*": "placebo markets are crypto-price and weather markets: volume shape, price path and buyer mix differ by market type, not by informed trading",
     'T1.log_buy_usdc_pre / log_market_usdc_pre / log_n_buy_fills_pre': 'selection by the sources, not construction: sources flag large bets, so pre-cut size alone ranks positives highly (univariate AUC 0.93-0.98). A detector that learns size learns what the press notices.',
-    'T2.prior_net_long_win_rate / n_prior_markets': 'partly construction: control pools exclude Orca- and Inca-flagged wallets (A6.10), which removes many strong past traders from the controls; and partly selection (sources flag fresh wallets). Univariate AUC 0.82-0.88.',
+    'T2.prior_net_long_win_rate / n_prior_markets': 'selection, not construction (run 10): allowing Orca/Inca wallets as controls (T2-open) leaves it at univariate AUC 0.88; sources find wallets that won before. T2w matches controls on its band.',
     "T3.log_usdc_*": "twins are matched on total volume decile, so total volume is controlled only coarsely; pre-cut volume can still differ by market age",
 }
 
@@ -135,6 +137,9 @@ def folds_for(df, std_counts):
     return f
 
 
+MIN_FOLDS = 6  # A32
+
+
 def summarise(per_fold):
     out = {}
     for model in sorted({m for f in per_fold.values() for m in f}):
@@ -143,6 +148,10 @@ def summarise(per_fold):
         out[model] = dict(loco_mean=round(float(np.mean(loco)), 4) if loco else None, loco_sd=round(float(np.std(loco)), 4) if loco else None,
                           loco_min=round(float(np.min(loco)), 4) if loco else None, loco_max=round(float(np.max(loco)), 4) if loco else None,
                           n_loco_folds=len(loco), time_split=round(vals["time_split"]["primary"], 4) if "time_split" in vals and not np.isnan(vals["time_split"]["primary"]) else None)
+        if len(loco) < MIN_FOLDS:  # A32: per-fold values with min and max only
+            out[model].pop("loco_mean"); out[model].pop("loco_sd")
+            out[model]["fold_values"] = {f: round(float(v["primary"]), 4) for f, v in vals.items() if not np.isnan(v["primary"])}
+            out[model]["reporting"] = "per_fold_only_A32"
     return out
 
 
@@ -173,7 +182,7 @@ def run_task(df, feats, metric, std_counts, rule_col, age_col, tune, n_neg, rng,
         per_fold[name]["_n"] = dict(primary=float(test.y.sum()))
     clean = {f: {m: v for m, v in r.items() if m != "_n"} for f, r in per_fold.items()}
     s = summarise(clean)
-    if "gradient_boosting_tuned" in s and "prevalence" in s and s["gradient_boosting_tuned"]["loco_mean"] is not None and s["prevalence"]["loco_mean"] is not None:
+    if "gradient_boosting_tuned" in s and "prevalence" in s and s["gradient_boosting_tuned"].get("loco_mean") is not None and s["prevalence"].get("loco_mean") is not None:
         s["gradient_boosting_tuned"]["below_prevalence"] = s["gradient_boosting_tuned"]["loco_mean"] < s["prevalence"]["loco_mean"]
     return dict(summary=s, folds={f: {m: {k: (round(x, 4) if isinstance(x, float) else x) for k, x in v.items()} for m, v in r.items() if m != "_n"} | {"n_test_positives": int(r["_n"]["primary"])} for f, r in per_fold.items()})
 
@@ -194,7 +203,7 @@ def train_set(lset):
 
 def t1(data, splits, version, lset, tune, quick, size_band=False):
     """T1 (secondary) or T1s (A27 headline, size_band=True: candidates within [0.5 x min, 2 x max] of the market's positives' pre-cut BUY)."""
-    p = pd.read_parquet(os.path.join(data, "positions.parquet"), filters=[("market_set", "==", "case"), ("t_news_version", "==", version), ("is_main_side", "==", True)])
+    p = pd.read_parquet(os.path.join(data, "positions.parquet"), filters=[("market_set", "==", "case"), ("t_news_version", "==", version), ("is_main_side", "==", True), ("t_news_reliable", "==", True)])
     p = prep_t1(p).merge(splits, on="case_id")
     tr = train_set(lset)
     p["y"] = p[lset].astype(int); p["y_tr"] = p[tr].astype(int); p["tie"] = p.buy_usdc_pre
@@ -216,8 +225,8 @@ def t1(data, splits, version, lset, tune, quick, size_band=False):
 
 
 def t2(data, splits, version, lset, tune, quick, design="standard"):
-    """T2 (standard controls), T2s (A27: age_matched) or T2-open (A27: open)."""
-    e = pd.read_parquet(os.path.join(data, "episodes.parquet"), filters=[("t_news_version", "==", version), ("control_design", "==", design)]).merge(splits, on="case_id")
+    """T2 (standard controls), T2s (A27: age_matched), T2w (A33: winrate_matched) or T2-open (A27: open)."""
+    e = pd.read_parquet(os.path.join(data, "episodes.parquet"), filters=[("t_news_version", "==", version), ("control_design", "==", design), ("t_news_reliable", "==", True)]).merge(splits, on="case_id")
     tr = train_set(lset)
     ep_tr = set(e[(e.role == "suspected") & e[tr]].episode_id); ep_ev = set(e[(e.role == "suspected") & e[lset]].episode_id)
     owner = np.where(e.role == "suspected", e.episode_id, e.control_of)
@@ -231,7 +240,11 @@ def t2(data, splits, version, lset, tune, quick, design="standard"):
     std = {c: n for c, n in W[W.label_standard].groupby("case_id").wallet.nunique().items() if c in set(e.case_id)}
     res = run_task(e, T2_FEATURES, auc_cw, std, "gate1_score", "account_age_days_at_first_buy", tune, 10**9, np.random.default_rng(SEED), "T2")
     ev = e[e.use_ev]
-    res.update(control_design=design, train_label=tr, n_rows_eval=int(len(ev)), n_pos_eval=int(ev.y.sum()),
+    sus = e[e.role == "suspected"]; ctl = e[e.role != "suspected"]
+    cov = dict(n_episodes=int(sus.episode_id.nunique()), n_episodes_with_same_side=int(e[e.role == "control_same_side"].control_of.nunique()),
+               n_control_rows=int(len(ctl)), n_relaxed_band_control_rows=int(ctl.relaxed_band.sum()) if "relaxed_band" in ctl else 0,
+               n_episodes_relaxed_band=int(ctl[ctl.relaxed_band == True].control_of.nunique()) if "relaxed_band" in ctl else 0)  # noqa: E712
+    res.update(control_design=design, train_label=tr, coverage=cov, n_rows_eval=int(len(ev)), n_pos_eval=int(ev.y.sum()),
                won_post_rate_by_role={k: round(float(v), 4) for k, v in ev.groupby("role").won_post.mean().items()},
                base_result="matched same-side controls win about as often as documented episodes: outcome alone does not separate them",
                univariate_auc=univariate(ev, T2_FEATURES + ["share_on_this_ladder_market"]))
@@ -239,7 +252,7 @@ def t2(data, splits, version, lset, tune, quick, design="standard"):
 
 
 def market_features(data, version, sets):
-    mm = pd.read_parquet(os.path.join(data, "market_minutes.parquet"), filters=[("t_news_version", "==", version)])
+    mm = pd.read_parquet(os.path.join(data, "market_minutes.parquet"), filters=[("t_news_version", "==", version), ("t_news_reliable", "==", True)])
     mm = mm[mm.minutes_from_cut < 0]
     k = ["market_set", "case_id", "condition_id"]
     def agg(g):
@@ -255,7 +268,7 @@ def market_features(data, version, sets):
             taker_buy_share_24h=tb / (tb + ts_) if (tb + ts_) else np.nan))
     f = mm.groupby(k).apply(agg, include_groups=False).reset_index()
     p = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=k + ["t_news_version", "wallet", "buy_usdc_pre", "account_age_days_at_first_buy", "gate1", "vwap_price_usdc_pre"] + sets,
-                        filters=[("t_news_version", "==", version)])
+                        filters=[("t_news_version", "==", version), ("t_news_reliable", "==", True)])
     def pagg(g):
         tot = g.buy_usdc_pre.sum(); w = g.groupby("wallet").buy_usdc_pre.sum().sort_values(ascending=False)
         d = dict(log_n_buyers=np.log1p(g.wallet.nunique()), top10_buy_share=w.head(10).sum() / tot if tot else np.nan,
@@ -265,6 +278,18 @@ def market_features(data, version, sets):
         return pd.Series(d)
     q = p.groupby(k).apply(pagg, include_groups=False).reset_index()
     return f.merge(q, on=k, how="outer")
+
+
+def excluded_unreliable(data):
+    """A29: what the t_news_reliable filter removes (cases, markets, positives per label set, suspected episodes)."""
+    m = pd.read_parquet(os.path.join(data, "markets.parquet"), columns=["case_id", "condition_id", "t_news_reliable"])
+    bad = m[~m.t_news_reliable]; cases = sorted(bad.case_id.unique())
+    w = pd.read_parquet(os.path.join(data, "wallets.parquet"), columns=["wallet", "case_id"] + SETS)
+    e = pd.read_parquet(os.path.join(data, "episodes.parquet"), columns=["t_news_version", "control_design", "role", "episode_id", "t_news_reliable"],
+                        filters=[("control_design", "==", "standard"), ("role", "==", "suspected")])
+    return dict(n_cases=len(cases), cases=cases, n_markets=int(len(bad)), n_markets_total=int(len(m)),
+                positives_removed={s: int(w[w.case_id.isin(cases)][s].sum()) for s in SETS}, positives_total={s: int(w[s].sum()) for s in SETS},
+                suspected_episodes_removed={v: int((~g.t_news_reliable).sum()) for v, g in e.groupby("t_news_version")})
 
 
 def t3(data, splits, version, comp, lset, tune, feats_cache):
@@ -299,15 +324,17 @@ if __name__ == "__main__":
     ap.add_argument("--quick", action="store_true", help="no gradient-boosting tuning, smaller negative samples (for the notebook)")
     a = ap.parse_args()
     splits = pd.read_csv(os.path.join(here, "splits.csv"))[["case_id", "split"]]
-    out = dict(seed=SEED, protocol="A15, A23, A26, A27", label_sets=SETS, training_label="label_standard (label_broad for the broad run); label_strict evaluation-only (A26)",
-               headline_tasks=["T1s", "T2s", "T2open"], secondary_tasks=["T1", "T2", "T3", "T3b"], leakage=LEAKAGE, known_shortcuts=SHORTCUTS,
-               features=dict(T1=T1_FEATURES, T2=T2_FEATURES, T3=T3_FEATURES), gb_grid=GRID)
+    out = dict(seed=SEED, protocol="A15, A23, A26, A27, A29, A32, A33", label_sets=SETS, training_label="label_standard (label_broad for the broad run); label_strict evaluation-only (A26)",
+               headline_tasks=["T1s", "T2s", "T2w", "T2open"], secondary_tasks=["T1", "T2", "T3", "T3b"], leakage=LEAKAGE, known_shortcuts=SHORTCUTS,
+               features=dict(T1=T1_FEATURES, T2=T2_FEATURES, T3=T3_FEATURES), gb_grid=GRID, min_folds_for_summary=MIN_FOLDS,
+               excluded_unreliable=excluded_unreliable(a.data))
     cache = {}
     for v in ["precise", "day"]:
         tune = (v == "precise") and not a.quick
         out[v] = {}
         for s_ in SETS:
             out[v][s_] = dict(T1s=t1(a.data, splits, v, s_, tune, a.quick, size_band=True), T2s=t2(a.data, splits, v, s_, tune, a.quick, "age_matched"),
+                              T2w=t2(a.data, splits, v, s_, tune, a.quick, "winrate_matched"),
                               T2open=t2(a.data, splits, v, s_, tune, a.quick, "open"), T1=t1(a.data, splits, v, s_, False, a.quick),
                               T2=t2(a.data, splits, v, s_, False, a.quick, "standard"), T3=t3(a.data, splits, v, "twin", s_, tune, cache),
                               T3b=t3(a.data, splits, v, "placebo", s_, tune, cache))
@@ -315,5 +342,5 @@ if __name__ == "__main__":
         out[v]["all_case_markets"] = dict(T3=t3(a.data, splits, v, "twin", "all", tune, cache), T3b=t3(a.data, splits, v, "placebo", "all", tune, cache))
     json.dump(out, open(a.out, "w"), indent=1, default=lambda x: None if (isinstance(x, float) and np.isnan(x)) else (bool(x) if isinstance(x, np.bool_) else float(x)))
     for s_ in SETS:
-        for t in ["T1s", "T2s", "T2open", "T1", "T2", "T3", "T3b"]:
-            print("precise", s_, t, {m: (r["loco_mean"], r["loco_sd"], r["time_split"]) for m, r in out["precise"][s_][t]["summary"].items()})
+        for t in ["T1s", "T2s", "T2w", "T2open", "T1", "T2", "T3", "T3b"]:
+            print("precise", s_, t, {m: (r.get("loco_mean"), r.get("loco_min"), r.get("loco_max"), r["time_split"]) for m, r in out["precise"][s_][t]["summary"].items()})

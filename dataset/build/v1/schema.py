@@ -76,7 +76,9 @@ TABLES["markets"] = dict(desc="One row per (case, market). Ladders are full Gamm
     col("t_news_precise_verified", S, "verified flag of the event_times row"), col("title_withheld", B, "A12.6"),
     col("t_news_market_utc", T, "A25: per-market exact cut (precise version): Gamma scheduled start, market deadline inside a coarse case date, or the case time", leak="label"),
     col("t_news_market_day_utc", T, "A25: per-market day-level cut (day version)", leak="label"),
-    col("t_news_market_method", S, "A25 method", allowed="scheduled_start;market_deadline;case_time"), col("is_placebo_market", B, "always false here"),
+    col("t_news_market_method", S, "A25 method (A30: a scheduled start is used only if before the market's close)", allowed="scheduled_start;market_deadline;case_time"), col("is_placebo_market", B, "always false here"),
+    col("t_news_reliable", B, "A29: false for every market of a month- or year-dated case without a sourced exact time; excluded from default analyses and benchmarks", leak="label"),
+    col("t_news_deadline_rule_utc", T, "A29: the A25 rule-2 deadline time where it set the cut; NULL otherwise", leak="label"),
     col("ff_tier", S, "ForesightFlow tier if listed"), col("ff_tier2_tnews", T, "ForesightFlow tier-2 proxy (stored, not used)")])
 TABLES["placebo_markets"] = dict(desc="One row per placebo market (A14) with its matched case market; case-market rows that could not be matched appear with NULL placebo fields.", cols=[
     col("placebo_row_id", S, "row key: PRnnnnn (every row, matched or not)", pk=True), col("placebo_id", S, "PLnnnnn; NULL for unmatched case-market rows"), col("case_id", S, "matched case (FK cases)"), col("case_condition_id", S, "matched case market (FK markets)"),
@@ -137,13 +139,16 @@ POS = [col("market_set", S, "case, placebo (A14) or twin (A22) market", allowed=
     col("placebo_rate", FL, "A13 placebo-to-real ratio of this version (share of hits expected by chance); NULL if the rule did not fire", leak="label"),
     col("is_control", B, "selected as a matched control in this market, version", leak="label"),
     col("is_placebo_market", B, "market_set = placebo", leak="label"), col("is_twin_market", B, "market_set = twin (A22)", leak="label"),
+    col("t_news_reliable", B, "A29: the (matched) case's news time is reliable; default analyses and benchmarks use true only", leak="label"),
     col("buy_usdc_post", FL, "BUY USDC at or after the cut", unit="USDC", leak="post"), col("buy_shares_post", FL, "BUY shares at or after the cut", leak="post"),
     col("sell_usdc_post", FL, "SELL USDC at or after the cut", unit="USDC", leak="post"), col("sell_shares_post", FL, "SELL shares at or after the cut", leak="post"),
     col("won_post", B, "token won", leak="post"), col("pnl_post", FL, "sells - buys + winning shares held (no redemptions, fees)", unit="USDC", leak="post")]
 TABLES["positions"] = dict(desc="All-buyer positions before the cut (C2): the full population a detector must search, case and placebo markets.", cols=POS)
 EPI = [col("row_id", S, "row id within version", pk=True), col("episode_id", S, "stable id of a documented episode (hash of case, wallet, market, token); NULL on control rows"),
     col("t_news_version", S, "A10.2", allowed=VER, pk=True),
-    col("control_design", S, "A27: standard (A6.10), age_matched (plus account-age band; T2s) or open (Orca/Inca wallets allowed; T2-open)", allowed="standard;age_matched;open", pk=True),
+    col("control_design", S, "A27/A33: standard (A6.10), age_matched (plus account-age band; T2s), winrate_matched (plus prior win-rate band; T2w) or open (Orca/Inca wallets allowed; T2-open)", allowed="standard;age_matched;winrate_matched;open", pk=True),
+    col("t_news_reliable", B, "A29: the case's news time is reliable (default analyses use true only)", leak="label"),
+    col("relaxed_band", B, "A33: control chosen after the adjacent age / win-rate band was allowed; false on suspected rows and exact-band controls", leak="label"),
     col("role", S, "suspected, control_same_side, control_other_side_large_buyer", leak="label"),
     col("label_strict", B, "suspected row of a label_strict wallet (A20); false on control rows", leak="label"), col("label_standard", B, "label_standard (A20)", leak="label"),
     col("label_broad", B, "label_broad (A20)", leak="label"),
@@ -168,7 +173,8 @@ EPI = [col("row_id", S, "row id within version", pk=True), col("episode_id", S, 
 TABLES["episodes"] = dict(desc="Per (wallet, market, token) episode of documented wallets and their matched controls; pre-news features, then _post outcomes.", cols=EPI)
 TABLES["controls"] = dict(desc="Matched controls (A6.10, seed 192) with relaxation flags, per t_news version.", cols=[
     col("t_news_version", S, "A10.2", allowed=VER, pk=True),
-    col("control_design", S, "A27 design", allowed="standard;age_matched;open", pk=True), col("episode_id", S, "documented episode", pk=True), col("wallet", S, "control wallet", pk=True),
+    col("control_design", S, "A27/A33 design", allowed="standard;age_matched;winrate_matched;open", pk=True), col("episode_id", S, "documented episode", pk=True), col("wallet", S, "control wallet", pk=True),
+    col("relaxed_band", B, "A33: chosen with the adjacent age / win-rate band allowed"),
     col("control_type", S, "same_side or other_side_large_buyer", allowed="same_side;other_side_large_buyer", pk=True),
     col("relaxation", S, "A6.10 relaxation used", allowed="base;window_72h;price_0.10;size_0.25_4x"), col("n_eligible", I, "eligible controls at that step"),
     col("case_id", S, "case"), col("condition_id", S, "market"), col("asset_id", S, "token"), col("outcome_label", S, "token label"),
@@ -195,7 +201,8 @@ TABLES["market_minutes"] = dict(desc="One row per market, version and UTC minute
     col("minutes_from_cut", I, "minutes relative to the cut (negative = before)", unit="minutes"), col("source", S, "sources in the minute"),
     col("n_fills_hf", I, "HF fills (taker legs)"), col("n_legs_api", I, "Data API legs"), col("usdc", FL, "volume", unit="USDC"), col("vwap", FL, "volume-weighted price"),
     col("last_price", FL, "last price"), col("taker_buy_usdc", FL, "aggressor buy volume (HF)", unit="USDC"), col("taker_sell_usdc", FL, "aggressor sell volume (HF)", unit="USDC"),
-    col("n_wallets", I, "distinct wallets"), col("n_new_wallets", I, "wallets with first Polymarket-v1 fill in the previous 7 days"), col("n_wallets_age_unknown", I, "wallets with no Polymarket-v1 history")])
+    col("n_wallets", I, "distinct wallets"), col("n_new_wallets", I, "wallets with first Polymarket-v1 fill in the previous 7 days"), col("n_wallets_age_unknown", I, "wallets with no Polymarket-v1 history"),
+    col("t_news_reliable", B, "A29: the (matched) case's news time is reliable", leak="label")])
 TABLES["contradictions"] = dict(desc="Places where the trades disagree with a claim (the claim is never edited), incl. the run-7 amount checks (gap > 10%).", cols=[
     col("contradiction_id", S, "CXnnn", pk=True), col("claim_id", S, "claim (FK claims)"), col("case_id", S, "case"), col("field", S, "claim field"),
     col("claimed_value", S, "value in the claim"), col("observed_value", S, "value observed"), col("evidence", S, "how it was observed"), col("evidence_file", S, "raw file or table"),

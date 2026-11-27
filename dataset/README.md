@@ -2,7 +2,7 @@
 
 An open, source-traced register of every publicly documented case of suspected informed trading on prediction markets, joined to trade-level data for analysis and machine learning.
 
-**Version 1.2.0 (2026-11-27, run 10).** Start with the dataset card [`release/README.md`](release/README.md). Two release packages: [`release/`](release/) (all files) and [`release_safe/`](release_safe/) (without the Data API fill files, with a script that rebuilds them). The full package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A28. Runs 7 to 10 are described in `logs/run7_report.md`, `logs/run8_report.md`, `logs/run9_report.md` and [`logs/run10_report.md`](logs/run10_report.md).
+**Version 1.2.1 (2026-11-27, run 11).** Start with the dataset card [`release/README.md`](release/README.md). Two release packages: [`release/`](release/) (all files) and [`release_safe/`](release_safe/) (without the Data API fill files, with a script that rebuilds them). The full package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A33. Runs 7 to 11 are described in `logs/run7_report.md` to `logs/run10_report.md` and [`logs/run11_report.md`](logs/run11_report.md).
 
 Files over 50 MB (`release/data/positions.parquet`, `weak_labels.parquet`, `fills_part*.parquet`) are not in git; they are listed with SHA-256 in `release/MANIFEST.json` and rebuilt by the scripts.
 
@@ -13,6 +13,8 @@ Files over 50 MB (`release/data/positions.parquet`, `weak_labels.parquet`, `fill
 Run 9 adds: `v1/label_sets.py` (after `v1/labels.py confirm`) → `v1/twin_markets.py` → `hf_pass_v9.py <hf> <work>` → (`v1/fills.py`, `v1/coordinated.py`, `v1/episodes.py`, `v1/positions.py`, `v1/minutes.py` as above) → `v1/hard_negatives.py <work>` → `v1/tables.py` → `v1/fills_release.py` → `release/benchmarks/pmitc_bench.py` → `v1/notebooks.py` + nbconvert → `v1/figure.py` → `v1/card.py` → `v1/kaggle_meta.py` → `v1/codebook.py` → `v1/package_safe.py` → `v1/upload_copies.py`; tests on `release`, `release_safe` and `upload/hf` (`PMITC_RELEASE=...`). Compute and disk: `release/docs/REBUILD.md`.
 
 Run 10 adds: `v1/market_times.py` (per-market cuts into `markets.csv`, after `build_markets.py`) → `v1/ref_times.py` (placebo and twin `t_ref`) → `v1/coordinated.py` → `v1/episodes.py <work> day|precise standard|age_matched|open` → `v1/positions.py` → `v1/minutes.py` → `v1/label_sets.py` → `v1/hard_negatives.py` → `v1/amount_checks.py` → then the run-9 release order from `v1/tables.py`.
+
+Run 11 adds: `v1/market_times.py` also writes `t_news_reliable`, `t_news_deadline_rule_utc` and `logs/scheduled_start_check.csv` (A29, A30); `v1/label_sets.py` links only from alleging claims (A31); `v1/episodes.py <work> day|precise standard|age_matched|winrate_matched|open` (A33).
 
 ---
 
