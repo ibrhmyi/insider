@@ -15,7 +15,7 @@ mk = pd.read_csv(os.path.join(D, "data", "markets.csv"), dtype=str, keep_default
 yes = lambda s: "Yes" if "Yes" in s.split(";") else (s.split(";")[0] if s else "")
 pl = pd.read_csv(os.path.join(D, "data", "placebo_markets.csv"), dtype=str, keep_default_na=False); pl = pl[pl.placebo_condition_id != ""]
 rows = [mk.assign(market_set="case", t_news_version=v, t_cut=ep(mk[col]), yes_label=mk.outcomes.map(yes))[["market_set", "case_id", "condition_id", "t_news_version", "t_cut", "yes_label"]]
-        for v, col in [("day", "t_news_utc"), ("precise", "t_news_precise_utc")]]
+        for v, col in [("day", "t_news_market_day_utc"), ("precise", "t_news_market_utc")]]
 rows += [pl.assign(market_set="placebo", condition_id=pl.placebo_condition_id, t_news_version=v, t_cut=ep(pl[f"t_ref_{v}_utc"]), yes_label=pl.placebo_outcomes.map(yes))[
          ["market_set", "case_id", "condition_id", "t_news_version", "t_cut", "yes_label"]] for v in ["day", "precise"]]
 tw = pd.read_csv(os.path.join(D, "data", "twin_markets.csv"), dtype=str, keep_default_na=False); tw = tw[tw.twin_condition_id != ""]

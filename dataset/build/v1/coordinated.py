@@ -19,7 +19,7 @@ W = pd.read_csv(os.path.join(D, "data", "wallet_labels.csv"), dtype=str, keep_de
 doc = W[(W.polarity == "suspected") & (W.trade_confirmed.str.lower() == "true") & (W.label_family == "informed_trading")]  # A19[["address", "case_id"]].drop_duplicates()
 labelled = sorted(set(W[W.label_tier != "L4_coordinated"].address))
 M = pd.concat([mk.assign(t_news_version=v, t_cut=ep(mk[col]))[["case_id", "condition_id", "t_news_version", "t_cut"]]
-               for v, col in [("day", "t_news_utc"), ("precise", "t_news_precise_utc")]])
+               for v, col in [("day", "t_news_market_day_utc"), ("precise", "t_news_market_utc")]])
 c.register("M_df", M); c.sql("CREATE TABLE M AS SELECT * FROM M_df")
 c.register("doc_df", doc); c.sql("CREATE TABLE DOC AS SELECT address wallet, case_id FROM doc_df")
 c.execute("CREATE TABLE LAB(a VARCHAR)"); c.executemany("INSERT INTO LAB VALUES (?)", [(a,) for a in labelled])

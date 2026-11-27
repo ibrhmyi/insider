@@ -24,7 +24,7 @@ yes_res = lad[lad.outcome.str.lower().eq("yes") & lad.lr.notna()]
 short = set(map(tuple, yes_res.loc[yes_res.groupby(["case_id", "event_id"]).lr.idxmin(), ["case_id", "condition_id"]].values))
 rows = []
 for r in mk.itertuples():
-    for v, col in [("day", "t_news_utc"), ("precise", "t_news_precise_utc")]:
+    for v, col in [("day", "t_news_market_day_utc"), ("precise", "t_news_market_utc")]:
         rows.append(dict(market_set="case", case_id=r.case_id, condition_id=r.condition_id, t_news_version=v, t_cut=getattr(r, col),
                          event_id=r.event_id, yes_label=r.yes_label, is_shortest_sufficient=(r.case_id, r.condition_id) in short,
                          winning_outcome=r.outcome or None, resolved_utc=r.resolved_utc))
