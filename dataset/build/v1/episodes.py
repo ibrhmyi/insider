@@ -85,14 +85,24 @@ if MODE == "winrate_matched":  # A33: prior win-rate band, computed as episodes.
     c.sql("""CREATE TABLE q AS SELECT DISTINCT wallet, condition_id, first_buy_ts FROM (
                SELECT p.wallet, p.condition_id, p.first_buy_ts FROM pre p JOIN em_df USING (case_id, condition_id) WHERE p.wallet NOT IN (SELECT a FROM excl)
                UNION ALL SELECT wallet, condition_id, first_buy_ts FROM ep_q)""")
-    wr = c.sql(f"""WITH p AS (SELECT wallet, condition_id, asset_id, min(first_ts) fts, sum(buy_shares) bs, sum(sell_shares) ss
-                     FROM read_parquet('{WORK}/P/*.parquet') WHERE wallet IN (SELECT DISTINCT wallet FROM q) GROUP BY 1, 2, 3),
-                   r AS (SELECT asset_id, condition_id, any_value(outcome_label) ol, any_value(winning_outcome_label) wl, any_value(resolution_status) st
-                         FROM '{OUT0}/hf_market_catalog.parquet' GROUP BY 1, 2)
-                   SELECT q.wallet, q.condition_id, q.first_buy_ts,
-                          avg(CASE WHEN r.st = 'resolved' AND r.wl IS NOT NULL AND p.bs > p.ss THEN (r.ol = r.wl)::INT END) wr
-                   FROM q JOIN p ON p.wallet = q.wallet AND p.fts < q.first_buy_ts AND p.condition_id <> q.condition_id
-                   LEFT JOIN r ON r.asset_id = p.asset_id AND r.condition_id = p.condition_id GROUP BY 1, 2, 3""").df()
+    # same quantity as the episode feature (avg over net-long resolved (market, token) rows with first trade before t, other markets only),
+    # computed with cumulative counts and an ASOF join instead of a candidate x prior-market join (disk)
+    c.sql(f"""CREATE TABLE pm AS
+        WITH p AS (SELECT wallet, condition_id, asset_id, min(first_ts) fts, sum(buy_shares) bs, sum(sell_shares) ss
+                   FROM read_parquet('{WORK}/P/*.parquet') WHERE wallet IN (SELECT DISTINCT wallet FROM q) GROUP BY 1, 2, 3),
+             r AS (SELECT asset_id, condition_id, any_value(outcome_label) ol, any_value(winning_outcome_label) wl, any_value(resolution_status) st
+                   FROM '{OUT0}/hf_market_catalog.parquet' GROUP BY 1, 2)
+        SELECT p.wallet, p.condition_id, p.fts, CASE WHEN r.st = 'resolved' AND r.wl IS NOT NULL AND p.bs > p.ss THEN (r.ol = r.wl)::INT END win
+        FROM p LEFT JOIN r ON r.asset_id = p.asset_id AND r.condition_id = p.condition_id""")
+    c.sql("""CREATE TABLE cum AS SELECT wallet, fts, sum(n) OVER w cn, sum(k) OVER w ck FROM
+               (SELECT wallet, fts, count(win) n, sum(win) k FROM pm GROUP BY 1, 2) WINDOW w AS (PARTITION BY wallet ORDER BY fts ROWS UNBOUNDED PRECEDING)""")
+    wr = c.sql("""WITH a AS (SELECT q.wallet, q.condition_id, q.first_buy_ts, coalesce(cum.cn, 0) cn, coalesce(cum.ck, 0) ck
+                             FROM q ASOF LEFT JOIN cum ON cum.wallet = q.wallet AND cum.fts < q.first_buy_ts),
+                       o AS (SELECT q.wallet, q.condition_id, q.first_buy_ts, count(pm.win) on_, coalesce(sum(pm.win), 0) ok
+                             FROM q JOIN pm ON pm.wallet = q.wallet AND pm.condition_id = q.condition_id AND pm.fts < q.first_buy_ts GROUP BY 1, 2, 3)
+                  SELECT a.wallet, a.condition_id, a.first_buy_ts,
+                         (a.ck - coalesce(o.ok, 0))::DOUBLE / nullif(a.cn - coalesce(o.on_, 0), 0) wr
+                  FROM a LEFT JOIN o USING (wallet, condition_id, first_buy_ts)""").df()
     wr = wr.set_index(["wallet", "condition_id", "first_buy_ts"]).wr
     band = lambda x: "none" if pd.isna(x) else ("lt_0.25" if x < 0.25 else "0.25_0.5" if x < 0.5 else "0.5_0.75" if x < 0.75 else "ge_0.75")
     for df_ in (ep, pre_df):
@@ -220,6 +230,11 @@ hist = c.sql(f"""WITH p AS (SELECT wallet, condition_id, asset_id, min(first_ts)
   LEFT JOIN r ON r.asset_id = p.asset_id AND r.condition_id = p.condition_id GROUP BY 1""").df()
 X = X.merge(hist, on="row_id", how="left")
 X["prior_markets"] = X["prior_markets"].fillna(0).astype(int)  # no earlier market in Polymarket-v1 -> 0
+if MODE == "winrate_matched":  # A33 self-check: the matching band equals the band of the episode's own feature
+    chk = X[X.role == "suspected"].merge(ep[["case_id", "condition_id", "asset_id", "wallet", "wr_band"]], on=["case_id", "condition_id", "asset_id", "wallet"])
+    mism = int((chk.prior_net_long_win_rate.map(band) != chk.wr_band).sum())
+    print("A33 band self-check: suspected rows", len(chk), "mismatches", mism, flush=True)
+    assert mism == 0
 case_vol = c.sql("SELECT row_id, sum(usdc) case_usdc FROM el GROUP BY 1").df()
 X = X.merge(case_vol, on="row_id", how="left")
 X["case_share_of_lifetime_volume"] = X["case_usdc"] / X["lifetime_usdc"]
