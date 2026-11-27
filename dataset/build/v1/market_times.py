@@ -71,7 +71,7 @@ for r in mk.itertuples():
         if pd.notna(tc) and tc < t:
             t, meth, dl_rule = tc, "case_time", pd.NaT
     day = t.floor("D") if meth != "case_time" else t0
-    reliable = not (r.t_news_precision in ("month", "year") and r.t_news_precise_precision == "day_fallback")  # A29
+    reliable = meth != "market_deadline"  # A29.1: per market; false only for a deadline-rule time
     out.append((t.strftime("%Y-%m-%dT%H:%M:%SZ"), day.strftime("%Y-%m-%dT%H:%M:%SZ"), meth, "true" if reliable else "false",
                 dl_rule.strftime("%Y-%m-%dT%H:%M:%SZ") if pd.notna(dl_rule) else ""))
 mk["t_news_market_utc"], mk["t_news_market_day_utc"], mk["t_news_market_method"], mk["t_news_reliable"], mk["t_news_deadline_rule_utc"] = zip(*out)
@@ -81,4 +81,4 @@ s = mk.groupby(["case_id", "t_news_market_method"]).size().unstack(fill_value=0)
 print(s[s.drop(columns=["case_time"], errors="ignore").sum(axis=1) > 0].to_string())
 print(mk.t_news_market_method.value_counts().to_dict())
 ck = pd.DataFrame(chk); print("A30 checked", len(ck), "disagreements", int(ck.disagreement.sum()), ck.close_source.value_counts().to_dict())
-print("A29 unreliable markets", int((mk.t_news_reliable == 'false').sum()), sorted(mk[mk.t_news_reliable == 'false'].case_id.unique()))
+print("A29.1 unreliable markets", int((mk.t_news_reliable == 'false').sum()), sorted(mk[mk.t_news_reliable == 'false'].case_id.unique()))

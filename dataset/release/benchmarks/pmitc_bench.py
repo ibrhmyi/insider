@@ -281,15 +281,22 @@ def market_features(data, version, sets):
 
 
 def excluded_unreliable(data):
-    """A29: what the t_news_reliable filter removes (cases, markets, positives per label set, suspected episodes)."""
+    """A29/A29.1: what the per-market t_news_reliable filter removes (markets, cases fully or partly removed, positives, suspected episodes)."""
     m = pd.read_parquet(os.path.join(data, "markets.parquet"), columns=["case_id", "condition_id", "t_news_reliable"])
-    bad = m[~m.t_news_reliable]; cases = sorted(bad.case_id.unique())
-    w = pd.read_parquet(os.path.join(data, "wallets.parquet"), columns=["wallet", "case_id"] + SETS)
-    e = pd.read_parquet(os.path.join(data, "episodes.parquet"), columns=["t_news_version", "control_design", "role", "episode_id", "t_news_reliable"],
+    by = m.groupby("case_id").t_news_reliable.agg(["sum", "size"])
+    p = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=["case_id", "wallet", "t_news_reliable"] + SETS,
+                        filters=[("market_set", "==", "case"), ("t_news_version", "==", "precise")])
+    pos = {}
+    for s in SETS:
+        q = p[p[s]].groupby(["case_id", "wallet"]).t_news_reliable.any()
+        pos[s] = dict(with_prenews_position=int(len(q)), kept=int(q.sum()), removed=int((~q).sum()),
+                      removed_by_case={k: int(v) for k, v in (~q).groupby(level=0).sum().items() if v})
+    e = pd.read_parquet(os.path.join(data, "episodes.parquet"), columns=["t_news_version", "t_news_reliable"],
                         filters=[("control_design", "==", "standard"), ("role", "==", "suspected")])
-    return dict(n_cases=len(cases), cases=cases, n_markets=int(len(bad)), n_markets_total=int(len(m)),
-                positives_removed={s: int(w[w.case_id.isin(cases)][s].sum()) for s in SETS}, positives_total={s: int(w[s].sum()) for s in SETS},
-                suspected_episodes_removed={v: int((~g.t_news_reliable).sum()) for v, g in e.groupby("t_news_version")})
+    return dict(rule="A29.1: per market; false only for deadline-rule cuts", n_markets=int((~m.t_news_reliable).sum()), n_markets_total=int(len(m)),
+                cases_fully_removed=sorted(by[by["sum"] == 0].index), cases_partly_removed=sorted(by[(by["sum"] > 0) & (by["sum"] < by["size"])].index),
+                markets_by_case={c: dict(reliable=int(r["sum"]), unreliable=int(r["size"] - r["sum"])) for c, r in by[by["sum"] < by["size"]].iterrows()},
+                positives=pos, suspected_episodes_removed={v: int((~g.t_news_reliable).sum()) for v, g in e.groupby("t_news_version")})
 
 
 def t3(data, splits, version, comp, lset, tune, feats_cache):

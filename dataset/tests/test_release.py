@@ -317,18 +317,18 @@ def test_relaxed_band_only_in_banded_designs():
 
 
 def test_t_news_reliable():
-    """A29: unreliable iff a month- or year-dated case without a sourced exact time; the flag is the same in every table."""
-    m = load("markets", ["case_id", "t_news_precision", "t_news_precise_precision", "t_news_reliable", "t_news_market_method", "t_news_deadline_rule_utc", "t_news_market_utc"])
-    exp = ~(m.t_news_precision.isin(["month", "year"]) & (m.t_news_precise_precision == "day_fallback"))
-    assert (m.t_news_reliable == exp).all()
+    """A29.1: per market; false only for a deadline-rule time; episodes carry their market's flag; placebo/twin rows their case market's."""
+    m = load("markets", ["case_id", "condition_id", "t_news_reliable", "t_news_market_method", "t_news_deadline_rule_utc", "t_news_market_utc"])
+    assert (m.t_news_reliable == (m.t_news_market_method != "market_deadline")).all()
     dl = m[m.t_news_market_method == "market_deadline"]
     assert (dl.t_news_deadline_rule_utc == dl.t_news_market_utc).all() and m[m.t_news_market_method != "market_deadline"].t_news_deadline_rule_utc.isna().all()
-    rel = m.groupby("case_id").t_news_reliable.first()
-    for t in ["episodes", "market_minutes"]:
-        d = load(t, ["case_id", "t_news_reliable"]).drop_duplicates()
-        assert (d.t_news_reliable.values == d.case_id.map(rel).fillna(True).values).all(), t
-    d = duckdb.sql(f"SELECT DISTINCT case_id, t_news_reliable FROM read_parquet('{R}/positions.parquet')").df()
-    assert (d.t_news_reliable.values == d.case_id.map(rel).fillna(True).values).all()
+    rel = dict(zip(zip(m.case_id, m.condition_id), m.t_news_reliable))
+    e = load("episodes", ["case_id", "condition_id", "t_news_reliable"]).drop_duplicates()
+    assert (e.t_news_reliable.values == [rel.get(k, True) for k in zip(e.case_id, e.condition_id)]).all()
+    for t in ["positions", "market_minutes"]:
+        d = duckdb.sql(f"SELECT DISTINCT case_id, condition_id, t_news_reliable FROM read_parquet('{R}/{t}.parquet') WHERE market_set = 'case'").df()
+        assert (d.t_news_reliable.values == [rel.get(k, True) for k in zip(d.case_id, d.condition_id)]).all(), t
+        assert duckdb.sql(f"SELECT count(*) FROM (SELECT market_set, case_id, condition_id FROM read_parquet('{R}/{t}.parquet') GROUP BY ALL HAVING count(DISTINCT t_news_reliable) > 1)").fetchall()[0][0] == 0, t
 
 
 def test_scheduled_starts_before_close():

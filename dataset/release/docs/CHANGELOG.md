@@ -2,7 +2,7 @@
 
 ## v1.2.1 (2026-11-27, run 11): last fixes
 Amendments A29-A33 (the run-11 request numbered them A28-A32; A28 was already taken by the run-10 multi-account family).
-- A29: `t_news_reliable` in `markets`, `positions`, `episodes` and `market_minutes`: false for every market of a month- or year-dated case without a sourced exact time; `markets.t_news_deadline_rule_utc` keeps the A25 deadline time. Default analyses and every benchmark use reliable rows only.
+- A29, A29.1: `t_news_reliable` per market in `markets`, `positions`, `episodes` and `market_minutes`: false only where the cut came from the A25 deadline rule (285 markets in 9 cases, range-dated tweet-count markets included); sourced exact times and checked scheduled starts are reliable (World Cup and KPMG stay in). `markets.t_news_deadline_rule_utc` keeps the deadline time. Default analyses and every benchmark use reliable rows only. (A29 as first applied, by case, flagged all 90 checked scheduled starts; A29.1 corrected the scope before any release table used it.)
 - A30: a scheduled start is used only if it is before the market's close (Gamma `closedTime`, else `resolved_utc`); all 91 candidates checked in `logs/scheduled_start_check.csv` (0 disagreements; no cut changed).
 - A31: only claims with stance `alleges` or `confirms` create `claim_wallet_links` (6 links from context claim CL0124 removed; no label changed).
 - A32: below 6 leave-one-case-out folds, results are reported per fold with min and max only (all `label_strict` results).
