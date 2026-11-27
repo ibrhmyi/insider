@@ -17,6 +17,16 @@ F = os.path.join(D, "out", "v1", "fills"); OUT = os.path.join(D, "out", "v1")
 c = duckdb.connect(); c.sql(f"SET memory_limit='5GB'; SET temp_directory='{TMPD}'; SET enable_progress_bar=false; SET preserve_insertion_order=false; SET threads=3")
 from cuts import build_cuts  # shared with directional.py (A34.2)
 M, mk = build_cuts(D)
+# Optional bucketing (disk allowance): PMITC_POS_BUCKET="b/NB" keeps whole Gamma events (else whole markets) of bucket b; every table here is
+# keyed by market or ranks within an event (BIG), so the union of the buckets equals a single pass. Merged by build/v1/positions_buckets.py.
+SUF = ""
+if os.environ.get("PMITC_POS_BUCKET"):
+    import hashlib
+    _b, _nb = map(int, os.environ["PMITC_POS_BUCKET"].split("/"))
+    _key = [(e if isinstance(e, str) and e else cid) for e, cid in zip(M.event_id, M.condition_id)]
+    M = M[[int(hashlib.sha1(k.encode()).hexdigest(), 16) % _nb == _b for k in _key]].reset_index(drop=True)
+    SUF = f"_bucket{_b:02d}"
+    print("bucket", _b, "of", _nb, "cut rows", len(M), flush=True)
 c.register("M_df", M.drop(columns=["t_cut", "resolved_utc"])); c.sql("CREATE TABLE M AS SELECT * FROM M_df")
 LSRC = legs_sql([f"{F}/fills_case.parquet", f"{F}/fills_placebo.parquet", f"{F}/fills_twin.parquet"])
 c.sql(f"""CREATE VIEW legs AS SELECT market_set, condition_id, asset_id, outcome_label, ts, price, usdc, shares, wallet, wallet_role, wallet_side, source, econ_inferred
@@ -75,7 +85,7 @@ c.sql("DROP VIEW L")
 # --- wallet history from the Polymarket-v1 day files (A16 F1 / F2 substitutions)
 c.sql(f"""CREATE TABLE WH AS SELECT address wallet, epoch(first_fill_utc)::BIGINT first_fill_v1_ts, n_markets lifetime_markets_v1
           FROM '{D}/out/weak_labels.parquet' WHERE address IN (SELECT DISTINCT wallet FROM WM)""")
-c.sql(f"COPY (SELECT wallet, to_timestamp(first_fill_v1_ts) first_fill_polymarket_v1_utc, first_fill_v1_ts FROM WH ORDER BY 1) TO '{OUT}/wallet_history.parquet' (FORMAT parquet)")
+c.sql(f"COPY (SELECT wallet, to_timestamp(first_fill_v1_ts) first_fill_polymarket_v1_utc, first_fill_v1_ts FROM WH ORDER BY 1) TO '{OUT}/wallet_history{SUF}.parquet' (FORMAT parquet)")
 c.sql("""CREATE TABLE WMD AS SELECT DISTINCT wallet, (to_timestamp(t_cut_ts) AT TIME ZONE 'UTC')::DATE dcut FROM WM""")
 # A16 F2 denominator: Polymarket-v1 volume (all markets) up to the end of the cut's UTC day, streamed from the day files (A16.1)
 c.sql(f"""CREATE TABLE F2 AS SELECT k.wallet, k.dcut, sum(p.buy_usdc + p.sell_usdc) vol_to_day
@@ -141,5 +151,5 @@ c.sql(f"""COPY (SELECT market_set, case_id, condition_id, asset_id, wallet, t_ne
      CASE WHEN winning_outcome IS NOT NULL THEN sell_usdc_pre + sell_usdc_post - buy_usdc_pre - buy_usdc_post
           + CASE WHEN lower(coalesce(outcome_label, '')) = lower(winning_outcome)
                  THEN greatest(buy_shares_pre + buy_shares_post - sell_shares_pre - sell_shares_post, 0) ELSE 0 END END pnl_post
-  FROM X1 ORDER BY market_set, case_id, condition_id, t_news_version, wallet, asset_id) TO '{OUT}/positions.parquet' (FORMAT parquet, COMPRESSION zstd)""")
-print(c.sql(f"SELECT market_set, t_news_version, count(*), sum(gate1::INT), sum(gate2a::INT), sum(gate2b::INT) FROM '{OUT}/positions.parquet' GROUP BY ALL").fetchall())
+  FROM X1 ORDER BY market_set, case_id, condition_id, t_news_version, wallet, asset_id) TO '{OUT}/positions{SUF}.parquet' (FORMAT parquet, COMPRESSION zstd)""")
+print(c.sql(f"SELECT market_set, t_news_version, count(*), sum(gate1::INT), sum(gate2a::INT), sum(gate2b::INT) FROM '{OUT}/positions{SUF}.parquet' GROUP BY ALL").fetchall())
