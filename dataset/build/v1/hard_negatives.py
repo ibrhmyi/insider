@@ -17,7 +17,7 @@ c.execute("CREATE TABLE EX(a VARCHAR)"); c.executemany("INSERT INTO EX VALUES (?
 c.execute("CREATE TABLE CL(a VARCHAR)"); c.executemany("INSERT INTO CL VALUES (?)", [(a,) for a in cleared])
 P = c.sql(f"""SELECT market_set, case_id, condition_id, asset_id, wallet, t_news_version, buy_usdc_pre, vwap_pre, first_buy_ts, won_post
               FROM '{D}/out/v1/positions.parquet'
-              WHERE buy_usdc_pre >= 1000 AND vwap_pre <= 0.35 AND wallet NOT IN (SELECT a FROM EX)
+              WHERE is_directional_position AND buy_usdc_pre >= 1000 AND vwap_pre <= 0.35 AND wallet NOT IN (SELECT a FROM EX)  -- A34.2
                 AND ((market_set IN ('case', 'twin') AND case_id IN (SELECT a FROM CL))
                   OR (market_set IN ('case', 'twin') AND won_post = false)
                   OR (market_set = 'placebo' AND won_post = true))""").df()

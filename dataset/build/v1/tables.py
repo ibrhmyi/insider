@@ -184,6 +184,8 @@ wl["triggering_suspect"] = wl.wallet.map(first.trigger_wallet)
 wl["placebo_rate"] = wl.wallet.map(first.t_news_version).map(lambda v: PR[v]["placebo_to_real_ratio"] if isinstance(v, str) else np.nan)
 wl["gate_scope"] = np.where(wl.gate1_n.notna(), "case_placebo_or_twin_markets", "not_in_case_placebo_or_twin_markets")
 wl["acdc_class"] = wl.acdc_class.replace("", None)
+_mm = pd.read_parquet(os.path.join(V1, "market_makers.parquet"), columns=["wallet", "is_market_maker"])  # A34.1 reporting flag
+wl = wl.merge(_mm, on="wallet", how="left"); wl["is_market_maker"] = wl.is_market_maker.fillna(False).astype(bool)
 wl = cast("weak_labels", wl)
 pq.write_table(pa.Table.from_pandas(wl, schema=schema_of("weak_labels"), preserve_index=False), os.path.join(OUT, "weak_labels.parquet"), compression="zstd")
 print("weak_labels", len(wl), flush=True)

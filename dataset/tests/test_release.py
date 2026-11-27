@@ -287,8 +287,8 @@ def test_strict_requires_prenews_buy():
     """A26: every label_strict wallet bought before a case market's precise cut; strict_no_prenews is disjoint from strict and within standard."""
     w = load("wallets", ["wallet", "label_strict", "label_standard", "strict_no_prenews"])
     assert not (w.label_strict & w.strict_no_prenews).any() and (~w.strict_no_prenews | w.label_standard).all()
-    p = load("positions", ["market_set", "wallet", "t_news_version"])
-    pre = set(p[(p.market_set == "case") & (p.t_news_version == "precise")].wallet)
+    p = load("positions", ["market_set", "wallet", "t_news_version", "is_directional_position"])
+    pre = set(p[(p.market_set == "case") & (p.t_news_version == "precise") & p.is_directional_position].wallet)  # A34.2
     assert set(w[w.label_strict].wallet) <= pre
 
 
@@ -373,3 +373,22 @@ def test_econ_view_consistent():
     p = load("positions", ["buy_usdc_pre", "econ_inferred_buy_usdc_pre", "raw_view_prenews_buy"])
     assert (p.econ_inferred_buy_usdc_pre <= p.buy_usdc_pre + 1e-6).all()
     assert p[~p.raw_view_prenews_buy].econ_inferred_buy_usdc_pre.gt(0).all()  # econ-only positions come from inferred legs
+
+
+def test_directional_positions():
+    """A34.2: at most one directional token per (wallet, market, version); it has directional shares; full sets never negative; FIFO cost within bounds."""
+    q = f"read_parquet('{R}/positions.parquet')"
+    assert duckdb.sql(f"""SELECT count(*) FROM (SELECT market_set, case_id, condition_id, t_news_version, wallet FROM {q} WHERE is_directional_position
+                          GROUP BY ALL HAVING count(*) > 1)""").fetchall()[0][0] == 0
+    bad = duckdb.sql(f"""SELECT count(*) FROM {q} WHERE (is_directional_position AND NOT directional_shares_pre > 1e-6) OR full_sets_pre_shares < 0
+                          OR directional_cost_usdc_pre < -1e-6 OR directional_cost_usdc_pre > directional_shares_pre + 1e-6
+                          OR (NOT is_directional_position AND directional_cost_usdc_pre <> 0)""").fetchall()[0][0]
+    assert bad == 0
+
+
+def test_market_maker_flag_consistent():
+    """A34.1: is_market_maker is the same reporting flag in positions and weak_labels."""
+    w = duckdb.sql(f"SELECT wallet, is_market_maker FROM read_parquet('{R}/weak_labels.parquet') WHERE is_market_maker").df()
+    p = duckdb.sql(f"SELECT DISTINCT wallet, is_market_maker FROM read_parquet('{R}/positions.parquet')").df()
+    assert duckdb.sql("SELECT count(*) FROM p WHERE is_market_maker AND wallet NOT IN (SELECT wallet FROM w)").fetchall()[0][0] == 0
+    assert p.groupby("wallet").is_market_maker.nunique().max() == 1

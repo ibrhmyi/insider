@@ -59,10 +59,10 @@ e4set = set(zip(e4.wallet, e4.case_id))
 strict_g = W.wallet_grade.isin(["E1", "E2", "E3"])
 strict_e4 = pd.Series([(a.lower(), c) in e4set for a, c in zip(W.address, W.case_id)], index=W.index)
 strict_rule = W.label_standard & (strict_g | strict_e4)
-# A26: strict also needs >= 1 BUY in a market of its case before that market's precise cut (positions hold exactly the pre-cut buyers)
+# A26: strict also needs a pre-news position in a market of its case before that market's precise cut; A34.2: a directional one (econ view, net of full sets)
 POS = os.path.join(D, "out", "v1", "positions.parquet")
 import duckdb
-pre = {(a, k) for a, k in duckdb.sql(f"SELECT DISTINCT wallet, case_id FROM '{POS}' WHERE market_set = 'case' AND t_news_version = 'precise'").fetchall()}
+pre = {(a, k) for a, k in duckdb.sql(f"SELECT DISTINCT wallet, case_id FROM '{POS}' WHERE market_set = 'case' AND t_news_version = 'precise' AND is_directional_position").fetchall()}  # A34.2
 has_pre = pd.Series([(a.lower(), k) in pre for a, k in zip(W.address, W.case_id)], index=W.index)
 W["label_strict"] = strict_rule & has_pre
 W["strict_no_prenews"] = (strict_rule & ~has_pre).map({True: "true", False: "false"})

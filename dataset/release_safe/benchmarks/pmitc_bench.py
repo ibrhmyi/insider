@@ -1,4 +1,5 @@
-"""PMITC v1.2.1 benchmark tasks (PROTOCOL A15, A23, A26, A27, A29, A32, A33). Runs on the released files only (../data).
+"""PMITC v1.2.1 benchmark tasks (PROTOCOL A15, A23, A26, A27, A29, A32, A33, A34).
+A34-A34.2: positions are in the economic view, net of full sets; T1 candidates are directional pre-news positions. Runs on the released files only (../data).
   python3 pmitc_bench.py [--data ../data] [--out baselines.json] [--quick]
 Folds: leave-one-case-out over cases with >= 3 label_standard wallets in the task's rows, plus the A15 time split (splits.csv).
 Label sets: label_strict, label_standard, label_broad (A20). A26: models train on label_standard (label_broad for the broad run); label_strict is
@@ -203,7 +204,7 @@ def train_set(lset):
 
 def t1(data, splits, version, lset, tune, quick, size_band=False):
     """T1 (secondary) or T1s (A27 headline, size_band=True: candidates within [0.5 x min, 2 x max] of the market's positives' pre-cut BUY)."""
-    p = pd.read_parquet(os.path.join(data, "positions.parquet"), filters=[("market_set", "==", "case"), ("t_news_version", "==", version), ("is_main_side", "==", True), ("t_news_reliable", "==", True)])
+    p = pd.read_parquet(os.path.join(data, "positions.parquet"), filters=[("market_set", "==", "case"), ("t_news_version", "==", version), ("is_directional_position", "==", True), ("t_news_reliable", "==", True)]  # A34.2)
     p = prep_t1(p).merge(splits, on="case_id")
     tr = train_set(lset)
     p["y"] = p[lset].astype(int); p["y_tr"] = p[tr].astype(int); p["tie"] = p.buy_usdc_pre
@@ -268,7 +269,7 @@ def market_features(data, version, sets):
             taker_buy_share_24h=tb / (tb + ts_) if (tb + ts_) else np.nan))
     f = mm.groupby(k).apply(agg, include_groups=False).reset_index()
     p = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=k + ["t_news_version", "wallet", "buy_usdc_pre", "account_age_days_at_first_buy", "gate1", "vwap_price_usdc_pre"] + sets,
-                        filters=[("t_news_version", "==", version), ("t_news_reliable", "==", True)])
+                        filters=[("t_news_version", "==", version), ("t_news_reliable", "==", True), ("is_directional_position", "==", True)])  # A34.2
     def pagg(g):
         tot = g.buy_usdc_pre.sum(); w = g.groupby("wallet").buy_usdc_pre.sum().sort_values(ascending=False)
         d = dict(log_n_buyers=np.log1p(g.wallet.nunique()), top10_buy_share=w.head(10).sum() / tot if tot else np.nan,
@@ -285,7 +286,7 @@ def excluded_unreliable(data):
     m = pd.read_parquet(os.path.join(data, "markets.parquet"), columns=["case_id", "condition_id", "t_news_reliable"])
     by = m.groupby("case_id").t_news_reliable.agg(["sum", "size"])
     p = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=["case_id", "wallet", "t_news_reliable"] + SETS,
-                        filters=[("market_set", "==", "case"), ("t_news_version", "==", "precise")])
+                        filters=[("market_set", "==", "case"), ("t_news_version", "==", "precise"), ("is_directional_position", "==", True)])
     pos = {}
     for s in SETS:
         q = p[p[s]].groupby(["case_id", "wallet"]).t_news_reliable.any()

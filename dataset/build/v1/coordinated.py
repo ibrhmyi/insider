@@ -25,9 +25,14 @@ c.register("doc_df", doc); c.sql("CREATE TABLE DOC AS SELECT address wallet, cas
 c.execute("CREATE TABLE LAB(a VARCHAR)"); c.executemany("INSERT INTO LAB VALUES (?)", [(a,) for a in labelled])
 sys.path.insert(0, os.path.dirname(__file__)); from econ_view import legs_sql  # A34
 c.sql(f"CREATE VIEW legs AS SELECT condition_id, asset_id, ts, usdc, wallet, wallet_side, leg_id FROM {legs_sql(F)} WHERE wallet_side = 'BUY' AND wallet IS NOT NULL")
+# A34.2: triggers and candidates only from directional pre-news positions (the directional token, net of full sets)
+c.sql(f"""CREATE TABLE DIR AS SELECT case_id, condition_id, t_news_version, wallet, directional_asset_id asset_id FROM '{D}/out/v1/directional.parquet'
+          WHERE market_set = 'case' AND directional_shares_pre > 1e-6""")
 c.sql("""CREATE TABLE TRIG AS SELECT l.leg_id trigger_leg_id, d.wallet trigger_wallet, m.case_id, l.condition_id, l.asset_id, l.ts trigger_ts,
           l.usdc trigger_usdc, m.t_news_version, m.t_cut FROM legs l JOIN DOC d ON d.wallet = l.wallet
-          JOIN M m ON m.case_id = d.case_id AND m.condition_id = l.condition_id WHERE l.ts < m.t_cut""")
+          JOIN M m ON m.case_id = d.case_id AND m.condition_id = l.condition_id
+          JOIN DIR x ON x.wallet = l.wallet AND x.case_id = m.case_id AND x.condition_id = lower(l.condition_id) AND x.t_news_version = m.t_news_version AND x.asset_id = l.asset_id
+          WHERE l.ts < m.t_cut""")
 print("triggers", c.sql("SELECT t_news_version, count(*) FROM TRIG GROUP BY 1").fetchall(), flush=True)
 # placebo window centres: 5 per trigger, uniform in [first fill in the market, t_cut - 600]
 T = c.sql("SELECT * FROM TRIG ORDER BY t_news_version, trigger_leg_id").df()
@@ -49,6 +54,7 @@ def hits(win):
                           w.t_news_version, l.wallet, sum(l.usdc) cand_usdc, min(l.ts) cand_first_buy_ts, count(*) cand_n_legs
                    FROM {win} w JOIN legs l ON l.condition_id = w.condition_id AND l.asset_id = w.asset_id
                         AND l.ts BETWEEN w.trigger_ts - {WIN} AND w.trigger_ts + {WIN} AND l.ts < w.t_cut
+                   JOIN DIR y ON y.wallet = l.wallet AND y.case_id = w.case_id AND y.condition_id = lower(w.condition_id) AND y.t_news_version = w.t_news_version AND y.asset_id = w.asset_id
                    WHERE l.wallet <> w.trigger_wallet AND l.wallet NOT IN (SELECT a FROM LAB)
                    GROUP BY ALL HAVING sum(l.usdc) BETWEEN 0.5 * w.trigger_usdc AND 2 * w.trigger_usdc""").df()
 

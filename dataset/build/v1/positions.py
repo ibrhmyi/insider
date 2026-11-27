@@ -15,38 +15,8 @@ D = os.path.join(os.path.dirname(__file__), "..", "..")
 WORK, TMPD = sys.argv[1:3]
 F = os.path.join(D, "out", "v1", "fills"); OUT = os.path.join(D, "out", "v1")
 c = duckdb.connect(); c.sql(f"SET memory_limit='5GB'; SET temp_directory='{TMPD}'; SET enable_progress_bar=false; SET preserve_insertion_order=false; SET threads=3")
-ts = lambda s: pd.to_datetime(s.replace("", None), utc=True, errors="coerce", format="mixed")
-ep = lambda s: (ts(s) - pd.Timestamp("1970-01-01", tz="UTC")).dt.total_seconds().round().astype("Int64")
-mk = pd.read_csv(os.path.join(D, "data", "markets.csv"), dtype=str, keep_default_na=False)
-mk["condition_id"] = mk.condition_id.str.lower()
-# Yes token = outcome 'Yes', else the first listed outcome (frozen v1 YES-direction convention)
-mk["yes_label"] = mk.outcomes.map(lambda s: "Yes" if "Yes" in s.split(";") else (s.split(";")[0] if s else ""))
-lad = mk.copy(); lad["lr"] = pd.to_numeric(lad.ladder_rank, errors="coerce")
-yes_res = lad[lad.outcome.str.lower().eq("yes") & lad.lr.notna()]
-short = set(map(tuple, yes_res.loc[yes_res.groupby(["case_id", "event_id"]).lr.idxmin(), ["case_id", "condition_id"]].values))
-rows = []
-for r in mk.itertuples():
-    for v, col in [("day", "t_news_market_day_utc"), ("precise", "t_news_market_utc")]:
-        rows.append(dict(market_set="case", case_id=r.case_id, condition_id=r.condition_id, t_news_version=v, t_cut=getattr(r, col),
-                         event_id=r.event_id, yes_label=r.yes_label, is_shortest_sufficient=(r.case_id, r.condition_id) in short,
-                         winning_outcome=r.outcome or None, resolved_utc=r.resolved_utc))
-pl = pd.read_csv(os.path.join(D, "data", "placebo_markets.csv"), dtype=str, keep_default_na=False)
-pl = pl[pl.placebo_condition_id != ""]
-for r in pl.itertuples():
-    outs = r.placebo_outcomes.split(";")
-    for v in ["day", "precise"]:
-        rows.append(dict(market_set="placebo", case_id=r.case_id, condition_id=r.placebo_condition_id, t_news_version=v,
-                         t_cut=getattr(r, f"t_ref_{v}_utc"), event_id=None, yes_label="Yes" if "Yes" in outs else outs[0],
-                         is_shortest_sufficient=False, winning_outcome=r.placebo_outcome, resolved_utc=r.placebo_end_utc))
-tw = pd.read_csv(os.path.join(D, "data", "twin_markets.csv"), dtype=str, keep_default_na=False)
-tw = tw[tw.twin_condition_id != ""]
-for r in tw.itertuples():  # A22: twin markets, cut at t_ref
-    outs = r.twin_outcomes.split(";")
-    for v in ["day", "precise"]:
-        rows.append(dict(market_set="twin", case_id=r.case_id, condition_id=r.twin_condition_id, t_news_version=v,
-                         t_cut=getattr(r, f"t_ref_{v}_utc"), event_id=None, yes_label="Yes" if "Yes" in outs else outs[0],
-                         is_shortest_sufficient=False, winning_outcome=r.twin_outcome, resolved_utc=r.twin_end_utc))
-M = pd.DataFrame(rows); M["t_cut_ts"] = ep(M.t_cut); M["resolved_ts"] = ep(M.resolved_utc)
+from cuts import build_cuts  # shared with directional.py (A34.2)
+M, mk = build_cuts(D)
 c.register("M_df", M.drop(columns=["t_cut", "resolved_utc"])); c.sql("CREATE TABLE M AS SELECT * FROM M_df")
 LSRC = legs_sql([f"{F}/fills_case.parquet", f"{F}/fills_placebo.parquet", f"{F}/fills_twin.parquet"])
 c.sql(f"""CREATE VIEW legs AS SELECT market_set, condition_id, asset_id, outcome_label, ts, price, usdc, shares, wallet, wallet_role, wallet_side, source, econ_inferred
@@ -129,11 +99,18 @@ c.sql(f"""CREATE TABLE BIG AS SELECT * FROM (
                    row_number() OVER (PARTITION BY market_set, case_id, event_id, t_news_version, wallet ORDER BY buy_usdc_pre DESC, condition_id, asset_id) rn
             FROM P WHERE event_id IS NOT NULL AND event_id <> '') WHERE rn = 1 AND is_shortest_sufficient AND is_yes""")
 FLAGS = ["flag_f1", "flag_f2", "flag_f3", "flag_f4", "flag_f5", "flag_f6"]
-c.sql(f"""CREATE VIEW X0 AS SELECT p.*, coalesce(sa.gate2a, false) gate2a, g.first_fill_in_market_ts, g.market_usdc_pre, g.market_buy_usdc_pre,
+c.sql(f"CREATE TABLE DIRP AS SELECT * FROM '{OUT}/directional.parquet'")  # A34.2
+c.sql(f"CREATE TABLE MMK AS SELECT wallet, is_market_maker FROM '{OUT}/market_makers.parquet'")  # A34.1 reporting flag
+c.sql(f"""CREATE VIEW X0 AS SELECT p.*, coalesce(sa.gate2a, false) gate2a,
+     coalesce(dr.full_sets_pre_shares, 0) full_sets_pre_shares, coalesce(dr.directional_shares_pre, 0) directional_shares_pre,
+     CASE WHEN p.asset_id = dr.directional_asset_id THEN coalesce(dr.directional_cost_usdc_pre, 0) ELSE 0 END directional_cost_usdc_pre,
+     coalesce(p.asset_id = dr.directional_asset_id AND dr.directional_shares_pre > 1e-6, false) is_directional_position,
+     coalesce(mmk.is_market_maker, false) is_market_maker, g.first_fill_in_market_ts, g.market_usdc_pre, g.market_buy_usdc_pre,
      g.f5_conviction, g.main_asset, g.first_fill_v1_ts, g.vol_to_day, g.lifetime_markets_v1, g.f1_days_account_to_first_fill, g.f2_share,
      mv.f3_main_vwap, (p.t_cut_ts - g.weighted_median_buy_ts) / 3600.0 f6_hours_median_buy_to_tnews, h.hf_market,
      (b.wallet IS NOT NULL) gate2b
   FROM P p LEFT JOIN SA sa USING ({K}, asset_id) LEFT JOIN G1 g USING ({K}) LEFT JOIN MV mv USING ({K})
+  LEFT JOIN DIRP dr USING ({K}) LEFT JOIN MMK mmk ON mmk.wallet = p.wallet
   LEFT JOIN HFM h ON h.market_set = p.market_set AND h.condition_id = p.condition_id
   LEFT JOIN BIG b ON b.market_set = p.market_set AND b.case_id = p.case_id AND b.condition_id = p.condition_id AND b.asset_id = p.asset_id
        AND b.t_news_version = p.t_news_version AND b.wallet = p.wallet""")
@@ -147,7 +124,8 @@ c.sql("""CREATE VIEW X1 AS SELECT *,
 score = " + ".join(f"coalesce({f}, false)::INT" for f in FLAGS)
 c.sql(f"""COPY (SELECT market_set, case_id, condition_id, asset_id, wallet, t_news_version, outcome_label, t_cut_ts, is_shortest_sufficient,
      n_buy_fills_pre, buy_usdc_pre, buy_shares_pre, first_buy_ts, last_buy_ts, first_buy_price, max_buy_price, median_buy_fill_usdc,
-     sell_usdc_pre, sell_shares_pre, taker_share_pre, source_pre, econ_inferred_buy_usdc_pre, raw_view_prenews_buy, buy_usdc_pre / nullif(buy_shares_pre, 0) vwap_pre, asset_id = main_asset is_main_side,
+     sell_usdc_pre, sell_shares_pre, taker_share_pre, source_pre, econ_inferred_buy_usdc_pre, raw_view_prenews_buy,
+     full_sets_pre_shares, directional_shares_pre, directional_cost_usdc_pre, is_directional_position, is_market_maker, buy_usdc_pre / nullif(buy_shares_pre, 0) vwap_pre, asset_id = main_asset is_main_side,
      (first_buy_ts - first_fill_v1_ts) / 86400.0 account_age_days_at_first_buy, first_fill_in_market_ts, market_usdc_pre, market_buy_usdc_pre,
      f5_conviction, vol_to_day, lifetime_markets_v1, f1_days_account_to_first_fill, f2_share, f3_main_vwap, f6_hours_median_buy_to_tnews,
      {", ".join(FLAGS)},
