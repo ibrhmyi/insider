@@ -136,8 +136,10 @@ One row per (case, market). Ladders are full Gamma events (A6.5). Titles withhel
 | `title_withheld` | bool |  |  |  | meta | A12.6 |
 | `t_news_market_utc` | timestamp |  |  |  | label | A25: per-market exact cut (precise version): Gamma scheduled start, market deadline inside a coarse case date, or the case time |
 | `t_news_market_day_utc` | timestamp |  |  |  | label | A25: per-market day-level cut (day version) |
-| `t_news_market_method` | string |  | scheduled_start, market_deadline, case_time |  | meta | A25 method |
+| `t_news_market_method` | string |  | scheduled_start, market_deadline, case_time |  | meta | A25 method (A30: a scheduled start is used only if before the market's close) |
 | `is_placebo_market` | bool |  |  |  | meta | always false here |
+| `t_news_reliable` | bool |  |  |  | label | A29: false for every market of a month- or year-dated case without a sourced exact time; excluded from default analyses and benchmarks |
+| `t_news_deadline_rule_utc` | timestamp |  |  |  | label | A29: the A25 rule-2 deadline time where it set the cut; NULL otherwise |
 | `ff_tier` | string |  |  |  | meta | ForesightFlow tier if listed |
 | `ff_tier2_tnews` | timestamp |  |  |  | meta | ForesightFlow tier-2 proxy (stored, not used) |
 
@@ -270,6 +272,7 @@ All-buyer positions before the cut (C2): the full population a detector must sea
 | `is_control` | bool |  |  |  | label | selected as a matched control in this market, version |
 | `is_placebo_market` | bool |  |  |  | label | market_set = placebo |
 | `is_twin_market` | bool |  |  |  | label | market_set = twin (A22) |
+| `t_news_reliable` | bool |  |  |  | label | A29: the (matched) case's news time is reliable; default analyses and benchmarks use true only |
 | `buy_usdc_post` | float64 | USDC |  |  | post | BUY USDC at or after the cut |
 | `buy_shares_post` | float64 |  |  |  | post | BUY shares at or after the cut |
 | `sell_usdc_post` | float64 | USDC |  |  | post | SELL USDC at or after the cut |
@@ -286,7 +289,9 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `row_id` | string (PK) |  |  |  | meta | row id within version |
 | `episode_id` | string |  |  |  | meta | stable id of a documented episode (hash of case, wallet, market, token); NULL on control rows |
 | `t_news_version` | string (PK) |  | day, precise |  | meta | A10.2 |
-| `control_design` | string (PK) |  | standard, age_matched, open |  | meta | A27: standard (A6.10), age_matched (plus account-age band; T2s) or open (Orca/Inca wallets allowed; T2-open) |
+| `control_design` | string (PK) |  | standard, age_matched, winrate_matched, open |  | meta | A27/A33: standard (A6.10), age_matched (plus account-age band; T2s), winrate_matched (plus prior win-rate band; T2w) or open (Orca/Inca wallets allowed; T2-open) |
+| `t_news_reliable` | bool |  |  |  | label | A29: the case's news time is reliable (default analyses use true only) |
+| `relaxed_band` | bool |  |  |  | label | A33: control chosen after the adjacent age / win-rate band was allowed; false on suspected rows and exact-band controls |
 | `role` | string |  |  |  | label | suspected, control_same_side, control_other_side_large_buyer |
 | `label_strict` | bool |  |  |  | label | suspected row of a label_strict wallet (A20); false on control rows |
 | `label_standard` | bool |  |  |  | label | label_standard (A20) |
@@ -337,9 +342,10 @@ Matched controls (A6.10, seed 192) with relaxation flags, per t_news version.
 | column | type | unit | allowed values | source | leakage | description |
 |---|---|---|---|---|---|---|
 | `t_news_version` | string (PK) |  | day, precise |  | meta | A10.2 |
-| `control_design` | string (PK) |  | standard, age_matched, open |  | meta | A27 design |
+| `control_design` | string (PK) |  | standard, age_matched, winrate_matched, open |  | meta | A27/A33 design |
 | `episode_id` | string (PK) |  |  |  | meta | documented episode |
 | `wallet` | string (PK) |  |  |  | meta | control wallet |
+| `relaxed_band` | bool |  |  |  | meta | A33: chosen with the adjacent age / win-rate band allowed |
 | `control_type` | string (PK) |  | same_side, other_side_large_buyer |  | meta | same_side or other_side_large_buyer |
 | `relaxation` | string |  | base, window_72h, price_0.10, size_0.25_4x |  | meta | A6.10 relaxation used |
 | `n_eligible` | int64 |  |  |  | meta | eligible controls at that step |
@@ -411,6 +417,7 @@ One row per market, version and UTC minute with fills, cut - 48 h to + 24 h, Yes
 | `n_wallets` | int64 |  |  |  | meta | distinct wallets |
 | `n_new_wallets` | int64 |  |  |  | meta | wallets with first Polymarket-v1 fill in the previous 7 days |
 | `n_wallets_age_unknown` | int64 |  |  |  | meta | wallets with no Polymarket-v1 history |
+| `t_news_reliable` | bool |  |  |  | label | A29: the (matched) case's news time is reliable |
 
 ## contradictions
 

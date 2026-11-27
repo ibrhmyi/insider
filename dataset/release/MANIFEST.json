@@ -1,6 +1,6 @@
 {
  "name": "PMITC",
- "version": "1.2.0",
+ "version": "1.2.1",
  "package": "release",
  "withheld_sources": [],
  "wallets_confirmed_only_by_withheld_sources": [],
@@ -40,8 +40,8 @@
   {
    "path": "benchmarks/README.md",
    "rows": null,
-   "bytes": 7339,
-   "sha256": "eedef74658eed960712e0d09fea9054a108eb1d76d14bcb1967629e12a25a177"
+   "bytes": 8401,
+   "sha256": "130493174b949cee56bc72868466530c29a2fe7daf579e286fd55c21fe5ce94c"
   },
   {
    "path": "benchmarks/baselines.json",
@@ -52,8 +52,8 @@
   {
    "path": "benchmarks/pmitc_bench.py",
    "rows": null,
-   "bytes": 22682,
-   "sha256": "8a211dd9422849ff7a08c0cdbe4053d89ae808f1fddc64dfef6e8f9e2733118c"
+   "bytes": 25904,
+   "sha256": "4f0daafffec9656cfc708f1fc477deb479bf4cac7158d743e6d1ef24ac125aeb"
   },
   {
    "path": "benchmarks/splits.csv",
@@ -75,15 +75,15 @@
   },
   {
    "path": "data/claim_wallet_links.csv",
-   "rows": 64,
-   "bytes": 6233,
-   "sha256": "b0023c9633c761ab3925ef761f1cf1a7207b121a361a7b2123600a42559beb8e"
+   "rows": 58,
+   "bytes": 5684,
+   "sha256": "e03fab291ecd04a4f551b96d1c436c2d7867353bfca8b8a32503c9930cd91e1c"
   },
   {
    "path": "data/claim_wallet_links.parquet",
-   "rows": 64,
-   "bytes": 5513,
-   "sha256": "06473f32c63d433258953a209fac9d9c1d16fbb0817469895370537d465e1624"
+   "rows": 58,
+   "bytes": 5478,
+   "sha256": "5d25b7fdd15735e594bc2083e04469d63ca6c59db75032080ab1f0816b98845e"
   },
   {
    "path": "data/claims.csv",
@@ -111,15 +111,15 @@
   },
   {
    "path": "data/controls.csv",
-   "rows": 52790,
-   "bytes": 16377880,
-   "sha256": "09cb276765524ee99b8bc676dd6a8f001ab61215ee99c29fdfaeedca66db7780"
+   "rows": 63666,
+   "bytes": 20212059,
+   "sha256": "a96a4974bdf79fb77925afe81ed68c5bd408584fd7decf8bbf2cca89a9150466"
   },
   {
    "path": "data/controls.parquet",
-   "rows": 52790,
-   "bytes": 627193,
-   "sha256": "d23d2458e54900a3f9503bf651706601960fc379c03a78ad8b24425aa8316bc9"
+   "rows": 63666,
+   "bytes": 740214,
+   "sha256": "ca33e1377acbce3b2101ec7cccb1984667e3096ca4ca3e8bd01693d5f42d9cec"
   },
   {
    "path": "data/edges.csv",
@@ -135,15 +135,15 @@
   },
   {
    "path": "data/episodes.csv",
-   "rows": 55913,
-   "bytes": 34848050,
-   "sha256": "bd6f269b93b3cecf44a8833806ef2758334d04b7dd117c0ecc30ed2b85a631f5"
+   "rows": 67830,
+   "bytes": 42843752,
+   "sha256": "b427e00d1f86c8be1ee5167ec60d1b23e9e988a6e00e984d827bfd768f66e744"
   },
   {
    "path": "data/episodes.parquet",
-   "rows": 55913,
-   "bytes": 2790678,
-   "sha256": "1542f05d5e03b0b9f0ab7d401df0b393a5c51bbb4bc56386a52f8c750d0a8754"
+   "rows": 67830,
+   "bytes": 3299742,
+   "sha256": "8619923692861860b75f8544a180cad36ec442e2ba4d9386bf435b504d20fc45"
   },
   {
    "path": "data/fills_part001_case_hf_polymarket_v1.parquet",
@@ -220,20 +220,20 @@
   {
    "path": "data/market_minutes.parquet",
    "rows": 2217628,
-   "bytes": 41401322,
-   "sha256": "d75977573eb495364f784cb0d788c4e96ffadd0fa894bc018cdc638ca09a39f7"
+   "bytes": 41409519,
+   "sha256": "7de833cf4bcce59aee208085b3b6e634f231560f12c3f2f80c34e3ee72950650"
   },
   {
    "path": "data/markets.csv",
    "rows": 1118,
-   "bytes": 844749,
-   "sha256": "dd1e5b985592e33a7a2e4ed8068f5e69d3ae7442e1a82f521c44eb0bf2491300"
+   "bytes": 857483,
+   "sha256": "91e2de9e0f091e0960b8042423635c0e2b259d0ac8b8f6776cd2c72ac258ec53"
   },
   {
    "path": "data/markets.parquet",
    "rows": 1118,
-   "bytes": 185982,
-   "sha256": "29bc2d3ebceff3e7594c69347b132e41a6e5212d94f5b0538dec1b91efb55bd2"
+   "bytes": 187610,
+   "sha256": "2733fb1fca184867ebd893764e6187cbe74bd5e3df29357d8acc6ac215f3695b"
   },
   {
    "path": "data/placebo_markets.csv",
@@ -250,8 +250,8 @@
   {
    "path": "data/positions.parquet",
    "rows": 11737142,
-   "bytes": 786004645,
-   "sha256": "9f3178b52ceae6eb1d3beca37a6bb143f44a199742fd72d8fd6c897ea6e5e9e8"
+   "bytes": 786016292,
+   "sha256": "e63a4332c4ff18f2a4e69f3336fbdd64f9b45a33e104574d698a8e2b5a35f763"
   },
   {
    "path": "data/twin_markets.csv",
@@ -292,26 +292,26 @@
   {
    "path": "docs/CHANGELOG.md",
    "rows": null,
-   "bytes": 6313,
-   "sha256": "fd02785f569e8af965a37f827ecea0ab47b11d77b65b7ea22cb97fd0dbd0fe31"
+   "bytes": 7776,
+   "sha256": "02e7b52898ab2814e769b5a0e5b6cbce7dced67f84dc7c21032b9434aafb9c69"
   },
   {
    "path": "docs/CITATION.cff",
    "rows": null,
    "bytes": 1237,
-   "sha256": "205f28d7f90b84b40e8d1c264202b9bb9bc1469149b7c14ecd251f08556b097b"
+   "sha256": "f44c47497a7022b84d0d7fe83f29572584491562c8c2730c4ea0bf656990324a"
   },
   {
    "path": "docs/CODEBOOK.md",
    "rows": null,
-   "bytes": 37979,
-   "sha256": "8b5f394829c67c2d5ffc3cebc2d5f62e5f0d30d5e5fb9f206c3a12d3ceddab4a"
+   "bytes": 39078,
+   "sha256": "65bac542cdab536976f7a9bba7a792dca18472dd61868b0f6ec81858f248aad1"
   },
   {
    "path": "docs/DATASHEET.md",
    "rows": null,
    "bytes": 5296,
-   "sha256": "558d37d89dc7724175149dcfc9376668661535f78b02f3edef55e804b5aba8e0"
+   "sha256": "c0e80d5cff3e9e9b607ff08b15d7b60ef7f3d95b8edf97465abb410799c6a12d"
   },
   {
    "path": "docs/DATA_PROTECTION.md",
@@ -322,8 +322,8 @@
   {
    "path": "docs/EXTRACTION.md",
    "rows": null,
-   "bytes": 2389,
-   "sha256": "4ae51d03b02dc6fee13e3f827a2d6ba5cc5e2d3454e28c5fa8fe30a31af0fd5d"
+   "bytes": 2601,
+   "sha256": "d7777362cba2d0bacf8a67c70696ccfcf1ab9cb6f098fabec4022a3fe0a1631c"
   },
   {
    "path": "docs/LICENSE.md",
