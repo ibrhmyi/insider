@@ -12,6 +12,7 @@
   "price_0.10": 11
  },
  "n_episodes_without_same_side": 28,
+ "n_episodes_relaxed_band": 0,
  "n_episode_rows": 8849,
  "rows_by_role": {
   "control_other_side_large_buyer": 4531,
@@ -33,9 +34,9 @@
   "mstr-btc-sale": 2,
   "taylor-swift-engagement": 2,
   "nobel-peace-2025": 2,
+  "draftkings-pm-launch": 1,
   "trump-pardon-cz-2025": 1,
   "fed-chair-nomination-2026": 1,
-  "draftkings-pm-launch": 1,
   "world-cup-2026-06": 1
  }
 }
