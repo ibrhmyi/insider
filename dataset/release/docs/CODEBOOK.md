@@ -80,13 +80,14 @@ One row per (wallet, case) label. Labels are allegations by the named source, no
 | `label_tier` | string |  |  |  | meta | L2 official-case wallet, L3 analyst full address / resolved handle, L4 cluster member, L4_coordinated (A13 rule), A ambiguous, NC negative control, M manipulation |
 | `polarity` | string |  | suspected, ambiguous, negative_control, manipulation, context, candidate |  | label | label polarity |
 | `trade_confirmed` | bool |  |  |  | label | A12.5: >= 1 fill in a market of its case (from fills) |
-| `label_family` | string |  | informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested |  | label | A19: manipulation for manipulation rows, else the family of the case's claims |
+| `label_family` | string |  | informed_trading, public_data_leak, manipulation, negative_control, oracle_manipulation, pre_taped_leak, resolution_event, contested, multi_account |  | label | A19: manipulation for manipulation rows, else the family of the case's claims |
 | `is_documented` | bool |  |  |  | label | polarity = suspected and trade_confirmed and label_family = informed_trading (default positive label, A19) |
 | `doc_grade` | string |  | E1, E2, E3, E4, E5, E6 |  | label | strongest grade among the case's claims about accounts, addresses, handles or clusters (not aggregates or markets) |
 | `wallet_grade` | string |  | E1, E2, E3, E4, E5, E6 |  | label | A20: strongest grade among the claims that name this wallet (data/claim_wallet_links.csv); NULL = link_only |
 | `label_broad` | bool |  |  |  | label | A20: trade_confirmed, informed_trading, doc_grade E1-E5 (= is_documented) |
 | `label_standard` | bool |  |  |  | label | A20: label_broad and doc_grade E1-E4 (includes cluster members) |
 | `label_strict` | bool |  |  |  | label | A20: label_standard and (wallet_grade E1-E3, or named by address or resolved handle in an E4 claim) |
+| `strict_no_prenews` | bool |  |  |  | label | A26: meets the rest of the strict rule but has no BUY before its case markets' precise cuts (so not strict) |
 | `strict_basis` | string |  | wallet_grade_E1, wallet_grade_E2, wallet_grade_E3, named_in_E4_claim |  | label | why label_strict holds |
 | `hard_negative` | bool |  |  |  | label | A21 cleared_case_wallet: a wallet in a case cleared by an official, platform or analyst |
 | `hard_negative_rule` | string |  | cleared_case_wallet |  | label | A21 rule |
@@ -133,6 +134,9 @@ One row per (case, market). Ladders are full Gamma events (A6.5). Titles withhel
 | `t_news_precise_source` | string |  |  |  | meta | URL of the event_times row; day_fallback; or rejected_outside_coarse_date (A18) |
 | `t_news_precise_verified` | string |  |  |  | meta | verified flag of the event_times row |
 | `title_withheld` | bool |  |  |  | meta | A12.6 |
+| `t_news_market_utc` | timestamp |  |  |  | label | A25: per-market exact cut (precise version): Gamma scheduled start, market deadline inside a coarse case date, or the case time |
+| `t_news_market_day_utc` | timestamp |  |  |  | label | A25: per-market day-level cut (day version) |
+| `t_news_market_method` | string |  | scheduled_start, market_deadline, case_time |  | meta | A25 method |
 | `is_placebo_market` | bool |  |  |  | meta | always false here |
 | `ff_tier` | string |  |  |  | meta | ForesightFlow tier if listed |
 | `ff_tier2_tnews` | timestamp |  |  |  | meta | ForesightFlow tier-2 proxy (stored, not used) |
@@ -216,7 +220,7 @@ All-buyer positions before the cut (C2): the full population a detector must sea
 | `wallet` | string (PK) |  |  |  | meta | buyer |
 | `t_news_version` | string (PK) |  | day, precise |  | meta | A10.2 |
 | `outcome_label` | string |  |  |  | meta | token label |
-| `t_cut_unix` | int64 | Unix s |  |  | label | cut time: t_news / t_news_precise (case) or t_ref (placebo) |
+| `t_cut_unix` | int64 | Unix s |  |  | label | cut time: the per-market cut (A25; case) or t_ref (placebo, twin) |
 | `is_shortest_sufficient` | bool |  |  |  | post | this market is its event's shortest deadline that resolved Yes |
 | `n_buy_fills_pre` | int64 |  |  |  | pre | BUY legs before the cut |
 | `buy_usdc_pre` | float64 | USDC |  |  | pre | BUY USDC before the cut |
@@ -282,6 +286,7 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `row_id` | string (PK) |  |  |  | meta | row id within version |
 | `episode_id` | string |  |  |  | meta | stable id of a documented episode (hash of case, wallet, market, token); NULL on control rows |
 | `t_news_version` | string (PK) |  | day, precise |  | meta | A10.2 |
+| `control_design` | string (PK) |  | standard, age_matched, open |  | meta | A27: standard (A6.10), age_matched (plus account-age band; T2s) or open (Orca/Inca wallets allowed; T2-open) |
 | `role` | string |  |  |  | label | suspected, control_same_side, control_other_side_large_buyer |
 | `label_strict` | bool |  |  |  | label | suspected row of a label_strict wallet (A20); false on control rows |
 | `label_standard` | bool |  |  |  | label | label_standard (A20) |
@@ -332,6 +337,7 @@ Matched controls (A6.10, seed 192) with relaxation flags, per t_news version.
 | column | type | unit | allowed values | source | leakage | description |
 |---|---|---|---|---|---|---|
 | `t_news_version` | string (PK) |  | day, precise |  | meta | A10.2 |
+| `control_design` | string (PK) |  | standard, age_matched, open |  | meta | A27 design |
 | `episode_id` | string (PK) |  |  |  | meta | documented episode |
 | `wallet` | string (PK) |  |  |  | meta | control wallet |
 | `control_type` | string (PK) |  | same_side, other_side_large_buyer |  | meta | same_side or other_side_large_buyer |

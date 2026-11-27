@@ -36,7 +36,7 @@ def coarse_end(t0, prec, ev):
 
 
 import re
-DEADLINE_Q = re.compile(r"\b(by|before)\s+(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|end of|\d{4}|q[1-4])", re.I)  # A25.2
+DEADLINE_Q = re.compile(r"\b(?:by|before)\s+(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|end of|\d{4}|q[1-4])", re.I)  # A25.2
 cases = pd.read_csv(os.path.join(D, "data", "cases.csv"), dtype=str, keep_default_na=False).set_index("case_id")
 out = []
 for r in mk.itertuples():
