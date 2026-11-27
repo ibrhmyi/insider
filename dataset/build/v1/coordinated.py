@@ -23,7 +23,8 @@ M = pd.concat([mk.assign(t_news_version=v, t_cut=ep(mk[col]))[["case_id", "condi
 c.register("M_df", M); c.sql("CREATE TABLE M AS SELECT * FROM M_df")
 c.register("doc_df", doc); c.sql("CREATE TABLE DOC AS SELECT address wallet, case_id FROM doc_df")
 c.execute("CREATE TABLE LAB(a VARCHAR)"); c.executemany("INSERT INTO LAB VALUES (?)", [(a,) for a in labelled])
-c.sql(f"CREATE VIEW legs AS SELECT condition_id, asset_id, ts, usdc, wallet, wallet_side, leg_id FROM '{F}' WHERE wallet_side = 'BUY' AND wallet IS NOT NULL")
+sys.path.insert(0, os.path.dirname(__file__)); from econ_view import legs_sql  # A34
+c.sql(f"CREATE VIEW legs AS SELECT condition_id, asset_id, ts, usdc, wallet, wallet_side, leg_id FROM {legs_sql(F)} WHERE wallet_side = 'BUY' AND wallet IS NOT NULL")
 c.sql("""CREATE TABLE TRIG AS SELECT l.leg_id trigger_leg_id, d.wallet trigger_wallet, m.case_id, l.condition_id, l.asset_id, l.ts trigger_ts,
           l.usdc trigger_usdc, m.t_news_version, m.t_cut FROM legs l JOIN DOC d ON d.wallet = l.wallet
           JOIN M m ON m.case_id = d.case_id AND m.condition_id = l.condition_id WHERE l.ts < m.t_cut""")

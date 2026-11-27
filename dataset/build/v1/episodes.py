@@ -19,10 +19,12 @@ assert MODE in ("standard", "age_matched", "open", "winrate_matched")
 BANDED = MODE in ("age_matched", "winrate_matched")
 OUT0 = os.path.join(D, "out")
 OUT = os.path.join(D, "out", "v1")
-LEGS = os.path.join(OUT, "fills", "fills_case.parquet")
+sys.path.insert(0, os.path.dirname(__file__)); from econ_view import legs_sql  # A34: economic view
+LEGS_FILE = os.path.join(OUT, "fills", "fills_case.parquet")
 import hashlib
 SEED = 192
 c = duckdb.connect(); c.sql(f"SET memory_limit='5GB'; SET enable_progress_bar=false; SET temp_directory='{WORK}/tmp'")
+c.sql(f"CREATE VIEW legs_v AS SELECT * FROM {legs_sql(LEGS_FILE)}"); LEGS = "legs_v"
 
 # --- markets with t_news (epoch) per case
 mk = pd.read_csv(os.path.join(D, "data", "markets.csv"), dtype=str)
@@ -52,7 +54,7 @@ c.sql(f"""CREATE TABLE pre AS
   SELECT m.case_id, l.condition_id, l.asset_id, any_value(l.outcome_label) outcome_label, l.wallet,
          min(l.ts) first_buy_ts, arg_min(l.price, l.ts) first_buy_price, sum(l.usdc) size_usdc, sum(l.shares) shares,
          count(*) n_buys
-  FROM '{LEGS}' l JOIN mk m USING (condition_id)
+  FROM {LEGS} l JOIN mk m USING (condition_id)
   WHERE l.wallet_side = 'BUY' AND l.ts < m.t_news AND l.wallet <> ''
   GROUP BY ALL""")
 n_pre = c.sql("SELECT count(*) FROM pre").fetchall()[0][0]
@@ -178,7 +180,7 @@ rows["row_id"] = ["ER%06d" % i for i in range(1, len(rows) + 1)]
 c.register("rows_df", rows[["row_id", "case_id", "condition_id", "asset_id", "wallet", "role", "control_of", "first_buy_ts"]])
 c.sql("CREATE TABLE er AS SELECT * FROM rows_df")
 c.sql(f"""CREATE TABLE el AS SELECT er.row_id, l.* , m.t_news, m.resolved_ts FROM er
-          JOIN '{LEGS}' l ON l.condition_id = er.condition_id AND l.asset_id = er.asset_id AND l.wallet = er.wallet
+          JOIN {LEGS} l ON l.condition_id = er.condition_id AND l.asset_id = er.asset_id AND l.wallet = er.wallet
           JOIN mk m ON m.case_id = er.case_id AND m.condition_id = er.condition_id""")
 
 F = c.sql("""
@@ -203,7 +205,9 @@ F = c.sql("""
     sum(shares) FILTER (WHERE wallet_side='BUY') buy_shares_all_post,
     sum(usdc) FILTER (WHERE wallet_side='BUY') buy_usdc_all_post, sum(usdc) FILTER (WHERE wallet_side='SELL') sell_usdc_all_post,
     sum(shares) FILTER (WHERE wallet_side='SELL') sell_shares_all_post,
-    any_value(source) FILTER (WHERE ts < t_news) source_pre, any_value(outcome_label) outcome_label
+    any_value(source) FILTER (WHERE ts < t_news) source_pre, any_value(outcome_label) outcome_label,
+    coalesce(sum(usdc) FILTER (WHERE wallet_side='BUY' AND ts < t_news AND econ_inferred), 0) econ_inferred_buy_usdc_pre,
+    count(*) FILTER (WHERE wallet_side='BUY' AND ts < t_news AND NOT econ_inferred) > 0 raw_view_prenews_buy
   FROM el GROUP BY row_id""").df()
 # Signal A: bought again at >= 1.5x the first price (pre t_news)
 sa = c.sql("""SELECT e.row_id, bool_or(e.price >= 1.5 * f.fp) signal_a_rebuy_1_5x
@@ -212,7 +216,7 @@ sa = c.sql("""SELECT e.row_id, bool_or(e.price >= 1.5 * f.fp) signal_a_rebuy_1_5
 # followers: other wallets' BUY legs on the same token within 60 min after each pre-news buy fill
 fol = c.sql(f"""WITH b AS (SELECT row_id, condition_id, asset_id, wallet, ts FROM el WHERE wallet_side='BUY' AND ts < t_news)
   SELECT b.row_id, count(DISTINCT l.wallet) follower_wallets_60m, sum(l.usdc) follower_buy_usdc_60m
-  FROM b JOIN '{LEGS}' l ON l.condition_id = b.condition_id AND l.asset_id = b.asset_id AND l.wallet_side = 'BUY'
+  FROM b JOIN {LEGS} l ON l.condition_id = b.condition_id AND l.asset_id = b.asset_id AND l.wallet_side = 'BUY'
        AND l.wallet <> b.wallet AND l.ts > b.ts AND l.ts <= b.ts + 3600
   GROUP BY 1""").df()
 X = rows.merge(F, on="row_id", how="left", suffixes=("", "_f")).merge(sa, on="row_id", how="left").merge(fol, on="row_id", how="left")
@@ -275,7 +279,8 @@ keep = ["row_id", "role", "control_of", "case_id", "condition_id", "event_slug",
         "pre_buy_usdc", "pre_buy_shares", "signal_a_rebuy_1_5x", "size_price_slope", "hours_last_buy_to_tnews", "ladder_rank",
         "is_shortest_sufficient", "share_on_this_ladder_market", "hours_first_buy_to_tnews", "hours_funding_to_first_trade",
         "funding_source_type", "funder_shared_with_labelled", "follower_wallets_60m", "follower_buy_usdc_60m",
-        "share_sold_before_resolution_post", "won_post", "pnl_post", "redemption_delay_hours_post", "relaxed_band"]
+        "share_sold_before_resolution_post", "won_post", "pnl_post", "redemption_delay_hours_post", "relaxed_band",
+        "econ_inferred_buy_usdc_pre", "raw_view_prenews_buy"]
 X = X.rename(columns={})[keep]
 X = X.merge(ep[["episode_id", "case_id", "condition_id", "asset_id", "wallet"]], on=["case_id", "condition_id", "asset_id", "wallet"], how="left")
 X.loc[X.role != "suspected", "episode_id"] = None

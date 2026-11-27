@@ -162,8 +162,8 @@ def test_no_pre_news_feature_uses_post_news_fill(v):
         pp = pp.merge(src, on=["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version"])
         pp = pp[pp.source_pre == "hf_polymarket_v1"].drop(columns="source_pre")
     con = duckdb.connect(); con.register("pp", pp)
-    d = con.sql(f"""SELECT pp.buy_usdc_pre, sum(f.usdc) re FROM pp JOIN read_parquet('{R}/fills_part*_case_*.parquet') f
-                    ON f.condition_id = pp.condition_id AND f.asset_id = pp.asset_id AND f.wallet = pp.wallet AND f.wallet_side = 'BUY' AND f.ts_unix < pp.t_cut_unix
+    d = con.sql(f"""SELECT pp.buy_usdc_pre, sum(f.econ_size_usdc) re FROM pp JOIN read_parquet('{R}/fills_part*_case_*.parquet') f
+                    ON f.condition_id = pp.condition_id AND f.econ_asset_id = pp.asset_id AND f.wallet = pp.wallet AND f.econ_side = 'BUY' AND f.ts_unix < pp.t_cut_unix
                     GROUP BY pp.case_id, pp.condition_id, pp.asset_id, pp.wallet, pp.buy_usdc_pre""").df()
     assert len(d) == len(pp) and ((d.buy_usdc_pre - d.re).abs() < 1e-6 * (1 + d.re)).all()
 
@@ -358,3 +358,15 @@ def test_few_fold_results_have_no_headline_number():
                     if x["n_loco_folds"] < B["min_folds_for_summary"]:
                         assert "loco_mean" not in x and "loco_sd" not in x and "fold_values" in x, (v, s_, t, m); n += 1
     assert n > 0
+
+
+def test_econ_view_consistent():
+    """A34: econ columns equal the raw ones except on inferred legs, which are raw SELLs re-read as BUYs of the other token at 1 - p."""
+    q = f"read_parquet('{R}/fills_part*.parquet')"
+    bad = duckdb.sql(f"""SELECT count(*) FROM {q} WHERE (NOT econ_inferred AND (econ_side <> wallet_side OR econ_asset_id <> asset_id OR abs(econ_size_usdc - usdc) > 1e-6))
+                          OR (econ_inferred AND (wallet_side <> 'SELL' OR econ_side <> 'BUY' OR econ_asset_id = asset_id
+                              OR abs(econ_price_usdc - (1 - price_usdc)) > 1e-9 OR abs(econ_size_usdc - shares * (1 - price_usdc)) > 1e-6))""").fetchall()[0][0]
+    assert bad == 0
+    p = load("positions", ["buy_usdc_pre", "econ_inferred_buy_usdc_pre", "raw_view_prenews_buy"])
+    assert (p.econ_inferred_buy_usdc_pre <= p.buy_usdc_pre + 1e-6).all()
+    assert p[~p.raw_view_prenews_buy].econ_inferred_buy_usdc_pre.gt(0).all()  # econ-only positions come from inferred legs

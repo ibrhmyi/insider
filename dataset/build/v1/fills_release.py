@@ -26,7 +26,8 @@ for ms in ["case", "placebo", "twin", "label_other"]:
                          (source = 'hf_polymarket_v1') role_fields_available, wallet_side,
                          CASE WHEN source = 'data_api_v2' THEN NULL ELSE aggressor_side END aggressor_side,
                          CASE WHEN source = 'data_api_v2' THEN NULL ELSE maker END maker, CASE WHEN source = 'data_api_v2' THEN NULL ELSE taker END taker,
-                         market_slug FROM {q} LIMIT {PART_ROWS} OFFSET {off})
+                         market_slug, econ_side, econ_asset_id, econ_outcome_label, econ_price_usdc::DOUBLE econ_price_usdc,
+                         econ_size_usdc::DOUBLE econ_size_usdc, econ_inferred FROM {q} LIMIT {PART_ROWS} OFFSET {off})
                       TO '{out}' (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 500000)""")
             total += min(PART_ROWS, n - off)
 print("fills", total, "rows in", n_part, "parts")

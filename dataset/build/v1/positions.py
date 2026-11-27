@@ -8,6 +8,8 @@ Usage: python3 build/v1/positions.py <hf_pass_work_dir> <tmp_dir>
 """
 import os, sys
 import duckdb, pandas as pd
+sys.path.insert(0, os.path.dirname(__file__))
+from econ_view import legs_sql  # A34: economic view by default
 
 D = os.path.join(os.path.dirname(__file__), "..", "..")
 WORK, TMPD = sys.argv[1:3]
@@ -46,11 +48,12 @@ for r in tw.itertuples():  # A22: twin markets, cut at t_ref
                          is_shortest_sufficient=False, winning_outcome=r.twin_outcome, resolved_utc=r.twin_end_utc))
 M = pd.DataFrame(rows); M["t_cut_ts"] = ep(M.t_cut); M["resolved_ts"] = ep(M.resolved_utc)
 c.register("M_df", M.drop(columns=["t_cut", "resolved_utc"])); c.sql("CREATE TABLE M AS SELECT * FROM M_df")
-c.sql(f"""CREATE VIEW legs AS SELECT market_set, condition_id, asset_id, outcome_label, ts, price, usdc, shares, wallet, wallet_role, wallet_side, source
-          FROM read_parquet(['{F}/fills_case.parquet', '{F}/fills_placebo.parquet', '{F}/fills_twin.parquet']) WHERE wallet IS NOT NULL AND wallet <> ''""")
+LSRC = legs_sql([f"{F}/fills_case.parquet", f"{F}/fills_placebo.parquet", f"{F}/fills_twin.parquet"])
+c.sql(f"""CREATE VIEW legs AS SELECT market_set, condition_id, asset_id, outcome_label, ts, price, usdc, shares, wallet, wallet_role, wallet_side, source, econ_inferred
+          FROM {LSRC} WHERE wallet IS NOT NULL AND wallet <> ''""")
 c.sql("""CREATE VIEW L AS SELECT m.market_set, m.case_id, m.condition_id, m.t_news_version, m.t_cut_ts, m.yes_label, m.event_id,
                  m.is_shortest_sufficient, m.winning_outcome, l.asset_id, l.outcome_label, l.ts, l.price, l.usdc, l.shares, l.wallet,
-                 l.wallet_role, l.wallet_side, l.source,
+                 l.wallet_role, l.wallet_side, l.source, l.econ_inferred,
                  CASE WHEN (l.outcome_label = m.yes_label) = (l.wallet_side = 'BUY') THEN 1 ELSE -1 END yes_dir
           FROM legs l JOIN M m ON m.condition_id = l.condition_id AND m.market_set = l.market_set""")
 print("legs view ready", flush=True)
@@ -71,6 +74,8 @@ c.sql(f"""CREATE TABLE P AS SELECT {K}, asset_id, any_value(outcome_label) outco
    coalesce(sum(shares) FILTER (WHERE wallet_side='SELL' AND ts < t_cut_ts), 0) sell_shares_pre,
    avg((wallet_role='taker')::INT) FILTER (WHERE wallet_side='BUY' AND ts < t_cut_ts AND wallet_role <> 'unknown') taker_share_pre,
    string_agg(DISTINCT source, ';') FILTER (WHERE ts < t_cut_ts) source_pre,
+   coalesce(sum(usdc) FILTER (WHERE wallet_side='BUY' AND ts < t_cut_ts AND econ_inferred), 0) econ_inferred_buy_usdc_pre,
+   count(*) FILTER (WHERE wallet_side='BUY' AND ts < t_cut_ts AND NOT econ_inferred) > 0 raw_view_prenews_buy,
    coalesce(sum(usdc) FILTER (WHERE wallet_side='BUY' AND ts >= t_cut_ts), 0) buy_usdc_post,
    coalesce(sum(shares) FILTER (WHERE wallet_side='BUY' AND ts >= t_cut_ts), 0) buy_shares_post,
    coalesce(sum(usdc) FILTER (WHERE wallet_side='SELL' AND ts >= t_cut_ts), 0) sell_usdc_post,
@@ -142,7 +147,7 @@ c.sql("""CREATE VIEW X1 AS SELECT *,
 score = " + ".join(f"coalesce({f}, false)::INT" for f in FLAGS)
 c.sql(f"""COPY (SELECT market_set, case_id, condition_id, asset_id, wallet, t_news_version, outcome_label, t_cut_ts, is_shortest_sufficient,
      n_buy_fills_pre, buy_usdc_pre, buy_shares_pre, first_buy_ts, last_buy_ts, first_buy_price, max_buy_price, median_buy_fill_usdc,
-     sell_usdc_pre, sell_shares_pre, taker_share_pre, source_pre, buy_usdc_pre / nullif(buy_shares_pre, 0) vwap_pre, asset_id = main_asset is_main_side,
+     sell_usdc_pre, sell_shares_pre, taker_share_pre, source_pre, econ_inferred_buy_usdc_pre, raw_view_prenews_buy, buy_usdc_pre / nullif(buy_shares_pre, 0) vwap_pre, asset_id = main_asset is_main_side,
      (first_buy_ts - first_fill_v1_ts) / 86400.0 account_age_days_at_first_buy, first_fill_in_market_ts, market_usdc_pre, market_buy_usdc_pre,
      f5_conviction, vol_to_day, lifetime_markets_v1, f1_days_account_to_first_fill, f2_share, f3_main_vwap, f6_hours_median_buy_to_tnews,
      {", ".join(FLAGS)},
