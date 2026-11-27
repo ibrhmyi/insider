@@ -1,0 +1,63 @@
+"""PROTOCOL A25: per-market news times. Adds t_news_market_utc, t_news_market_day_utc, t_news_market_method to data/markets.csv
+from Gamma market fields cached in logs/gamma_raw/events/ (gameStartTime, eventStartTime, endDate). Idempotent.
+Usage: python3 build/v1/market_times.py"""
+import glob, json, os
+import pandas as pd
+
+D = os.path.join(os.path.dirname(__file__), "..", "..")
+G = {}
+for f in glob.glob(os.path.join(D, "logs", "gamma_raw", "events", "*.json")):
+    d = json.load(open(f))
+    items = d if isinstance(d, list) else [d]
+    for e in items:
+        if not isinstance(e, dict):
+            continue
+        for m in (e.get("markets") or ([e] if e.get("conditionId") else [])):
+            cid = (m.get("conditionId") or "").lower()
+            if cid:
+                g = G.setdefault(cid, {})
+                for k in ("gameStartTime", "eventStartTime", "endDate"):
+                    if m.get(k) and not g.get(k):
+                        g[k] = m[k]
+mk = pd.read_csv(os.path.join(D, "data", "markets.csv"), dtype=str, keep_default_na=False)
+mk = mk.drop(columns=[c for c in mk.columns if c.startswith("t_news_market")])
+ts = lambda x: pd.to_datetime(x, utc=True, errors="coerce", format="mixed") if x else pd.NaT
+
+
+def coarse_end(t0, prec, ev):
+    if prec == "month": return t0 + pd.offsets.MonthBegin(1)
+    if prec == "quarter": return t0 + pd.offsets.QuarterBegin(1, startingMonth=1)
+    if prec == "year": return t0 + pd.offsets.YearBegin(1)
+    if prec == "range" and "/" in ev:
+        b = ev.split("/")[1]
+        t = pd.Timestamp(b if len(b) > 7 else b + ("-01" if len(b) == 7 else "-01-01"), tz="UTC")
+        return t + (pd.Timedelta(days=1) if len(b) == 10 else (pd.offsets.MonthBegin(1) if len(b) == 7 else pd.offsets.YearBegin(1)))
+    return None
+
+
+cases = pd.read_csv(os.path.join(D, "data", "cases.csv"), dtype=str, keep_default_na=False).set_index("case_id")
+out = []
+for r in mk.itertuples():
+    g = G.get(r.condition_id.lower(), {})
+    sched = ts(g.get("gameStartTime") or g.get("eventStartTime") or "")
+    t0 = ts(r.t_news_utc)
+    if pd.notna(sched):
+        t, meth = sched, "scheduled_start"
+    else:
+        t, meth = ts(r.t_news_precise_utc), "case_time"
+        if r.t_news_precision in ("month", "quarter", "year", "range"):
+            end = coarse_end(t0, r.t_news_precision, cases.loc[r.case_id, "event_date"] if r.case_id in cases.index else "")
+            dl = ts(g.get("endDate") or r.deadline_utc)
+            if end is not None and pd.notna(dl) and t0 <= dl < end:
+                t, meth = dl, "market_deadline"
+    if meth != "case_time" and r.t_news_precise_precision != "day_fallback":  # A25.1
+        tc = ts(r.t_news_precise_utc)
+        if pd.notna(tc) and tc < t:
+            t, meth = tc, "case_time"
+    day = t.floor("D") if meth != "case_time" else t0
+    out.append((t.strftime("%Y-%m-%dT%H:%M:%SZ"), day.strftime("%Y-%m-%dT%H:%M:%SZ"), meth))
+mk["t_news_market_utc"], mk["t_news_market_day_utc"], mk["t_news_market_method"] = zip(*out)
+mk.to_csv(os.path.join(D, "data", "markets.csv"), index=False)
+s = mk.groupby(["case_id", "t_news_market_method"]).size().unstack(fill_value=0)
+print(s[s.drop(columns=["case_time"], errors="ignore").sum(axis=1) > 0].to_string())
+print(mk.t_news_market_method.value_counts().to_dict())
