@@ -144,3 +144,13 @@ n,date,source_class,query,engine,result
 143,2026-11-26,S3,Polymarket suspected insider wallet November 2026,WebSearch (run 7),new case nvidia-ceo-return-2026-11 (CL0118)
 144,2026-11-26,S3,Bubblemaps Polymarket Nvidia return accounts,WebSearch (run 7),CL0118 page read (CryptoSlate); CL0119
 145,2026-11-26,S3,prediction market insider trading accounts flagged this week,WebSearch (run 7),new: Kalshi side of the Nvidia case (CL0123); topic stopped after this query
+146,2026-11-27,S3,Polymarket insider suspected accounts news November 26 2026,WebSearch (run 9),none new (latest items already held)
+147,2026-11-27,S1,Kalshi insider trading fine suspended November 2026,WebSearch (run 9),none new; Kalshi notice bucket: no disciplinary notice after 2026-08-31
+148,2026-11-27,S3,Trump Fed chair nominee post time January 2026,WebSearch (run 9),"none (Friday morning, no minute)"
+149,2026-11-27,S3,Biden preemptive pardons January 20 2025 time,WebSearch (run 9),"none used: family pardons just before noon ET, other pardons earlier that day (time not sourced); not conservative"
+150,2026-11-27,S3,CNN Walz scoop time,WebSearch (run 9),none (earliest timestamps found are after CNN's report)
+151,2026-11-27,S3,GPT-5.2 announcement time,WebSearch (run 9),none
+152,2026-11-27,S3,Google Year in Search 2025 release time,WebSearch (run 9),none
+153,2026-11-27,S3,explosions Caracas January 3 2026 first reported time,WebSearch (run 9),rows maduro-2026-01 and railgun-venezuela-control (05:30Z)
+154,2026-11-27,S3,Super Bowl LIX halftime start time,WebSearch (run 9),none (pre-game estimates only)
+155,2026-11-27,S3,US Iran ceasefire March 2026 time,WebSearch (run 9),none (no ceasefire event that week)
