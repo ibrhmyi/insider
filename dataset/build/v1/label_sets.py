@@ -11,6 +11,8 @@ h1, h7, hc = rd("data/handles_to_resolve.csv"), rd("logs/handle_checks_run7.csv"
 RANK = {g: i for i, g in enumerate("E1 E2 E3 E4 E5 E6".split())}
 cl["post_url"] = cl.notes.str.extract(r"post_url=(\S+?)(?:;|\s|$)")[0].fillna("")
 named = cl[~cl.subject_type.isin(["aggregate", "market"])]
+LINKING = cl.stance.isin(["alleges", "confirms"])  # A31: only allegations and confirmations create links
+named_l = cl[~cl.subject_type.isin(["aggregate", "market"]) & LINKING]
 handle_of = {}
 for r in h1.itertuples():
     if r.resolved_address and r.status.startswith("resolved"):
@@ -26,7 +28,7 @@ tok = lambda s: {t.lower() for t in re.findall(r"[A-Za-z0-9_.\-]{3,}", s)}
 links = []
 for w in W.itertuples():
     a = w.address.lower()
-    for c in named[named.case_id == w.case_id].itertuples():
+    for c in named_l[named_l.case_id == w.case_id].itertuples():
         text = (c.subject + " " + c.claim_text + " " + c.notes).lower()
         st = tok(c.subject)
         if a in text:
@@ -38,7 +40,7 @@ for w in W.itertuples():
         if w.source_url and w.source_url in (c.url, c.post_url):
             links.append((c.claim_id, a, w.case_id, "source_url"))
 for r in hc[hc.check_type.str.contains("complaint|official", case=False) & hc.result.str.contains("match|accept", case=False)].itertuples():
-    for c in cl[(cl.case_id == r.case_id) & cl.source_class.eq("S1") & ~cl.subject_type.isin(["aggregate", "market"])].itertuples():
+    for c in cl[(cl.case_id == r.case_id) & cl.source_class.eq("S1") & ~cl.subject_type.isin(["aggregate", "market"]) & LINKING].itertuples():
         links.append((c.claim_id, r.address.lower(), r.case_id, "official_figures_match"))
 L = pd.DataFrame(links, columns=["claim_id", "wallet", "case_id", "link_type"]).drop_duplicates()
 L = L.merge(cl[["claim_id", "evidence_grade", "subject_type"]], on="claim_id")
