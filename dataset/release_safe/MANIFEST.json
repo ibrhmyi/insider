@@ -297,8 +297,8 @@
   {
    "path": "docs/CHANGELOG.md",
    "rows": null,
-   "bytes": 6231,
-   "sha256": "5fe33252649f8c6c8a08b8493f673727e7973d065b65fc3c69b9b4fae5e48511"
+   "bytes": 6313,
+   "sha256": "fd02785f569e8af965a37f827ecea0ab47b11d77b65b7ea22cb97fd0dbd0fe31"
   },
   {
    "path": "docs/CITATION.cff",
