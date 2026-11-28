@@ -8,9 +8,9 @@ condition_id,case_id,old_utc,new_utc,source_case,basis
 0x184f4a327edc0cd0af1f409980f6cc8d227fa96855625ce1ae9dad10e80057a1,bubblemaps-military-cluster,2026-02-28T06:15:00Z,2026-02-28T06:15:00Z,bubblemaps-military-cluster,earliest
 0x184f4a327edc0cd0af1f409980f6cc8d227fa96855625ce1ae9dad10e80057a1,us-iran-ceasefire-2026-03,2026-03-24T00:00:00Z,2026-02-28T06:15:00Z,bubblemaps-military-cluster,earliest
 0x184f4a327edc0cd0af1f409980f6cc8d227fa96855625ce1ae9dad10e80057a1,us-iran-ceasefire-2026-04-07,2026-04-07T22:00:00Z,2026-02-28T06:15:00Z,bubblemaps-military-cluster,earliest
-0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,bubblemaps-military-cluster,2026-02-28T06:15:00Z,2026-02-28T06:15:00Z,bubblemaps-military-cluster,earliest
-0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,us-iran-ceasefire-2026-03,2026-03-24T00:00:00Z,2026-02-28T06:15:00Z,bubblemaps-military-cluster,earliest
-0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,us-iran-ceasefire-2026-04-07,2026-04-07T22:00:00Z,2026-02-28T06:15:00Z,bubblemaps-military-cluster,earliest
+0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,bubblemaps-military-cluster,2026-02-28T06:15:00Z,2026-03-24T00:00:00Z,us-iran-ceasefire-2026-03,claim_positions
+0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,us-iran-ceasefire-2026-03,2026-03-24T00:00:00Z,2026-03-24T00:00:00Z,us-iran-ceasefire-2026-03,claim_positions
+0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,us-iran-ceasefire-2026-04-07,2026-04-07T22:00:00Z,2026-03-24T00:00:00Z,us-iran-ceasefire-2026-03,claim_positions
 0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,bubblemaps-military-cluster,2026-02-28T06:15:00Z,2026-04-07T22:00:00Z,us-iran-ceasefire-2026-04-07,claim_positions
 0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,us-iran-ceasefire-2026-03,2026-03-24T00:00:00Z,2026-04-07T22:00:00Z,us-iran-ceasefire-2026-04-07,claim_positions
 0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,us-iran-ceasefire-2026-04-07,2026-04-07T22:00:00Z,2026-04-07T22:00:00Z,us-iran-ceasefire-2026-04-07,claim_positions
