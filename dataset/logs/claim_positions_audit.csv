@@ -1,0 +1,51 @@
+claim_id,decision,reason
+CL0004,no_row,"address and funding/PnL from a repo list; no market or side named (wallet takes its case's cluster claims, A35.1 (3))"
+CL0006,no_row,funding links only
+CL0007,no_row,funding links and aggregate PnL
+CL0009,no_row,charge over Year-in-Search bets; no market or side named (the wallet's market is named by CL0011)
+CL0010,no_row,parallel complaint; no market or side named
+CL0012,no_row,address mapping only
+CL0013,no_row,'the Gemini 3.0 release date': names the event but neither the side nor the rung (would need the outcome)
+CL0016,no_row,address mapping only
+CL0018,row,"only_case_market: 'bet that Israel would strike Iran that week', Yes"
+CL0019,row,"event_ladder_rungs_after_event_date: 'won longshot bets on the June 21 strike', Yes"
+CL0020,row,"event_ladder_rungs_after_event_date: 'timing a June 2025 strike', Yes; month-level event date, so rungs from 2025-06-01 (literal A35.1)"
+CL0025,no_row,aggregate result and payment links
+CL0027,no_row,one account's profit; no market or side named
+CL0029,no_row,address and funding network only
+CL0030,row,"named_market: 'out by end of March' = 'Khamenei out ... by March 31?', Yes"
+CL0031,row,"named_market: 'a ceasefire by March 31' = 'US x Iran ceasefire by March 31?', Yes (outcome known from the reviewer's note before mapping; see A48)"
+CL0035,row,"event_ladder_rungs_after_event_date: 'ceasefire bets in April', Yes (as CL0034)"
+CL0036,row,"named_market: quotes 'Trump meets Zelenskyy by Dec 31', Yes"
+CL0037,no_row,aggregate over Biden pardon markets; no market or side named
+CL0038,no_row,cash-out (funding) links
+CL0039,no_row,'the VP pick': unnamed candidate (A35.1 (2))
+CL0049,no_row,aggregate (17 of 20 performer markets)
+CL0050,no_row,"public-data-leak family; describes a price jump, not the address's side"
+CL0052,no_row,recurring wallets on MicroStrategy markets; no market or side named
+CL0053,no_row,flag on launch markets; no side named
+CL0054,row,"named_market: 'bet that OpenAI would launch a browser that month' (October 2025) = 'OpenAI browser by October 31?', Yes"
+CL0055,no_row,'entered a week before the release': side not stated
+CL0058,no_row,aggregate over earnings-beat markets
+CL0059,no_row,describes the Yes price move and traders' profit; the traders' side is not stated
+CL0062,no_row,market claim on 'the eventual winner': unnamed (would need the outcome)
+CL0071,no_row,"oracle vote, not a position"
+CL0079,no_row,"'bought Yes ... before the Oct 1 2024 strike': the only same-event market is the daily 'today?' market, which A35.1 (1) excludes; 'Another ...' and 'by Nov 8' (created 2024-10-31) are other events"
+CL0081,no_row,market claim; no side named
+CL0082,no_row,lists markets; no side named
+CL0087,no_row,on-chain links only
+CL0091,no_row,'World Cup markets' aggregate (A35.1 (2))
+CL0092,no_row,manipulation family; aggregate over post-count markets
+CL0098,no_row,'a named candidate': unnamed in the claim (A35.1 (2))
+CL0099,no_row,'a different candidate': unnamed
+CL0101,no_row,official statement on the leak; no side named
+CL0102,no_row,'a guest appearing': unnamed
+CL0103,no_row,individual songs: unnamed
+CL0104,no_row,employer finding; no market named
+CL0105,no_row,'a frontier-model launch market': rung and side not stated
+CL0107,no_row,aggregate (17 of 20 halftime bets)
+CL0118,row,"event_ladder_rungs_after_event_date: 'bet ... on the CEO's return', Yes"
+CL0119,row,"event_ladder_rungs_after_event_date: 'on the CEO's return', Yes (the no-successor market is not a case market)"
+CL0120,no_row,letter on 'the Iran strike contract'; no side named
+CL0121,no_row,platform statement
+CL0123,no_row,Kalshi trades; the case markets are Polymarket markets

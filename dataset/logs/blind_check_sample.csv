@@ -18,17 +18,20 @@ CL0060,https://github.com/searadacunha/POLYMARKET-HOME-OF-THE-INSIDERS/blob/main
 CL0083,https://github.com/ForesightFlow/datasets/tree/main/ffic-inventory
 CL0088,https://blockchain.news/flashnews/insiders-pocket-663k-on-us-iran-ceasefire-bet-via-polymarket
 
-# section 2: claim_positions blind mapping (A35; seed 192; 30 of 150 rows; claim text only, no mapped market or side)
+# section 2: claim_positions blind mapping (A35; seed 192; 36 of 178 rows; claim text only, no mapped market or side)
 cp_row,claim_id,url,claim_text
 23,CL0023,https://www.npr.org/2026/03/01/nx-s1-5731568/polymarket-trade-iran-supreme-leader-killing,Bet about $87k at 17% about 71 minutes before strike news; over $553k including Khamenei-out bets.
-30,CL0023,https://www.npr.org/2026/03/01/nx-s1-5731568/polymarket-trade-iran-supreme-leader-killing,Bet about $87k at 17% about 71 minutes before strike news; over $553k including Khamenei-out bets.
-31,CL0023,https://www.npr.org/2026/03/01/nx-s1-5731568/polymarket-trade-iran-supreme-leader-killing,Bet about $87k at 17% about 71 minutes before strike news; over $553k including Khamenei-out bets.
 33,CL0023,https://www.npr.org/2026/03/01/nx-s1-5731568/polymarket-trade-iran-supreme-leader-killing,Bet about $87k at 17% about 71 minutes before strike news; over $553k including Khamenei-out bets.
+41,CL0024,https://www.aljazeera.com/economy/2026/3/25/large-polymarket-wall-street-bets-on-trumps-war-news-under-scrutiny,"38 accounts believed to belong to one person netted over $2M on the Feb 28 strikes, 4 to 10 bets each."
 44,CL0024,https://www.aljazeera.com/economy/2026/3/25/large-polymarket-wall-street-bets-on-trumps-war-news-under-scrutiny,"38 accounts believed to belong to one person netted over $2M on the Feb 28 strikes, 4 to 10 bets each."
 48,CL0024,https://www.aljazeera.com/economy/2026/3/25/large-polymarket-wall-street-bets-on-trumps-war-news-under-scrutiny,"38 accounts believed to belong to one person netted over $2M on the Feb 28 strikes, 4 to 10 bets each."
 51,CL0024,https://www.aljazeera.com/economy/2026/3/25/large-polymarket-wall-street-bets-on-trumps-war-news-under-scrutiny,"38 accounts believed to belong to one person netted over $2M on the Feb 28 strikes, 4 to 10 bets each."
 52,CL0024,https://www.aljazeera.com/economy/2026/3/25/large-polymarket-wall-street-bets-on-trumps-war-news-under-scrutiny,"38 accounts believed to belong to one person netted over $2M on the Feb 28 strikes, 4 to 10 bets each."
+58,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
+59,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
 60,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
+61,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
+65,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
 67,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
 69,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
 71,CL0026,https://en.wikipedia.org/wiki/Insider_trading_allegations_during_the_second_Trump_administration,About 150 accounts correctly bet the strike would come the next day; most new; groups of up to 38 may be one person.
@@ -36,17 +39,20 @@ cp_row,claim_id,url,claim_text
 77,CL0032,https://wtop.com/national/2026/04/newly-created-polymarket-accounts-bet-big-on-us-iran-ceasefire-in-hours-before-trumps-announcement/,At least 50 wallets placed substantial Yes bets before the ceasefire post; one created 12 minutes before.
 79,CL0032,https://wtop.com/national/2026/04/newly-created-polymarket-accounts-bet-big-on-us-iran-ceasefire-in-hours-before-trumps-announcement/,At least 50 wallets placed substantial Yes bets before the ceasefire post; one created 12 minutes before.
 81,CL0032,https://wtop.com/national/2026/04/newly-created-polymarket-accounts-bet-big-on-us-iran-ceasefire-in-hours-before-trumps-announcement/,At least 50 wallets placed substantial Yes bets before the ceasefire post; one created 12 minutes before.
-82,CL0032,https://wtop.com/national/2026/04/newly-created-polymarket-accounts-bet-big-on-us-iran-ceasefire-in-hours-before-trumps-announcement/,At least 50 wallets placed substantial Yes bets before the ceasefire post; one created 12 minutes before.
 86,CL0033,https://finance.yahoo.com/markets/crypto/articles/potential-insiders-made-600k-predicting-171731685.html,Three cluster accounts made about $611k on the ceasefire; same cluster made $1.2M on February strikes.
 88,CL0033,https://finance.yahoo.com/markets/crypto/articles/potential-insiders-made-600k-predicting-171731685.html,Three cluster accounts made about $611k on the ceasefire; same cluster made $1.2M on February strikes.
-90,CL0033,https://finance.yahoo.com/markets/crypto/articles/potential-insiders-made-600k-predicting-171731685.html,Three cluster accounts made about $611k on the ceasefire; same cluster made $1.2M on February strikes.
+93,CL0034,https://cryptobriefing.com/polymarket-insider-trading-military-bets/,A further group pulled in $1.4M on an April 2026 ceasefire bet.
 96,CL0034,https://cryptobriefing.com/polymarket-insider-trading-military-bets/,A further group pulled in $1.4M on an April 2026 ceasefire bet.
+101,CL0088,https://blockchain.news/flashnews/insiders-pocket-663k-on-us-iran-ceasefire-bet-via-polymarket,"Lookonchain: four wallets, most created and funded on ceasefire day with no prior transactions, netted about $663k buying at 2.9-10.3% odds."
 102,CL0088,https://blockchain.news/flashnews/insiders-pocket-663k-on-us-iran-ceasefire-bet-via-polymarket,"Lookonchain: four wallets, most created and funded on ceasefire day with no prior transactions, netted about $663k buying at 2.9-10.3% odds."
+104,CL0088,https://blockchain.news/flashnews/insiders-pocket-663k-on-us-iran-ceasefire-bet-via-polymarket,"Lookonchain: four wallets, most created and funded on ceasefire day with no prior transactions, netted about $663k buying at 2.9-10.3% odds."
 109,CL0089,https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears,Lookonchain flagged BlueHorseshoe86 as netting about $194k on the US-Iran ceasefire.
 110,CL0089,https://beincrypto.com/polymarket-iran-ceasefire-insider-trading-fears,Lookonchain flagged BlueHorseshoe86 as netting about $194k on the US-Iran ceasefire.
 117,CL0028,https://cointelegraph.com/news/bubblemaps-polymarket-cluster-win-military-bets,"Nine linked accounts won 98% of 80+ bets on US military actions (strike, Khamenei, ceasefire), about $2.4M."
 120,CL0028,https://cointelegraph.com/news/bubblemaps-polymarket-cluster-win-military-bets,"Nine linked accounts won 98% of 80+ bets on US military actions (strike, Khamenei, ceasefire), about $2.4M."
 128,CL0028,https://cointelegraph.com/news/bubblemaps-polymarket-cluster-win-military-bets,"Nine linked accounts won 98% of 80+ bets on US military actions (strike, Khamenei, ceasefire), about $2.4M."
-139,CL0015,https://cointelegraph.com/magazine/fix-insider-trading-polymarket-kalshi,Seven correct bets on Israel-Iran war timing; reactivated in January 2026; account deleted after flags.
-143,CL0047,https://github.com/searadacunha/POLYMARKET-HOME-OF-THE-INSIDERS/blob/main/FORENSIC_CASEBOOK.md,"One Safe owner key sent 372,522 USDC to eight accounts on Oct 9-10 before the announcement."
-150,CL0051,https://x.com/Polysights/status/1977716009797570865,"Bought Yes from Sept 28; about $28.7k in, +$56.8k."
+132,CL0028,https://cointelegraph.com/news/bubblemaps-polymarket-cluster-win-military-bets,"Nine linked accounts won 98% of 80+ bets on US military actions (strike, Khamenei, ceasefire), about $2.4M."
+149,CL0048,https://www.sportsbookreview.com/news/polymarket-user-profits-from-swift-kelce-engagement-bet-aug-27-2025/,Heavy Yes buying under 24 hours before the announcement; about $3k profit; account also hedged.
+152,CL0019,https://acdatacollective.org/wp-content/uploads/2026/04/Insider_Risks_in_Polymarket_Political_Markets_ACDC.pdf,"Eight wallets won longshot bets on the June 21 strike, about $1.8M; four had 99%+ win rates and sold 3% or less."
+167,CL0035,https://www.thedailybeast.com/maga-stars-vance-bets-spark-insider-trading-concerns/,White House Counsel's office flagged anonymous five-figure ceasefire bets in April.
+178,CL0119,https://www.world-today-news.com/public-citizen-demands-investigation-into-nvidia-prediction-market-bets/,"Public Citizen cited a separate account that turned about $29k into about $200k on the CEO's return and no successor, and asked for an investigation."

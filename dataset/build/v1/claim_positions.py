@@ -49,6 +49,17 @@ SPEC = [
     ("CL0048", "only", None, "Yes", "heavy Yes buying before the announcement"),
     # trump-pardon-cz-2025
     ("CL0051", "market", r"^Will Trump pardon Changpeng Zhao", "Yes", "bought Yes from Sept 28"),
+    # A48 completeness audit (logs/claim_positions_audit.csv): claims of cases without labelled wallets, from the text only
+    ("CL0018", "only", None, "Yes", "bet that Israel would strike Iran that week (the case's one market)"),
+    ("CL0019", "ladder", r"^US military action against Iran ", "Yes", "won longshot bets on the June 21 strike"),
+    ("CL0020", "ladder", r"^US military action against Iran ", "Yes", "timing a June 2025 strike (month-level event date: rungs from June 1)"),
+    ("CL0030", "market", r"^Khamenei out as Supreme Leader of Iran by March 31\?", "Yes", "bet that Khamenei would be out by end of March"),
+    ("CL0031", "market", r"^US x Iran ceasefire by March 31\?", "Yes", "bet on a ceasefire by March 31"),
+    ("CL0035", "ladder", CEASE, "Yes", "five-figure ceasefire bets in April"),
+    ("CL0036", "market", r"^Will Trump meet with Zelenskyy by December 31\?", "Yes", "claim names 'Trump meets Zelenskyy by Dec 31'"),
+    ("CL0054", "market", r"^OpenAI browser by October 31\?", "Yes", "bet that OpenAI would launch a browser that month (October 2025)"),
+    ("CL0118", "ladder", r"^Will Jensen Huang rejoin NVIDIA by ", "Yes", "bet on the CEO's return before the announcement"),
+    ("CL0119", "ladder", r"^Will Jensen Huang rejoin NVIDIA by ", "Yes", "bets on the CEO's return (the no-successor market is not in this case)"),
 ]
 MON = "January February March April May June July August September October November December".split()
 
