@@ -11,3 +11,4 @@ release_safe/data/weak_labels.parquet
 upload/
 logs/gamma_raw/profile_*.json
 release/data/tmp_*.parquet
+release/data/*.cast_tmp
