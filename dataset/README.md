@@ -2,7 +2,7 @@
 
 An open, source-traced register of every publicly documented case of suspected informed trading on prediction markets, joined to trade-level data for analysis and machine learning.
 
-**Version 1.2.1 (2026-11-27, run 11).** Start with the dataset card [`release/README.md`](release/README.md). Two release packages: [`release/`](release/) (all files) and [`release_safe/`](release_safe/) (without the Data API fill files, with a script that rebuilds them). The full package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A33. Runs 7 to 11 are described in `logs/run7_report.md` to `logs/run10_report.md` and [`logs/run11_report.md`](logs/run11_report.md).
+**Version 1.2.1 (2026-11-28, run 11).** Start with the dataset card [`release/README.md`](release/README.md). Two release packages: [`release/`](release/) (all files) and [`release_safe/`](release_safe/) (without the Data API fill files, with a script that rebuilds them). The full package is in [`release/`](release/): data tables (`release/data/`), benchmarks, notebooks, docs (README, DATASHEET, CODEBOOK, PROTOCOL, CHANGELOG, LICENSE, CITATION) and `MANIFEST.json` with SHA-256 for every file. Start with [`release/docs/README.md`](release/docs/README.md). Collected under [PROTOCOL.md](PROTOCOL.md) v1.0 and amendments A1 to A49. Runs 7 to 11 are described in `logs/run7_report.md` to `logs/run10_report.md` and [`logs/run11_report.md`](logs/run11_report.md).
 
 Files over 50 MB (`release/data/positions.parquet`, `weak_labels.parquet`, `fills_part*.parquet`) are not in git; they are listed with SHA-256 in `release/MANIFEST.json` and rebuilt by the scripts.
 
@@ -15,6 +15,8 @@ Run 9 adds: `v1/label_sets.py` (after `v1/labels.py confirm`) → `v1/twin_marke
 Run 10 adds: `v1/market_times.py` (per-market cuts into `markets.csv`, after `build_markets.py`) → `v1/ref_times.py` (placebo and twin `t_ref`) → `v1/coordinated.py` → `v1/episodes.py <work> day|precise standard|age_matched|open` → `v1/positions.py` → `v1/minutes.py` → `v1/label_sets.py` → `v1/hard_negatives.py` → `v1/amount_checks.py` → then the run-9 release order from `v1/tables.py`.
 
 Run 11 adds: `v1/market_times.py` also writes `t_news_reliable`, `t_news_deadline_rule_utc` and `logs/scheduled_start_check.csv` (A29, A30); `v1/label_sets.py` links only from alleging claims (A31); `v1/episodes.py <work> day|precise standard|age_matched|winrate_matched|open` (A33).
+
+Run 11 audit and finish add: `v1/claim_positions.py` (A35, A48) → `v1/market_scope.py` (A41) → `v1/question_type.py` (A38, imported) → `v1/twin_markets.py` (A46: full catalog) → `v1/ref_times.py` → `hf_pass_v9.py <hf> <work>` → `v1/fills.py` → `v1/econ.py <tmp>` (A34) → `v1/labels.py confirm` → `v1/market_makers.py <tmp>` → `v1/directional.py <tmp>` (A34.2) → `v1/coordinated.py <work> <tmp>` → `v1/episodes.py` (8 runs) → `v1/positions_buckets.py <work> <tmp> 6` → `v1/label_sets.py` → `v1/minutes.py <tmp>` → `v1/hard_negatives.py <work>` → `v1/amount_checks.py` → `v1/splits.py` (A37) → `v1/tables.py <tmp>` → `v1/fills_release.py <tmp>` → report scripts `v1/a35_report.py`, `v1/econ_compare.py`, `v1/mm_check.py`, `v1/blind_sample_positions.py` → benchmarks and the run-9 release order.
 
 ---
 
