@@ -95,6 +95,8 @@ _ct = _cpm.groupby("claim_id").agg(first_res=("res", "min"), n_unres=("won", lam
 _cd = pd.to_datetime(cl.claim_date.where(cl.claim_date.str.len() >= 10, None), utc=True, errors="coerce", format="mixed")
 cl["claim_timing"] = [("" if k not in _ct.index or pd.isna(_ct.at[k, "first_res"]) or pd.isna(d) else ("ex_ante" if d < _ct.at[k, "first_res"] else "ex_post"))
                       for k, d in zip(cl.claim_id, _cd)]
+cl["claim_day_contains_resolution"] = [("" if t == "" else ("true" if _ct.at[k, "first_res"] < d + pd.Timedelta(days=1) else "false"))
+                                       for k, d, t in zip(cl.claim_id, _cd, cl.claim_timing)]  # A49
 cl["alleged_side_won"] = [("" if k not in _ct.index or _ct.at[k, "n_unres"] > 0 else ("true" if _ct.at[k, "all_won"] else "false")) for k in cl.claim_id]
 cl["duplicate_of"] = cl.claim_id.map({"CL0124": "CL0091"}).fillna("")
 cl["post_url"] = cl.notes.map(lambda n: (re.search(r"post_url=(\S+?)(?:;|\s|$)", n) or [None, None])[1])

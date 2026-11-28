@@ -1,0 +1,240 @@
+{
+ "precise": {
+  "suspected_side_positions": 523,
+  "alleged_positions": 143,
+  "labelled_other_positions": 380,
+  "losing_positions": 35,
+  "losing_by_role": {
+   "labelled_other_position": 35
+  },
+  "won_post_null": 0,
+  "reliable_alleged_positions": 142,
+  "label_sets": {
+   "label_strict": {
+    "positions": 55,
+    "alleged_positions": 21,
+    "wallets_with_position": 19,
+    "wallets_with_alleged_position": 16,
+    "cases_with_position": 7,
+    "cases_with_alleged_position": 6,
+    "wallets_in_set": 19,
+    "wallets_without_prenews_position": 0,
+    "cases_dropping_out": [
+     "world-cup-2026-06"
+    ]
+   },
+   "label_standard": {
+    "positions": 501,
+    "alleged_positions": 140,
+    "wallets_with_position": 111,
+    "wallets_with_alleged_position": 79,
+    "cases_with_position": 11,
+    "cases_with_alleged_position": 8,
+    "wallets_in_set": 112,
+    "wallets_without_prenews_position": 1,
+    "cases_dropping_out": [
+     "biden-pardons",
+     "kpmg-earnings-2025-26",
+     "world-cup-2026-06"
+    ]
+   },
+   "label_broad": {
+    "positions": 523,
+    "alleged_positions": 143,
+    "wallets_with_position": 117,
+    "wallets_with_alleged_position": 82,
+    "cases_with_position": 17,
+    "cases_with_alleged_position": 11,
+    "wallets_in_set": 119,
+    "wallets_without_prenews_position": 2,
+    "cases_dropping_out": [
+     "biden-pardons",
+     "draftkings-pm-launch",
+     "fed-chair-nomination-2026",
+     "kpmg-earnings-2025-26",
+     "super-bowl-halftime-2026",
+     "world-cup-2026-06"
+    ]
+   }
+  },
+  "dropouts": {
+   "wallets": 35,
+   "by_reason": {
+    "no_linked_or_cluster_claim_names_market_or_side": 30,
+    "alleged_market_or_side_not_held_before_cut": 5
+   },
+   "by_case": {
+    "biden-pardons": {
+     "wallets": 2,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 2
+    },
+    "draftkings-pm-launch": {
+     "wallets": 1,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 0
+    },
+    "fed-chair-nomination-2026": {
+     "wallets": 1,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 0
+    },
+    "kpmg-earnings-2025-26": {
+     "wallets": 22,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 22
+    },
+    "maduro-2026-01": {
+     "wallets": 3,
+     "reason": "alleged_market_or_side_not_held_before_cut",
+     "strict": 0,
+     "standard": 3
+    },
+    "super-bowl-halftime-2026": {
+     "wallets": 1,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 0
+    },
+    "us-iran-strike-2026-02-28": {
+     "wallets": 2,
+     "reason": "alleged_market_or_side_not_held_before_cut",
+     "strict": 0,
+     "standard": 2
+    },
+    "world-cup-2026-06": {
+     "wallets": 3,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 3,
+     "standard": 3
+    }
+   }
+  }
+ },
+ "day": {
+  "suspected_side_positions": 410,
+  "alleged_positions": 98,
+  "labelled_other_positions": 312,
+  "losing_positions": 30,
+  "losing_by_role": {
+   "labelled_other_position": 30
+  },
+  "won_post_null": 0,
+  "reliable_alleged_positions": 97,
+  "label_sets": {
+   "label_strict": {
+    "positions": 38,
+    "alleged_positions": 15,
+    "wallets_with_position": 12,
+    "wallets_with_alleged_position": 10,
+    "cases_with_position": 7,
+    "cases_with_alleged_position": 6,
+    "wallets_in_set": 19,
+    "wallets_without_prenews_position": 7,
+    "cases_dropping_out": [
+     "world-cup-2026-06"
+    ]
+   },
+   "label_standard": {
+    "positions": 388,
+    "alleged_positions": 95,
+    "wallets_with_position": 76,
+    "wallets_with_alleged_position": 53,
+    "cases_with_position": 11,
+    "cases_with_alleged_position": 8,
+    "wallets_in_set": 112,
+    "wallets_without_prenews_position": 36,
+    "cases_dropping_out": [
+     "biden-pardons",
+     "kpmg-earnings-2025-26",
+     "world-cup-2026-06"
+    ]
+   },
+   "label_broad": {
+    "positions": 410,
+    "alleged_positions": 98,
+    "wallets_with_position": 82,
+    "wallets_with_alleged_position": 56,
+    "cases_with_position": 17,
+    "cases_with_alleged_position": 11,
+    "wallets_in_set": 119,
+    "wallets_without_prenews_position": 37,
+    "cases_dropping_out": [
+     "biden-pardons",
+     "draftkings-pm-launch",
+     "fed-chair-nomination-2026",
+     "kpmg-earnings-2025-26",
+     "super-bowl-halftime-2026",
+     "world-cup-2026-06"
+    ]
+   }
+  },
+  "dropouts": {
+   "wallets": 26,
+   "by_reason": {
+    "no_linked_or_cluster_claim_names_market_or_side": 21,
+    "alleged_market_or_side_not_held_before_cut": 5
+   },
+   "by_case": {
+    "biden-pardons": {
+     "wallets": 2,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 2
+    },
+    "draftkings-pm-launch": {
+     "wallets": 1,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 0
+    },
+    "fed-chair-nomination-2026": {
+     "wallets": 1,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 0
+    },
+    "kpmg-earnings-2025-26": {
+     "wallets": 15,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 15
+    },
+    "maduro-2026-01": {
+     "wallets": 2,
+     "reason": "alleged_market_or_side_not_held_before_cut",
+     "strict": 0,
+     "standard": 2
+    },
+    "super-bowl-halftime-2026": {
+     "wallets": 1,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 0,
+     "standard": 0
+    },
+    "us-iran-strike-2026-02-28": {
+     "wallets": 2,
+     "reason": "alleged_market_or_side_not_held_before_cut",
+     "strict": 0,
+     "standard": 2
+    },
+    "world-cup-2026-06": {
+     "wallets": 1,
+     "reason": "no_linked_or_cluster_claim_names_market_or_side",
+     "strict": 1,
+     "standard": 1
+    },
+    "zachxbt-axiom-2026-02": {
+     "wallets": 1,
+     "reason": "alleged_market_or_side_not_held_before_cut",
+     "strict": 1,
+     "standard": 1
+    }
+   }
+  }
+ }
+}

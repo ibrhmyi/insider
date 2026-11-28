@@ -46,6 +46,7 @@ TABLES["claims"] = dict(desc="One row per claim: one statement by one source at 
     col("accessed_date", DT, "date accessed"), col("extractor", S, "who extracted the row"), col("notes", S, "free notes"),
     col("right_of_reply", S, "reply received from the subject, verbatim summary and date (A24); NULL if none. not_built: no reply recorded yet (A43)"),
     col("claim_timing", S, "A42: ex_ante if claim_date is before the earliest resolution of the claim's alleged markets (claim_positions), else ex_post; NULL without a mapped market", allowed="ex_ante;ex_post", leak="label"),
+    col("claim_day_contains_resolution", B, "A49: the first resolution of the claim's alleged markets falls inside the claim's UTC day (a same-day 'ex_ante' claim may describe the event after the fact); NULL where claim_timing is NULL", leak="label"),
     col("alleged_side_won", B, "A42: the alleged side won in every mapped market (NULL without a mapped market or if one is unresolved)", leak="post"),
     col("duplicate_of", S, "A44: claim this one repeats (same source and wallets); NULL otherwise")])
 TABLES["wallets"] = dict(desc="One row per (wallet, case) label. Labels are allegations by the named source, not findings.", cols=[
