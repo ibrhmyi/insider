@@ -1,33 +1,33 @@
 {
  "seed": 192,
- "n_episodes": 527,
- "n_controls": 9210,
- "n_pre_rows": 1498669,
- "n_excluded_addresses": 12525,
- "episodes_with_same_side_controls": 481,
+ "n_episodes": 523,
+ "n_controls": 9130,
+ "n_pre_rows": 1498542,
+ "n_excluded_addresses": 12512,
+ "episodes_with_same_side_controls": 477,
  "relaxation_counts": {
   "base": 250,
-  "size_0.25_4x": 181,
+  "size_0.25_4x": 178,
   "price_0.10": 32,
-  "window_72h": 18
+  "window_72h": 17
  },
  "n_episodes_without_same_side": 46,
  "n_episodes_relaxed_band": 0,
- "n_episode_rows": 9737,
+ "n_episode_rows": 9653,
  "rows_by_role": {
-  "control_other_side_large_buyer": 5233,
-  "control_same_side": 3977,
-  "suspected": 527
+  "control_other_side_large_buyer": 5193,
+  "control_same_side": 3937,
+  "suspected": 523
  },
  "suspected_episodes_by_case": {
   "us-iran-strike-2026-02-28": 314,
   "kpmg-earnings-2025-26": 87,
   "google-yis-2025": 18,
   "nobel-peace-2025": 17,
-  "us-iran-ceasefire-2026-04-07": 15,
   "super-bowl-halftime-2026": 13,
   "zachxbt-axiom-2026-02": 13,
   "world-cup-2026-06": 12,
+  "us-iran-ceasefire-2026-04-07": 11,
   "bubblemaps-military-cluster": 9,
   "maduro-2026-01": 9,
   "biden-pardons": 9,
