@@ -160,62 +160,62 @@
   {
    "path": "data/fills_part001_case_hf_polymarket_v1.parquet",
    "rows": 15000000,
-   "bytes": 383702642,
-   "sha256": "556f2b8398990956949a12f39adf2c8172be681686ae06c3c99bef28718192c4"
+   "bytes": 382684372,
+   "sha256": "29c38aa7c6a22a7ab3fa31dd4fb0e89e6136ea6215971bf0ad4e327d6d339bf3"
   },
   {
    "path": "data/fills_part002_case_hf_polymarket_v1.parquet",
    "rows": 5966634,
-   "bytes": 156282274,
-   "sha256": "c340cdbd29397559bb5a3b9dfc68859d75f8c87e03f19fd329b5f0ce2dbeac7a"
+   "bytes": 154662398,
+   "sha256": "e595a6f9f685b1c9eea90dc6b65c2906d7423357672d478d751dea8db87435bf"
   },
   {
    "path": "data/fills_part003_case_data_api_v2.parquet",
    "rows": 2131706,
-   "bytes": 151356618,
-   "sha256": "de15a11a2a4e9d632741ba7d9594ffd958347d20281a0adec4712a804353b05f"
+   "bytes": 151114919,
+   "sha256": "3224a081e643c9a53b77d2d2fc4abe70c1cb630c2b2e1198e59e0e5305635875"
   },
   {
    "path": "data/fills_part004_placebo_hf_polymarket_v1.parquet",
    "rows": 15000000,
-   "bytes": 421701434,
-   "sha256": "e24e883ddcf1ca1e92a45bb6ddc73d6e36d06ef49ee54b0b215585a0e42eb5dd"
+   "bytes": 421702112,
+   "sha256": "a784201cca10075b99d9a964ea7f492ff0e936e45ed7c37177cfa83a40dbfc2e"
   },
   {
    "path": "data/fills_part005_placebo_hf_polymarket_v1.parquet",
    "rows": 15000000,
-   "bytes": 421223560,
-   "sha256": "ba49848448b80004c76c7b0986d3151fbf9b9e144aebbfeab8da78088559803d"
+   "bytes": 419944159,
+   "sha256": "0a7b87cd84d957820b1325820f10c40daf014a50f9a8d618a6b43f00da486147"
   },
   {
    "path": "data/fills_part006_placebo_hf_polymarket_v1.parquet",
    "rows": 260306,
-   "bytes": 7837692,
-   "sha256": "b0c19ee8737871520643d05ede95878010622d2b5104d540c33bb44f37f92b93"
+   "bytes": 7867640,
+   "sha256": "bd1fb1c62461b4e7968d9012e071234d4d6725ce88eca797c0f44b116e712af7"
   },
   {
    "path": "data/fills_part007_twin_hf_polymarket_v1.parquet",
    "rows": 15000000,
-   "bytes": 395896254,
-   "sha256": "6d9b19d6a331864fe9c2adcfda7e665ef94525ba12d01f0492ded592ae7a5989"
+   "bytes": 395897073,
+   "sha256": "f57c5b86b2f46d6cca2b943dc05557a716b43f7050957fef623c3b3070c15f65"
   },
   {
    "path": "data/fills_part008_twin_hf_polymarket_v1.parquet",
    "rows": 13135632,
-   "bytes": 346388235,
-   "sha256": "8ee0bb0813f6fa52d4ccf4d14b58a1b9d4ec4cc980dd07989ac352af81285a43"
+   "bytes": 345351349,
+   "sha256": "f93a4b255b4b5287199803e444c135f933ee19b42d180a2c4b8162bb982943b3"
   },
   {
    "path": "data/fills_part009_label_other_hf_polymarket_v1.parquet",
    "rows": 58850,
-   "bytes": 2508424,
-   "sha256": "c4857659b2858de2181c7327a1a7943a3bb255cff6033cbd2c903b2024d1d509"
+   "bytes": 2508400,
+   "sha256": "db117e816f72621f31fbcf5a0783e8da5d622765b6fcc78cefe4264a27fb78e6"
   },
   {
    "path": "data/fills_part010_label_other_data_api_v2.parquet",
    "rows": 6118,
-   "bytes": 857105,
-   "sha256": "4bed94b734704cbdd5ee43c9fa363b128d184d78023d61a0be5efaefa0a2e047"
+   "bytes": 857111,
+   "sha256": "ab61c1cd652cc2af25704fab367dac4fb144e7f89cec954d3803c8ed59b7fb46"
   },
   {
    "path": "data/hard_negatives.csv",
@@ -238,14 +238,14 @@
   {
    "path": "data/markets.csv",
    "rows": 1107,
-   "bytes": 860974,
-   "sha256": "7ed8c20959f87cf03428eef37b08a36cf3f04fd3b9eaca57c7fd73fead0ca1d3"
+   "bytes": 884679,
+   "sha256": "49e52940848f5b973162dd551d29e03a72e0be3ccfe04a444bc9c19b1602a32b"
   },
   {
    "path": "data/markets.parquet",
    "rows": 1107,
-   "bytes": 188247,
-   "sha256": "4e9976539ae6d8777d5b0177d18498d88297205bb99326c0bb3b6792266e4717"
+   "bytes": 189727,
+   "sha256": "d75d8c6942ddd0b5880e5734fa6fb37cdaca10ae1a7930b62c431ee094679794"
   },
   {
    "path": "data/placebo_markets.csv",
@@ -316,8 +316,8 @@
   {
    "path": "docs/CODEBOOK.md",
    "rows": null,
-   "bytes": 46521,
-   "sha256": "0ba28f8291eb7344e5713e7d507b302f619a180dcf178a9225f673ca42b6c865"
+   "bytes": 46680,
+   "sha256": "28ea035f69a584afec5d1fd911797ba1fa8be473d17dc2a4e19a880acdd80823"
   },
   {
    "path": "docs/DATASHEET.md",

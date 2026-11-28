@@ -146,6 +146,7 @@ One row per (case, market). Ladders are full Gamma events (A6.5). Titles withhel
 | `t_news_market_method` | string |  | scheduled_start, market_deadline, case_time |  | meta | A25 method (A30: a scheduled start is used only if before the market's close) |
 | `is_placebo_market` | bool |  |  |  | meta | always false here |
 | `t_news_reliable` | bool |  |  |  | label | A29.1/A29.2: false for deadline-rule cuts and for case-date fallbacks of month/quarter/year/range-dated cases; excluded from default analyses and benchmarks |
+| `t_news_market_source_case` | string |  |  |  | label | A36.1: the case whose per-market time this market takes (its own case unless the market is shared) |
 | `question_type` | string |  | weather, crypto_price, sports, legal_action, appointment, election, award, military_action, corporate_release, crypto_project, other |  | meta | A38 keyword type of the question |
 | `t_news_deadline_rule_utc` | timestamp |  |  |  | label | A29: the A25 rule-2 deadline time where it set the cut; NULL otherwise |
 | `ff_tier` | string |  |  |  | meta | ForesightFlow tier if listed |
