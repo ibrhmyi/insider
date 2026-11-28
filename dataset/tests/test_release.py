@@ -285,7 +285,8 @@ def test_market_cut_not_after_sourced_case_time():
     assert (dl.t_news_precision != "day").all() and (dl.t_news_market_utc >= dl.t_news_utc).all()  # A25 rule 2: only inside a coarse date
     dq = re.compile(r"\b(?:by|before)\s+(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|end of|\d{4}|q[1-4])", re.I)
     assert not m[(m.t_news_market_method == "scheduled_start") & m.question.fillna("").str.contains(dq)].shape[0]  # A25.2
-    assert (m[m.t_news_market_method == "case_time"].t_news_market_utc == m[m.t_news_market_method == "case_time"].t_news_precise_utc).all()
+    ct = m.t_news_market_method == "case_time"  # A36.1: the case time of the case the market's time comes from
+    assert (m[ct].t_news_market_utc <= sp[ct]).all()
 
 
 def test_positions_use_market_cut():
@@ -330,7 +331,7 @@ def test_relaxed_band_only_in_banded_designs():
 
 def test_t_news_reliable():
     """A29.1: per market; false only for a deadline-rule time; episodes carry their market's flag; placebo/twin rows their case market's."""
-    m = load("markets", ["case_id", "condition_id", "t_news_reliable", "t_news_market_method", "t_news_deadline_rule_utc", "t_news_market_utc"])
+    m = load("markets", ["case_id", "condition_id", "t_news_reliable", "t_news_market_method", "t_news_deadline_rule_utc", "t_news_market_utc", "t_news_precision", "t_news_precise_precision"])
     coarse = (m.t_news_market_method == "case_time") & m.t_news_precision.isin(["month", "quarter", "year", "range"]) & (m.t_news_precise_precision == "day_fallback")
     assert (m.t_news_reliable == ((m.t_news_market_method != "market_deadline") & ~coarse)).all()  # A29.1, A29.2
     dl = m[m.t_news_market_method == "market_deadline"]
@@ -500,4 +501,4 @@ def test_no_all_null_columns():
 def test_lifetime_share_in_unit_interval():
     """A43: case_share_of_lifetime_volume uses one source for numerator and denominator."""
     e = load("episodes", ["case_share_of_lifetime_volume"]).dropna()
-    assert ((e.case_share_of_lifetime_volume >= 0) & (e.case_share_of_lifetime_volume <= 1 + 1e-6)).all()  # denominator is rounded to cents
+    assert ((e.case_share_of_lifetime_volume >= 0) & (e.case_share_of_lifetime_volume <= 1)).all()
