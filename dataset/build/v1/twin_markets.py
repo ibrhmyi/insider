@@ -1,4 +1,5 @@
-"""Run 9, PROTOCOL A22: same-category comparison ("twin") markets. Writes data/twin_markets.csv.
+"""Run 9, PROTOCOL A22, A38, A39: same-category, same-question-type comparison ("twin") markets, never a placebo category or the same subject.
+Run 11 (A38): twins are chosen from the markets whose fills are already in the release pass (out/v1/fills/fills_twin.parquet). Writes data/twin_markets.csv.
 Usage: python3 build/v1/twin_markets.py"""
 import os, sys
 import duckdb, numpy as np, pandas as pd
@@ -31,7 +32,16 @@ ev_slugs = {s for s in mk.event_slug if s}
 pool = res2[~res2.condition_id.isin(case_cids) & ~res2.condition_id.isin(plc) & ~res2.neg_risk_market_id.fillna("~").isin(case_events)
             & res2.duration_band.notna() & res2.category_refined.notna()].copy()
 pool = pool[~pool.slug.fillna("").map(lambda s: any(e and s.startswith(e) for e in ev_slugs))]
-print("twin pool", len(pool))
+from question_type import qtype, PLACEBO_TYPES  # A38
+import duckdb as _dd, re as _re
+_fetched = {r[0] for r in _dd.sql(f"SELECT DISTINCT lower(condition_id) FROM '{D}/out/v1/fills/fills_twin.parquet'").fetchall()}
+pool = pool[pool.condition_id.isin(_fetched)].copy()
+pool["qt"] = pool.slug.fillna("").str.replace("-", " ").map(qtype)
+pool = pool[~pool.qt.isin(PLACEBO_TYPES)]
+pool["slug_words"] = pool.slug.fillna("").str.lower().str.split("-").map(set)
+MONTHS = set("january february march april may june july august september october november december will".split())
+subject = lambda q: {w.lower() for w in _re.findall(r"(?<!^)(?<![.?!] )\b[A-Z][A-Za-z.'’]{2,}", q or "")} - MONTHS  # proper nouns of the case question
+print("twin pool", len(pool), pool.qt.value_counts().to_dict())
 ci = cat.set_index("condition_id")
 ts = lambda x: pd.to_datetime(x.replace("", None), utc=True, errors="coerce", format="mixed")
 mk["created"] = ts(mk.created_utc); mk["end"] = ts(mk.resolved_utc).fillna(ts(mk.deadline_utc))
@@ -44,10 +54,15 @@ for r in mk.itertuples():
         out.append(dict(base, relaxation="not_matched_no_category")); continue
     if pd.isna(r.vol) or r.vol <= 0 or pd.isna(r.created) or pd.isna(r.end):
         out.append(dict(base, relaxation="not_matched_zero_volume_or_dates")); continue
+    if r.case_id == "tweet-count-self-2026-03":  # A39: same-subject markets are not twins
+        out.append(dict(base, relaxation="not_matched_same_subject_case_A39")); continue
     catg = ci.loc[r.condition_id, "category_refined"]; d = dec(r.vol)
+    qt = qtype(r.question); subj = subject(r.question)
     b = band((r.end - r.created).total_seconds() / 86400) or BN[0]; bi = BN.index(b); y = r.end.year
     adj = [BN[j] for j in (bi - 1, bi, bi + 1) if 0 <= j < len(BN)]
-    av = pool[(pool.category_refined == catg) & ~pool.condition_id.isin(used)]
+    av = pool[(pool.category_refined == catg) & (pool.qt == qt) & ~pool.condition_id.isin(used)]  # A38: same question type
+    if subj:
+        av = av[~av.slug_words.map(lambda w: bool(w & subj)).astype(bool).values] if len(av) else av  # A38: never the same subject
     steps = [("exact", av[(av.volume_decile == d) & (av.duration_band == b) & (av.year == y)]),
              ("year_pm1", av[(av.volume_decile == d) & (av.duration_band == b) & ((av.year - y).abs() <= 1)]),
              ("adjacent_band_year_pm1", av[(av.volume_decile == d) & av.duration_band.isin(adj) & ((av.year - y).abs() <= 1)]),
@@ -56,12 +71,12 @@ for r in mk.itertuples():
     name, q = next(((nm, q) for nm, q in steps if len(q) >= 5), steps[-1])
     q = q.sort_values("condition_id")
     if not len(q):
-        out.append(dict(base, relaxation="not_matched_none_available", category_refined=catg)); continue
+        out.append(dict(base, relaxation="not_matched_none_available", category_refined=catg, question_type=qt)); continue
     pick = q.iloc[np.sort(rng.choice(len(q), min(5, len(q)), replace=False))]
     span = (r.end - r.created).total_seconds()
     for p in pick.itertuples():
         used.add(p.condition_id); n += 1
-        row = dict(base, twin_id=f"TW{n:05d}", twin_condition_id=p.condition_id, category_refined=catg, twin_slug=p.slug, twin_token_ids=p.token_ids,
+        row = dict(base, twin_id=f"TW{n:05d}", twin_condition_id=p.condition_id, category_refined=catg, question_type=qt, twin_slug=p.slug, twin_token_ids=p.token_ids,
                    twin_outcomes=p.outcomes, twin_outcome=p.outcome, twin_opens_utc=p.opens_at, twin_end_utc=p.end_at, twin_volume_usdc=round(p.volume, 2),
                    volume_decile=d, duration_band=b, resolution_year=y, twin_duration_band=p.duration_band, twin_year=p.year, relaxation=name, n_eligible=len(q))
         for v, col in [("day", "t_news_utc"), ("precise", "t_news_precise_utc")]:

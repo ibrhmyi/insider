@@ -71,10 +71,29 @@ for r in mk.itertuples():
         if pd.notna(tc) and tc < t:
             t, meth, dl_rule = tc, "case_time", pd.NaT
     day = t.floor("D") if meth != "case_time" else t0
-    reliable = meth != "market_deadline"  # A29.1: per market; false only for a deadline-rule time
+    coarse_fallback = meth == "case_time" and r.t_news_precision in ("month", "quarter", "year", "range") and r.t_news_precise_precision == "day_fallback"
+    reliable = meth != "market_deadline" and not coarse_fallback  # A29.1 (per market) and A29.2 (coarse case-date fallbacks)
     out.append((t.strftime("%Y-%m-%dT%H:%M:%SZ"), day.strftime("%Y-%m-%dT%H:%M:%SZ"), meth, "true" if reliable else "false",
                 dl_rule.strftime("%Y-%m-%dT%H:%M:%SZ") if pd.notna(dl_rule) else ""))
 mk["t_news_market_utc"], mk["t_news_market_day_utc"], mk["t_news_market_method"], mk["t_news_reliable"], mk["t_news_deadline_rule_utc"] = zip(*out)
+# A36: one news time per market. A market in several cases takes the time of the case whose claim_positions row names it (its resolving
+# event); if none or several do, the earliest per-market time (never later than any case's). Method, reliability and deadline-rule time follow.
+_cp = pd.read_csv(os.path.join(D, "data", "claim_positions.csv"), dtype=str)
+_named = _cp.groupby("condition_id").case_id.agg(lambda s: sorted(set(s))).to_dict()
+mk["_cid"] = mk.condition_id.str.lower(); a36 = []
+for cid, g in mk.groupby("_cid"):
+    if g.t_news_market_utc.nunique() == 1 and g.t_news_market_day_utc.nunique() == 1:
+        continue
+    nm = [k for k in _named.get(cid, []) if k in set(g.case_id)]
+    src = g[g.case_id == nm[0]].iloc[0] if len(nm) == 1 else g.sort_values(["t_news_market_utc", "t_news_market_day_utc"]).iloc[0]
+    for i in g.index:
+        a36.append(dict(condition_id=cid, case_id=mk.at[i, "case_id"], old_utc=mk.at[i, "t_news_market_utc"], new_utc=src.t_news_market_utc,
+                        source_case=src.case_id, basis="claim_positions" if len(nm) == 1 else "earliest"))
+        for col in ["t_news_market_utc", "t_news_market_day_utc", "t_news_market_method", "t_news_reliable", "t_news_deadline_rule_utc"]:
+            mk.at[i, col] = src[col]
+mk = mk.drop(columns="_cid")
+pd.DataFrame(a36, columns=["condition_id", "case_id", "old_utc", "new_utc", "source_case", "basis"]).to_csv(os.path.join(D, "logs", "a36_shared_market_times.csv"), index=False)
+print("A36 shared markets harmonised:", len({r["condition_id"] for r in a36}), "rows", len(a36), "changed", sum(r["old_utc"] != r["new_utc"] for r in a36))
 pd.DataFrame(chk).sort_values(["case_id", "condition_id"]).to_csv(os.path.join(D, "logs", "scheduled_start_check.csv"), index=False)
 mk.to_csv(os.path.join(D, "data", "markets.csv"), index=False)
 s = mk.groupby(["case_id", "t_news_market_method"]).size().unstack(fill_value=0)
