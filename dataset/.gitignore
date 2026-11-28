@@ -1,0 +1,14 @@
+# v1.0 release files over 50 MB (listed with SHA-256 in release/MANIFEST.json; rebuilt by build/v1/)
+out/v1/
+release/data/fills_part*.parquet
+release/data/positions.parquet
+release/data/weak_labels.parquet
+*.pyc
+__pycache__/
+release_safe/data/fills_part*.parquet
+release_safe/data/positions.parquet
+release_safe/data/weak_labels.parquet
+upload/
+logs/gamma_raw/profile_*.json
+release/data/tmp_*.parquet
+release/data/*.cast_tmp

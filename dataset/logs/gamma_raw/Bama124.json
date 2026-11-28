@@ -1,0 +1,14 @@
+{
+ "profiles": [
+  {
+   "name": "bama124",
+   "pseudonym": "Tired-Veteran",
+   "displayUsernamePublic": true,
+   "proxyWallet": "0xe5c8026239919339b988fdb150a7ef4ea196d3e7"
+  }
+ ],
+ "pagination": {
+  "hasMore": false,
+  "totalResults": 0
+ }
+}

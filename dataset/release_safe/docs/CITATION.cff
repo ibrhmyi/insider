@@ -1,0 +1,27 @@
+cff-version: 1.2.1
+message: "If you use this dataset, please cite it as below."
+title: "Prediction-Market Informed-Trading Casebook (PMITC)"
+version: 1.2.1
+date-released: 2026-11-26
+authors:
+  - family-names: Yildiz
+    given-names: I.
+license: CC-BY-4.0
+repository-code: "https://github.com/ibrhmyi/insider"
+abstract: >-
+  A source-traced register of publicly documented cases of suspected informed trading on prediction markets
+  (court and regulator actions, platform sanctions, analyst investigations, press reports, rule-based screens),
+  joined to trade-level Polymarket data: fills, all-buyer positions before the news, matched controls, placebo
+  markets, minute paths and benchmark tasks. Labels are allegations by the named sources, not findings.
+keywords: [prediction markets, Polymarket, Kalshi, insider trading, market microstructure, anomaly detection, benchmark]
+references:
+  - type: dataset
+    title: "Polymarket-v1"
+    authors: [{name: "TimeSeventeen"}]
+    url: "https://huggingface.co/datasets/TimeSeventeen/Polymarket-v1"
+    license: CC-BY-4.0
+  - type: dataset
+    title: "ForesightFlow datasets"
+    authors: [{name: "ForesightFlow"}]
+    url: "https://github.com/ForesightFlow/datasets"
+    license: CC-BY-4.0

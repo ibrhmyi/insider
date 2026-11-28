@@ -1,0 +1,14 @@
+{
+ "profiles": [
+  {
+   "name": "romanticpaul",
+   "pseudonym": "Worthy-Going",
+   "displayUsernamePublic": true,
+   "proxyWallet": "0xf5cfe6f998d597085e366f915b140e82e0869fc6"
+  }
+ ],
+ "pagination": {
+  "hasMore": false,
+  "totalResults": 0
+ }
+}

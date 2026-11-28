@@ -1,0 +1,26 @@
+case_id,kind,value,reason
+acdc-orcas,no_market_found,,aggregate (rule-defined wallets)
+campaign-staff-bets,no_market_found,,claims name no market or account
+coinbase-earnings-mentions,no_market_found,,Kalshi; no public account or trade IDs
+inca-digital-39,no_market_found,,aggregate
+iran-military-trader-967k,no_market_found,,one trader across many markets; no account or market named
+israel-election-2026-10,no_market_found,,claims name no specific market
+israel-iaf-officer-2,no_market_found,,claims name no market or account
+kalshi-candidate-own-race,no_market_found,,Kalshi; no public account or trade IDs
+kalshi-mrbeast-2025,no_market_found,,Kalshi; no public account or trade IDs
+kalshi-q1-2026-aggregate,no_market_found,,Kalshi aggregate
+kalshi-q2q3-2026-aggregate,no_market_found,,Kalshi aggregate
+kalshi-sotu-attendance,no_market_found,,Kalshi; no public account or trade IDs
+kalshi-teleprompter-2026,no_market_found,,Kalshi; no public account or trade IDs
+midterms-2026,no_market_found,,claims name no specific market
+mitts-ofir-composite,no_market_found,,aggregate (rule-defined pairs)
+netanyahu-odds-support-2026,no_market_found,,market for 'Netanyahu staying PM' ambiguous (several candidate markets); handle unresolved
+nyt-80-accounts,no_market_found,,aggregate; accounts not public
+nyt-siena-polls-2026,no_market_found,,markets not yet identified (Senate race markets; trader address not public); see needs_page_read
+openai-markets-aggregate,no_market_found,,aggregate (60 wallets not public)
+polymarket-referrals-aggregate,no_market_found,,aggregate
+polysights-flags-aggregate,no_market_found,,aggregate
+solidus-multichain,no_market_found,,aggregate
+tariff-decisions-2026,no_market_found,,claims name no specific market
+tweet-count-self-2026-03,no_market_found,,DECISION NEEDED: the market names the person the claim alleges controls the accounts (PROTOCOL 9)
+xfm-self-trading,no_market_found,,self-trading pattern across many unrelated markets; no market identified

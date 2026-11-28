@@ -1,0 +1,10 @@
+{
+ "question": "T1 random baseline changed from AP 0.052 (run 7) to 0.005 (run 8)",
+ "test_rows_identical": "yes: the 4 test cases (biden-pardons, bubblemaps-military-cluster, kpmg-earnings-2025-26, us-iran-ceasefire-2026-04-07) were not touched by A18/A19; 102,109 rows, 32 positives in 20 markets in both runs",
+ "prevalence_test": {"pooled": 0.00031, "mean_per_market": 0.0013},
+ "prevalence_train_run8": {"pooled": 0.00166, "mean_per_market": 0.0049, "rows": 229838, "positives": 382},
+ "cause": "pmitc_bench.py drew the training negative subsample from the seeded generator first (one draw per row of p, train and test), then the random scores. A19 removed the Spotify Wrapped rows from p (one documented wallet's markets), so the stream shifted and the test rows got different random scores. Same code, same test rows, a different draw.",
+ "random_ap_100_seeds": {"mean": 0.0203, "sd": 0.0437, "min": 0.0035, "max": 0.2549, "share_ge_0.052": 0.07, "share_le_0.005": 0.22},
+ "why_so_variable": "per-market AP is averaged per case; a few small test markets with one positive (121, 210, 214 rows) dominate: a random draw that puts that one positive near the top gives AP up to 1 for that market",
+ "bug": "no metric bug; a fragile baseline. A23 drops it for the deterministic prevalence baseline (constant score)"
+}

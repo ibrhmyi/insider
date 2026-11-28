@@ -1,0 +1,20 @@
+{
+ "profiles": [
+  {
+   "name": "alpharaccoon2",
+   "pseudonym": "Mountainous-Pursuit",
+   "displayUsernamePublic": true,
+   "proxyWallet": "0xae7bb7b62985548ccc69e0ac060b87baf361edae"
+  },
+  {
+   "name": "AlphaRaccoonn",
+   "pseudonym": "Frilly-Bow",
+   "displayUsernamePublic": true,
+   "proxyWallet": "0x4b099b6b61bdb9c5bf64be5e53e1efca516a4b65"
+  }
+ ],
+ "pagination": {
+  "hasMore": false,
+  "totalResults": 0
+ }
+}
