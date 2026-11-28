@@ -178,6 +178,7 @@ epi = epi.merge(LS, on=["wallet", "case_id"], how="left")
 for x in ["label_strict", "label_standard", "label_broad"]:  # A20: only suspected rows carry a label set (before the A35 role split below)
     epi[x] = epi[x].fillna(False).astype(bool) & (epi.role == "suspected")
 epi["t_news_reliable"] = [REL_M.get((a, b), True) for a, b in zip(epi.case_id, epi.condition_id.str.lower())]
+epi["case_share_of_lifetime_volume"] = epi.case_share_of_lifetime_volume.clip(upper=1.0)  # A43: the lifetime denominator is rounded to cents
 _alg = set(zip(ALG.wallet, ALG.case_id, ALG.condition_id, ALG.side.str.lower()))  # A35
 epi["is_alleged_position"] = [(w.lower(), k, cid.lower(), str(o).lower()) in _alg for w, k, cid, o in zip(epi.wallet, epi.case_id, epi.condition_id, epi.outcome_label)]
 epi["is_alleged_position"] = epi.is_alleged_position & (epi.role == "suspected")
