@@ -45,8 +45,8 @@ a35l = A35["label_sets"]
 HEAD = ["T1s", "T2s", "T2w", "T2open"]
 nf = {s: {t: B["precise"][s][t]["summary"].get("logistic_regression", {}).get("n_loco_folds", 0) for t in HEAD} for s in ["label_strict", "label_standard", "label_broad"]}
 sf = sorted(set(nf["label_strict"].values()))
-STRICT_FOLDS = (f"**`label_strict` has fewer than 4 usable leave-one-group-out folds** ({', '.join(f'{t}: {nf['label_strict'][t]}' for t in HEAD)}; plus the time split): strict results are anecdotal, one fold can move the range by more than any model difference, and no strict number should be read as a detector's accuracy."
-                if max(sf) < 4 else f"`label_strict` has {', '.join(f'{t}: {nf['label_strict'][t]}' for t in HEAD)} usable leave-one-group-out folds (plus the time split); below 6 folds results are per fold only (A32).")
+STRICT_FOLDS = (f"**`label_strict` has fewer than 4 usable leave-one-group-out folds** ({', '.join(f'{t}: {nf['label_strict'][t]}' for t in HEAD)} leave-one-group-out folds, of which 2 are evaluable, see below; the time split is empty): strict results are anecdotal, one fold can move the range by more than any model difference, and no strict number should be read as a detector's accuracy."
+                if max(sf) < 4 else f"`label_strict` has {', '.join(f'{t}: {nf['label_strict'][t]}' for t in HEAD)} usable leave-one-group-out folds; below 6 folds results are per fold only (A32).")
 few = [s_ for s_ in ["label_standard", "label_broad"] if max(nf[s_].values()) < 6]
 FEW_TXT = (f" With alleged positions as positives (A35) and whole groups as folds (A37), {' and '.join(f'`{x}`' for x in few)} also have fewer than 6 folds ({', '.join(f'{x}: {max(nf[x].values())}' for x in few)}), so **every cell is a range of fold values**." if few else "")
 ts_none = all(B["precise"][s_][t]["summary"].get("logistic_regression", {}).get("time_split") is None for s_ in nf for t in HEAD)
