@@ -1,5 +1,6 @@
 """Run 9, PROTOCOL A22, A38, A39: same-category, same-question-type comparison ("twin") markets, never a placebo category or the same subject.
-Run 11 (A38): twins are chosen from the markets whose fills are already in the release pass (out/v1/fills/fills_twin.parquet). Writes data/twin_markets.csv.
+Run 11 finish (A46): the pool is A22's full Polymarket-v1 catalog pool with the A38/A39 conditions (the A38 restriction to already-fetched
+markets is lifted); twin fills then come from a new build/hf_pass_v9.py pass. Writes data/twin_markets.csv.
 Usage: python3 build/v1/twin_markets.py"""
 import os, sys
 import duckdb, numpy as np, pandas as pd
@@ -33,9 +34,8 @@ pool = res2[~res2.condition_id.isin(case_cids) & ~res2.condition_id.isin(plc) & 
             & res2.duration_band.notna() & res2.category_refined.notna()].copy()
 pool = pool[~pool.slug.fillna("").map(lambda s: any(e and s.startswith(e) for e in ev_slugs))]
 from question_type import qtype, PLACEBO_TYPES  # A38
-import duckdb as _dd, re as _re
-_fetched = {r[0] for r in _dd.sql(f"SELECT DISTINCT lower(condition_id) FROM '{D}/out/v1/fills/fills_twin.parquet'").fetchall()}
-pool = pool[pool.condition_id.isin(_fetched)].copy()
+import re as _re
+pool = pool.copy()  # A46: full catalog pool (A38's already-fetched restriction lifted)
 pool["qt"] = pool.slug.fillna("").str.replace("-", " ").map(qtype)
 pool = pool[~pool.qt.isin(PLACEBO_TYPES)]
 pool["slug_words"] = pool.slug.fillna("").str.lower().str.split("-").map(set)
