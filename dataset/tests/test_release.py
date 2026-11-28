@@ -274,10 +274,13 @@ def test_numeric_columns_carry_units(t):
 
 def test_market_cut_not_after_sourced_case_time():
     """A25/A25.1: per-market cuts never fall after the case's sourced exact time nor after the day-level case date ends."""
-    m = load("markets", ["question", "t_news_precision", "t_news_utc", "t_news_precise_utc", "t_news_precise_precision", "t_news_market_utc", "t_news_market_day_utc", "t_news_market_method"])
+    m = load("markets", ["case_id", "t_news_market_source_case", "question", "t_news_precision", "t_news_utc", "t_news_precise_utc", "t_news_precise_precision", "t_news_market_utc", "t_news_market_day_utc", "t_news_market_method"])
     m = m[m.t_news_market_utc.notna()]
-    sourced = m.t_news_precise_precision != "day_fallback"
-    assert (m[sourced].t_news_market_utc <= m[sourced].t_news_precise_utc).all()
+    # A25.1 / A36.1: never later than the sourced exact time of the case the market's time comes from
+    src = m.drop_duplicates("case_id").set_index("case_id")[["t_news_precise_utc", "t_news_precise_precision"]]
+    sp = m.t_news_market_source_case.map(src.t_news_precise_utc); spp = m.t_news_market_source_case.map(src.t_news_precise_precision)
+    sourced = spp != "day_fallback"
+    assert (m[sourced].t_news_market_utc <= sp[sourced]).all()
     dl = m[m.t_news_market_method == "market_deadline"]
     assert (dl.t_news_precision != "day").all() and (dl.t_news_market_utc >= dl.t_news_utc).all()  # A25 rule 2: only inside a coarse date
     dq = re.compile(r"\b(?:by|before)\s+(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|end of|\d{4}|q[1-4])", re.I)
@@ -497,4 +500,4 @@ def test_no_all_null_columns():
 def test_lifetime_share_in_unit_interval():
     """A43: case_share_of_lifetime_volume uses one source for numerator and denominator."""
     e = load("episodes", ["case_share_of_lifetime_volume"]).dropna()
-    assert ((e.case_share_of_lifetime_volume >= 0) & (e.case_share_of_lifetime_volume <= 1 + 1e-9)).all()
+    assert ((e.case_share_of_lifetime_volume >= 0) & (e.case_share_of_lifetime_volume <= 1 + 1e-6)).all()  # denominator is rounded to cents

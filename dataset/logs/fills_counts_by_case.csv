@@ -1,4 +1,4 @@
-case_id,source,legs,distinct_fills,distinct_wallets,usdc_half_of_legs
+case_id,source,legs,fills,wallets,usdc_half_of_legs
 arbitrum-airdrop-2023,hf_polymarket_v1,11318,5659,1194,3088555.0
 ballon-dor-2026,data_api_v2,1049103,1049103,32655,27702669.0
 ballon-dor-2026,hf_polymarket_v1,35680,17840,2414,1138301.0
@@ -8,7 +8,7 @@ bubblemaps-military-cluster,hf_polymarket_v1,3595302,1797651,148928,446178529.0
 draftkings-pm-launch,hf_polymarket_v1,30920,15460,2748,1049095.0
 election-2024,hf_polymarket_v1,9945590,4972795,257099,1301061958.0
 fed-chair-nomination-2026,hf_polymarket_v1,2133168,1066584,69643,156368946.0
-ftx-sbf,hf_polymarket_v1,228794,114397,24995,15017972.0
+ftx-sbf,hf_polymarket_v1,49524,24762,8487,6405519.0
 gemini3-release-2025,hf_polymarket_v1,261640,130820,18265,14236763.0
 google-yis-2025,hf_polymarket_v1,313954,156977,21059,26507719.0
 iran-strike-2024-10,hf_polymarket_v1,7744,3872,1406,350703.0

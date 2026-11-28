@@ -86,6 +86,7 @@ TABLES["markets"] = dict(desc="One row per (case, market). Ladders are full Gamm
     col("t_news_market_day_utc", T, "A25: per-market day-level cut (day version)", leak="label"),
     col("t_news_market_method", S, "A25 method (A30: a scheduled start is used only if before the market's close)", allowed="scheduled_start;market_deadline;case_time"), col("is_placebo_market", B, "always false here"),
     col("t_news_reliable", B, "A29.1/A29.2: false for deadline-rule cuts and for case-date fallbacks of month/quarter/year/range-dated cases; excluded from default analyses and benchmarks", leak="label"),
+    col("t_news_market_source_case", S, "A36.1: the case whose per-market time this market takes (its own case unless the market is shared)", leak="label"),
     col("question_type", S, "A38 keyword type of the question", allowed="weather;crypto_price;sports;legal_action;appointment;election;award;military_action;corporate_release;crypto_project;other"),
     col("t_news_deadline_rule_utc", T, "A29: the A25 rule-2 deadline time where it set the cut; NULL otherwise", leak="label"),
     col("ff_tier", S, "ForesightFlow tier if listed"), col("ff_tier2_tnews", T, "ForesightFlow tier-2 proxy (stored, not used)")])

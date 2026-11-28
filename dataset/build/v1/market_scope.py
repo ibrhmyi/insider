@@ -17,3 +17,13 @@ for f in ["placebo_markets.csv", "twin_markets.csv"]:
     t = rd(f); k = [(a, b.lower()) in keys for a, b in zip(t.case_id, t.case_condition_id)]
     t[[not x for x in k]].to_csv(os.path.join(D, "data", f), index=False); print(f, "rows removed", sum(k))
 print("markets removed", len(drop), sorted(drop.question.str[:40]))
+
+# counts per case for the current market scope (same query as build/v1/fills.py; the release gate reconciles against it)
+import csv, duckdb
+c = duckdb.connect(); cur = rd("markets.csv")
+c.register("m", pd.DataFrame({"case_id": cur.case_id, "condition_id": cur.condition_id.str.lower()}))
+res = c.sql(f"""SELECT m.case_id, l.source, count(*) legs, count(DISTINCT l.fill_id) fills, count(DISTINCT l.wallet) wallets, round(sum(l.usdc)/2) usdc
+               FROM m JOIN '{D}/out/v1/fills/fills_case.parquet' l USING (condition_id) GROUP BY ALL ORDER BY 1, 2""").fetchall()
+with open(os.path.join(D, "logs", "fills_counts_by_case.csv"), "w", newline="") as f:
+    w = csv.writer(f); w.writerow(["case_id", "source", "legs", "fills", "wallets", "usdc_half_of_legs"]); w.writerows(res)
+print("fills_counts_by_case.csv rewritten", len(res))

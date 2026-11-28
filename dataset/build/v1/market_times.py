@@ -20,7 +20,7 @@ for f in glob.glob(os.path.join(D, "logs", "gamma_raw", "events", "*.json")):
                     if m.get(k) and not g.get(k):
                         g[k] = m[k]
 mk = pd.read_csv(os.path.join(D, "data", "markets.csv"), dtype=str, keep_default_na=False)
-mk = mk.drop(columns=[c for c in mk.columns if c.startswith("t_news_market") or c in ("t_news_reliable", "t_news_deadline_rule_utc")])
+mk = mk.drop(columns=[c for c in mk.columns if c.startswith("t_news_market") or c in ("t_news_reliable", "t_news_deadline_rule_utc")])  # includes t_news_market_source_case
 ts = lambda x: pd.to_datetime(x, utc=True, errors="coerce", format="mixed") if x else pd.NaT
 
 
@@ -80,7 +80,7 @@ mk["t_news_market_utc"], mk["t_news_market_day_utc"], mk["t_news_market_method"]
 # event); if none or several do, the earliest per-market time (never later than any case's). Method, reliability and deadline-rule time follow.
 _cp = pd.read_csv(os.path.join(D, "data", "claim_positions.csv"), dtype=str)
 _named = _cp.groupby("condition_id").case_id.agg(lambda s: sorted(set(s))).to_dict()
-mk["_cid"] = mk.condition_id.str.lower(); a36 = []
+mk["_cid"] = mk.condition_id.str.lower(); a36 = []; mk["t_news_market_source_case"] = mk.case_id
 for cid, g in mk.groupby("_cid"):
     if g.t_news_market_utc.nunique() == 1 and g.t_news_market_day_utc.nunique() == 1:
         continue
@@ -91,6 +91,7 @@ for cid, g in mk.groupby("_cid"):
                         source_case=src.case_id, basis="claim_positions" if len(nm) == 1 else "earliest"))
         for col in ["t_news_market_utc", "t_news_market_day_utc", "t_news_market_method", "t_news_reliable", "t_news_deadline_rule_utc"]:
             mk.at[i, col] = src[col]
+        mk.at[i, "t_news_market_source_case"] = src.case_id  # A36.1
 mk = mk.drop(columns="_cid")
 pd.DataFrame(a36, columns=["condition_id", "case_id", "old_utc", "new_utc", "source_case", "basis"]).to_csv(os.path.join(D, "logs", "a36_shared_market_times.csv"), index=False)
 print("A36 shared markets harmonised:", len({r["condition_id"] for r in a36}), "rows", len(a36), "changed", sum(r["old_utc"] != r["new_utc"] for r in a36))
