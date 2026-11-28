@@ -1,17 +1,17 @@
 {
  "precise": {
-  "suspected_side_positions": 523,
+  "suspected_side_positions": 527,
   "alleged_positions": 143,
-  "labelled_other_positions": 380,
-  "losing_positions": 35,
+  "labelled_other_positions": 384,
+  "losing_positions": 39,
   "losing_by_role": {
-   "labelled_other_position": 35
+   "labelled_other_position": 39
   },
   "won_post_null": 0,
   "reliable_alleged_positions": 142,
   "label_sets": {
    "label_strict": {
-    "positions": 55,
+    "positions": 58,
     "alleged_positions": 21,
     "wallets_with_position": 19,
     "wallets_with_alleged_position": 16,
@@ -24,7 +24,7 @@
     ]
    },
    "label_standard": {
-    "positions": 501,
+    "positions": 505,
     "alleged_positions": 140,
     "wallets_with_position": 111,
     "wallets_with_alleged_position": 79,
@@ -39,7 +39,7 @@
     ]
    },
    "label_broad": {
-    "positions": 523,
+    "positions": 527,
     "alleged_positions": 143,
     "wallets_with_position": 117,
     "wallets_with_alleged_position": 82,
@@ -116,18 +116,18 @@
   }
  },
  "day": {
-  "suspected_side_positions": 410,
+  "suspected_side_positions": 414,
   "alleged_positions": 98,
-  "labelled_other_positions": 312,
-  "losing_positions": 30,
+  "labelled_other_positions": 316,
+  "losing_positions": 34,
   "losing_by_role": {
-   "labelled_other_position": 30
+   "labelled_other_position": 34
   },
   "won_post_null": 0,
   "reliable_alleged_positions": 97,
   "label_sets": {
    "label_strict": {
-    "positions": 38,
+    "positions": 41,
     "alleged_positions": 15,
     "wallets_with_position": 12,
     "wallets_with_alleged_position": 10,
@@ -140,7 +140,7 @@
     ]
    },
    "label_standard": {
-    "positions": 388,
+    "positions": 392,
     "alleged_positions": 95,
     "wallets_with_position": 76,
     "wallets_with_alleged_position": 53,
@@ -155,7 +155,7 @@
     ]
    },
    "label_broad": {
-    "positions": 410,
+    "positions": 414,
     "alleged_positions": 98,
     "wallets_with_position": 82,
     "wallets_with_alleged_position": 56,

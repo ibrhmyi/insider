@@ -149,3 +149,31 @@ CL0057,zachxbt-axiom-2026-02,0x804bc34275d7d610dea3293c06105e925ebfcd6e454813aa2
 CL0090,zachxbt-axiom-2026-02,0x804bc34275d7d610dea3293c06105e925ebfcd6e454813aa27d59a882d50e86d,Yes,named_market,top Axiom-market winners
 CL0048,taylor-swift-engagement,0x89ac32e18929185f5bd0dc00e70337571f546e64ae5cd16dceb6026ac2679c1e,Yes,only_case_market,heavy Yes buying before the announcement
 CL0051,trump-pardon-cz-2025,0xdfbdc5331baaf33996d442f543f7c0fe3391dd067cecbb90899b8339e927d05c,Yes,named_market,bought Yes from Sept 28
+CL0018,israel-strike-2025-06-week,0x7f39808829da93cfd189807f13f6d86a0e604835e6f9482d8094fac46b3abaac,Yes,only_case_market,bet that Israel would strike Iran that week (the case's one market)
+CL0019,us-iran-strike-2025-06,0x4ec4d0c92654ccfed5b161c3ca1b4e3664608581b9d21d80939ce792a3a3b94f,Yes,event_ladder_rungs_after_event_date,won longshot bets on the June 21 strike
+CL0019,us-iran-strike-2025-06,0x6a67b9d828d53862160e470329ffea5246f338ecfffdf2cab45211ec578b0347,Yes,event_ladder_rungs_after_event_date,won longshot bets on the June 21 strike
+CL0019,us-iran-strike-2025-06,0x6c6cff89b135f5684f5a25a98fd0335814d1bc411d08bfcf0be400db76ce511a,Yes,event_ladder_rungs_after_event_date,won longshot bets on the June 21 strike
+CL0020,us-iran-strike-2025-06,0x4ec4d0c92654ccfed5b161c3ca1b4e3664608581b9d21d80939ce792a3a3b94f,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0020,us-iran-strike-2025-06,0x6a67b9d828d53862160e470329ffea5246f338ecfffdf2cab45211ec578b0347,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0020,us-iran-strike-2025-06,0x6c6cff89b135f5684f5a25a98fd0335814d1bc411d08bfcf0be400db76ce511a,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0020,us-iran-strike-2025-06,0xb2f2bdc4427cfe0b7ae878355610478ad2384e387705e42cf8c8f596193488c6,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0030,khamenei-removal-2026,0x70909f0ba8256a89c301da58812ae47203df54957a07c7f8b10235e877ad63c2,Yes,named_market,bet that Khamenei would be out by end of March
+CL0031,us-iran-ceasefire-2026-03,0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,Yes,named_market,bet on a ceasefire by March 31
+CL0035,us-iran-ceasefire-2026-04-07,0x0de3f76fe9b60857833856bec4f30d815cdb0c283361112b46e13b759cd8ef38,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x4ccff8c606ad71080c7611d28f1593a528a8ca6c11c1fb63bfa24a7eb2ad30d7,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x773abaa5fe55e5cde51a261f444b7921652a4e059ead6b3be9fe56499c2d4609,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x80059ff4e694f878c0498f6f3a067ee7ca62dc2fc46251a4287b58355ce47bc5,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x81b06cb917c9a2aabc67a7765bc3c640e88a699bbf451b29915049c0766cde04,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0xa9937410f8aae98cc6440a7480ad832be5a1a998afcf5a6e77c6f5aa4c0f259f,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0xd9a8b5917a3bc25caf28784fddac39bc45a9f2fe4c63fbf4e3ac8684d8b757df,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0036,trump-zelensky-meeting-2025-12,0x702dcbe5b0f73dae060f2ed0fde1ce7aa8c9c01a8068dcc7ad375d85364eca8d,Yes,named_market,claim names 'Trump meets Zelenskyy by Dec 31'
+CL0054,openai-browser-2025-10,0xc25e15f39f776813870ee363ed483451add1c55dad163b18bdb2df653be2c90c,Yes,named_market,bet that OpenAI would launch a browser that month (October 2025)
+CL0118,nvidia-ceo-return-2026-11,0x27748e74503ff93d998d1e857980c43eca77c38efd61f642dd43d41a18525250,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0118,nvidia-ceo-return-2026-11,0x6368d1c0daed920fb7cb4444636b605e8b02d700dfdf70bba2758a7c0c4054cb,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0118,nvidia-ceo-return-2026-11,0x79a7b7c58effc4f2753011fb78f44ff59d1912eddc62f4a4ad16f7adda09eb81,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0118,nvidia-ceo-return-2026-11,0xf29406bd9f45effb17a902125a7480b9e15fdc7c24f1a897f543ed3799876be6,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0119,nvidia-ceo-return-2026-11,0x27748e74503ff93d998d1e857980c43eca77c38efd61f642dd43d41a18525250,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
+CL0119,nvidia-ceo-return-2026-11,0x6368d1c0daed920fb7cb4444636b605e8b02d700dfdf70bba2758a7c0c4054cb,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
+CL0119,nvidia-ceo-return-2026-11,0x79a7b7c58effc4f2753011fb78f44ff59d1912eddc62f4a4ad16f7adda09eb81,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
+CL0119,nvidia-ceo-return-2026-11,0xf29406bd9f45effb17a902125a7480b9e15fdc7c24f1a897f543ed3799876be6,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
