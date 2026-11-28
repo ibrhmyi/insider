@@ -28,7 +28,8 @@ for ms in ["case", "placebo", "twin", "label_other"]:
         if not os.path.exists(f"{V1}/fills_{ms}.parquet"):
             continue
         n = c.sql(f"SELECT count(*) FROM {q}").fetchall()[0][0]
-        for off in range(0, n, PART_ROWS):
+        nparts = max(1, -(-n // PART_ROWS))  # parts by market hash: disjoint and reproducible (LIMIT/OFFSET pages are not)
+        for off in range(nparts):
             n_part += 1
             out = os.path.join(OUT, f"fills_part{n_part:03d}_{ms}_{src}.parquet")
             c.sql(f"""COPY (SELECT market_set, leg_id, source, fill_id, tx_hash, ts::BIGINT ts_unix, to_timestamp(ts) ts_utc, condition_id, asset_id, CASE WHEN outcome_label IN {OL} THEN NULL ELSE outcome_label END outcome_label,
@@ -41,7 +42,7 @@ for ms in ["case", "placebo", "twin", "label_other"]:
                          CASE WHEN market_slug IN {SL} THEN NULL ELSE market_slug END market_slug, econ_side, econ_asset_id, CASE WHEN econ_outcome_label IN {OL} THEN NULL ELSE econ_outcome_label END econ_outcome_label, econ_price_usdc::DOUBLE econ_price_usdc,
                          econ_size_usdc::DOUBLE econ_size_usdc, econ_inferred, econ_partial, econ_excess_shares::DOUBLE econ_excess_shares,
                          econ_excess_asset_id, CASE WHEN econ_excess_outcome_label IN {OL} THEN NULL ELSE econ_excess_outcome_label END econ_excess_outcome_label, econ_excess_price_usdc::DOUBLE econ_excess_price_usdc,
-                         econ_excess_size_usdc::DOUBLE econ_excess_size_usdc FROM {q} LIMIT {PART_ROWS} OFFSET {off})
+                         econ_excess_size_usdc::DOUBLE econ_excess_size_usdc FROM {q} WHERE hash(condition_id) % {nparts} = {off} ORDER BY condition_id, ts, leg_id)
                       TO '{out}' (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 500000)""")
-            total += min(PART_ROWS, n - off)
+            total += c.sql(f"SELECT count(*) FROM '{out}'").fetchall()[0][0]
 print("fills", total, "rows in", n_part, "parts")
