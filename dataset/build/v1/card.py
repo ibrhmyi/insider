@@ -30,6 +30,10 @@ def cell(task, s, model):
 
 
 XU = B["excluded_unreliable"]
+EC = json.load(open(os.path.join(D, "logs", "econ_positions_compare.json")))  # A34 comparison (build/v1/econ_compare.py)
+ec = lambda ms: f"{EC[ms + '/precise']['all']['directional_econ_only_share']:.0%}"
+LBL = pd.read_csv(os.path.join(D, "logs", "econ_labelled_prenews.csv"))
+n_std_dir = int(LBL[LBL.label_standard.astype(str).str.lower() == "true"].econ_pre.sum())
 # Maduro strict fold (one positive): tasks where logistic regression ranks the wallet below all its controls
 MAD = sorted(t for t in ["T1s", "T2s", "T2w", "T2open", "T1", "T2"] if B["precise"]["label_strict"][t]["summary"].get("logistic_regression", {}).get("fold_values", {}).get("loco:maduro-2026-01") == 0.0)
 MAD_TXT = (f"- In the strict leave-one-case-out fold for Maduro (one positive: the wallet in the charged, E2 case), logistic regression ranks that wallet below all of its matched controls (AUC 0.0 in {', '.join(MAD)}): the pattern learned from the cluster-heavy training cases does not match the strongest-evidence case."
@@ -100,9 +104,9 @@ Every time-dependent table exists for two cut times (`t_news_version`): `day` an
 
 **`t_news_reliable` (A29, A29.1).** A market whose cut came from the deadline rule (a coarse case date and nothing better for that market) has no trustworthy cut: `t_news_reliable = false` (the deadline time is kept as `markets.t_news_deadline_rule_utc`). Sourced exact times and checked scheduled starts are reliable; markets that fall back to the case date keep `true` (their cut is the start of the documented period, earlier than the news). **Default analyses and every benchmark use `t_news_reliable = true` only.** This removes {XU['n_markets']} of {XU['n_markets_total']} markets: whole cases {", ".join(f"`{c}`" for c in XU['cases_fully_removed'])}; part of {", ".join(f"`{c}`" for c in XU['cases_partly_removed'])}. Of the documented wallets with a pre-news position it keeps {XU['positives']['label_strict']['kept']} of {XU['positives']['label_strict']['with_prenews_position']} strict, {XU['positives']['label_standard']['kept']} of {XU['positives']['label_standard']['with_prenews_position']} standard and {XU['positives']['label_broad']['kept']} of {XU['positives']['label_broad']['with_prenews_position']} broad.
 
-## Benchmarks (PROTOCOL A23, A26, A27, A29, A32, A33; `benchmarks/`)
+## Benchmarks (PROTOCOL A23, A26, A27, A29, A32, A33, A34; `benchmarks/`)
 
-Leave-one-case-out over cases with at least 3 `label_standard` wallets, plus a time split (test = cases first claimed on or after 2026-03-01). Only `t_news_reliable = true` markets (A29). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. **With fewer than 6 folds (A32) a cell gives only the range of fold values** ("folds min-max (n) / time split"); per-fold values are in `baselines.json`. This applies to every `label_strict` cell. Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
+Leave-one-case-out over cases with at least 3 `label_standard` wallets, plus a time split (test = cases first claimed on or after 2026-03-01). Only `t_news_reliable = true` markets (A29) and directional pre-news positions in the economic view (A34-A34.2). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. **With fewer than 6 folds (A32) a cell gives only the range of fold values** ("folds min-max (n) / time split"); per-fold values are in `baselines.json`. This applies to every `label_strict` cell. Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
 
 **Headline tasks control for how sources select cases (A27):** **T1s** ranks pre-news buyers only within the size band of the market's positives (size alone no longer separates them); **T2s** matches controls on account-age band as well as time, price and size; **T2w** matches on account-age and prior win-rate bands (A33); both retry with the adjacent band before dropping an episode (`relaxed_band`); **T2-open** lets Orca/Inca-flagged wallets be controls. Secondary: T1 (all buyers), T2 (standard controls), T3 (case vs same-category twin markets), T3b (case vs crypto/weather placebo markets; market-type sensitive).
 
@@ -129,7 +133,8 @@ Base result for T2: matched same-side controls win about as often as documented 
 - {int((claims.verified == "pending").sum())} claims are pending (pages blocked or unread); the blind second-extractor check (A4) is pending.
 - Rule outputs (coordinated-buyer rule, Gate 1, ACDC, Inca) are screens with known false-positive rates, not labels.
 {MAD_TXT}
-- Positions and episodes need a BUY fill before the cut (A6.10), so 3 of 112 `label_standard` wallets have none: one bought only after the news, two traded only by SELL legs before it (one of them possibly an economic buy through split-then-sell, which the fills cannot show without the CTF mint layer).
+- Positions are economic and net of full sets (A34-A34.2): a SELL of a token the wallet did not hold is read as a BUY of the other token, and a held Yes + No pair counts as no direction. The raw fills are unchanged and the raw view stays comparable (`raw_view_prenews_buy`, `econ_inferred_buy_usdc_pre`). Merges cannot be inferred from fills, so some full sets come from buys of both tokens. In this view {n_std_dir} of {ls['label_standard']} `label_standard` wallets have a directional pre-news position in their case. The share of directional pre-news positions that exist only in the economic view is {ec('case')} in case markets, {ec('twin')} in twins and {ec('placebo')} in placebos (precise cut; the same for non-market-makers): the re-reading is market mechanics, not a case-market signal.
+- `is_market_maker` is a reporting flag with a simple rule (both tokens traded in most active minutes); it also flags some large one-way buyers (see the run-11 report).
 
 ## Ethics, data protection and removal
 
@@ -141,7 +146,7 @@ CC-BY-4.0 for PMITC tables and docs; MIT for code. Polymarket-v1 (TimeSeventeen,
 
 ## How to cite
 
-> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.2.1 [dataset]. Protocol v1.0 with amendments A1 to A33. https://github.com/ibrhmyi/insider
+> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.2.1 [dataset]. Protocol v1.0 with amendments A1 to A34.3. https://github.com/ibrhmyi/insider
 
 See `docs/CITATION.cff`. Please also cite Polymarket-v1 for the fills.
 """

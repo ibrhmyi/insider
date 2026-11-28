@@ -1,10 +1,12 @@
 # PMITC v1.2.1 benchmark tasks
 
-Rules: PROTOCOL A15, A23, A26, A27, A29, A32 and A33. Run `python3 pmitc_bench.py` (writes `baselines.json`, seed 192; about an hour with gradient-boosting tuning) or `python3 pmitc_bench.py --quick`; `notebooks/03_benchmarks.ipynb` shows the results.
+Rules: PROTOCOL A15, A23, A26, A27, A29, A32, A33 and A34-A34.2. Run `python3 pmitc_bench.py` (writes `baselines.json`, seed 192; about an hour with gradient-boosting tuning) or `python3 pmitc_bench.py --quick`; `notebooks/03_benchmarks.ipynb` shows the results.
 
 Labels are allegations by named sources. Positives are sparse and clustered: 74 of the 119 `label_broad` wallets come from two cases (52 Feb-28 2026 Iran strike, 22 KPMG), and 87 are cluster members linked by money flows. Every task therefore runs on three nested label sets (`label_strict` ⊆ `label_standard` ⊆ `label_broad`, A20) and every metric is reported per fold, per case and case-weighted. **Training and evaluation labels (A26):** every model is trained on `label_standard` (the main training label; `label_broad` for its own column) and scored on the label set of the column; `label_strict` is evaluation-only and is never used to fit or tune. In an evaluation on a smaller set, documented wallets outside the set are dropped from the test rows (neither positive nor negative). `label_strict` requires a buy before the market's precise news time; `wallets.strict_no_prenews` marks the wallets that meet the rest of the rule without one.
 
 **Reliable news times only (A29, A29.1):** every task drops markets whose cut came from the deadline rule (`t_news_reliable = false`, per market); `baselines.json` (`excluded_unreliable`) lists what that removes.
+
+**Economic view (A34-A34.2):** T1 candidates are directional pre-news positions (`is_directional_position`): sells of tokens never held are read as buys of the other token, and full sets are netted out. Episodes and controls follow the same rule.
 
 **Few folds (A32):** a task and label set with fewer than 6 leave-one-case-out folds is summarised by its fold values with min and max only (`reporting = per_fold_only_A32`); no mean, SD or single headline number. This applies to every `label_strict` result.
 

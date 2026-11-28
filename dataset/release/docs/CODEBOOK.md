@@ -255,7 +255,7 @@ All-buyer positions before the cut (C2): the full population a detector must sea
 | `directional_cost_usdc_pre` | float64 | USDC |  |  | pre | A34.2: FIFO cost of the excess shares on the directional token (0 on the other token); a FIFO accounting figure, not an entry price or time (A34.3) |
 | `directional_first_buy_utc` | timestamp |  |  |  | pre | A34.3: first econ BUY of the directional token before the cut (entry time; use for timing features) |
 | `directional_first_buy_price` | float64 |  |  |  | pre | A34.3: price of that first econ BUY |
-| `directional_vwap_pre` | float64 |  |  |  | pre | A34.3: VWAP of econ BUYs of the directional token before the cut |
+| `directional_vwap_price_usdc_pre` | float64 |  |  |  | pre | A34.3: VWAP of econ BUYs of the directional token before the cut |
 | `directional_hours_first_buy_to_cut` | float64 | hours |  |  | pre | A34.3: hours from that first econ BUY to the cut |
 | `is_directional_position` | bool |  |  |  | pre | A34.2: this token is the wallet's directional token here and directional_shares_pre > 0; the pre-news position used by label sets, benchmarks, episodes, hard negatives and the coordinated rule |
 | `is_market_maker` | bool |  |  |  | meta | A34.1 reporting flag, NOT a label: >= 20 active (market, minute) pairs with both tokens traded in > 50% of them; not used by any rule or benchmark |
@@ -334,7 +334,7 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `directional_cost_usdc_pre` | float64 | USDC |  |  | pre | A34.2: FIFO cost of the directional shares (FIFO accounting figure, not entry timing; A34.3) |
 | `directional_first_buy_utc` | timestamp |  |  |  | pre | A34.3: first econ BUY of the directional token before the cut (entry time; use for timing features) |
 | `directional_first_buy_price` | float64 |  |  |  | pre | A34.3: price of that first econ BUY |
-| `directional_vwap_pre` | float64 |  |  |  | pre | A34.3: VWAP of econ BUYs of the directional token before the cut |
+| `directional_vwap_price_usdc_pre` | float64 |  |  |  | pre | A34.3: VWAP of econ BUYs of the directional token before the cut |
 | `directional_hours_first_buy_to_cut` | float64 | hours |  |  | pre | A34.3: hours from that first econ BUY to the cut |
 | `account_age_days_at_first_buy` | float64 | days |  |  | pre | days from first Polymarket-v1 fill to first pre-news buy |
 | `n_prior_markets` | int64 |  |  |  | pre | distinct Polymarket-v1 markets before the first buy |

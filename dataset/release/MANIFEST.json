@@ -40,8 +40,8 @@
   {
    "path": "benchmarks/README.md",
    "rows": null,
-   "bytes": 8401,
-   "sha256": "130493174b949cee56bc72868466530c29a2fe7daf579e286fd55c21fe5ce94c"
+   "bytes": 8660,
+   "sha256": "827b8085ffc2b4cbdbf357cafc2607a016d8071ec35d28282cbf15708324507a"
   },
   {
    "path": "benchmarks/baselines.json",
@@ -136,14 +136,14 @@
   {
    "path": "data/episodes.csv",
    "rows": 60155,
-   "bytes": 46281954,
-   "sha256": "d57f9568ff81f69db23d45c9997523d1d7951b09dd7d0b997ab9c52911eb7b0d"
+   "bytes": 46281965,
+   "sha256": "2c71d43e2ebae02a134abc61e68006bf6a0d0e26825835a957e675022b439cd7"
   },
   {
    "path": "data/episodes.parquet",
    "rows": 60155,
-   "bytes": 3836578,
-   "sha256": "c3179830910d99d0ba3651d5748d21de8f1a0b1084382f50c532ba9e30f2c296"
+   "bytes": 3836662,
+   "sha256": "dffa4ab0a72e2cc6e692fe5a05bde32b2474c13a356b595791a5dc52068e3d80"
   },
   {
    "path": "data/fills_part001_case_hf_polymarket_v1.parquet",
@@ -250,8 +250,8 @@
   {
    "path": "data/positions.parquet",
    "rows": 18240932,
-   "bytes": 1899336766,
-   "sha256": "76e20bd7c85e91ade08a37368ab6f1fd3d5b61e4ed9ebc479c2bb3d919233571"
+   "bytes": 1899337196,
+   "sha256": "dd2a304e4aa23dfb2ec1fd00f1bd64924c9a2474741dda53e5b18b36f1e6fea5"
   },
   {
    "path": "data/twin_markets.csv",
@@ -292,8 +292,8 @@
   {
    "path": "docs/CHANGELOG.md",
    "rows": null,
-   "bytes": 7776,
-   "sha256": "02e7b52898ab2814e769b5a0e5b6cbce7dced67f84dc7c21032b9434aafb9c69"
+   "bytes": 9130,
+   "sha256": "3d779b33416356585b0443c28f46e89da849cce2df29fbc3c962f4a9d2d65263"
   },
   {
    "path": "docs/CITATION.cff",
@@ -304,8 +304,8 @@
   {
    "path": "docs/CODEBOOK.md",
    "rows": null,
-   "bytes": 43519,
-   "sha256": "6583b137e47733c4a769ee59041c9d2ec82cc1d9c2d20a9e5aa0822e031731e5"
+   "bytes": 43541,
+   "sha256": "6d4446232fde07a0aa8b61f0367d3267bfba68d29fe303bda34de331090c5ace"
   },
   {
    "path": "docs/DATASHEET.md",
