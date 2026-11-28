@@ -148,74 +148,86 @@
   {
    "path": "data/episodes.csv",
    "rows": 59611,
-   "bytes": 45950615,
-   "sha256": "eedf268d666f7c3e6f43a7942fed44bd80e1299eb38ad32f669940400d5647d0"
+   "bytes": 45950540,
+   "sha256": "57fc5ae1a713756bc9222a7c0e7fef729fa07cce7245cb7c7b199c1171e710a5"
   },
   {
    "path": "data/episodes.parquet",
    "rows": 59611,
-   "bytes": 3742007,
-   "sha256": "f31e35c6d17133f60e2fdc507dc13e34410bbcca9edfd8db45a57f0a5b54f21e"
+   "bytes": 3741823,
+   "sha256": "4b8999460a303821b9d6982c34ea29bb3e5072a2c316995a7fe2b13c38ca55a9"
   },
   {
    "path": "data/fills_part001_case_hf_polymarket_v1.parquet",
-   "rows": 15000000,
-   "bytes": 382684372,
-   "sha256": "29c38aa7c6a22a7ab3fa31dd4fb0e89e6136ea6215971bf0ad4e327d6d339bf3"
+   "rows": 5976458,
+   "bytes": 148093887,
+   "sha256": "1a764f4bf310eb03e6e74979a8261dd7d2a7b11dacdb5f263ad0ea094179a13d"
   },
   {
    "path": "data/fills_part002_case_hf_polymarket_v1.parquet",
-   "rows": 5966634,
-   "bytes": 154662398,
-   "sha256": "e595a6f9f685b1c9eea90dc6b65c2906d7423357672d478d751dea8db87435bf"
+   "rows": 14990176,
+   "bytes": 390036171,
+   "sha256": "59ebcca0a5217344ed22e2e30dfdda9fd78b8155b43d41c056e64b0821e6470e"
   },
   {
    "path": "data/fills_part003_case_data_api_v2.parquet",
    "rows": 2131706,
-   "bytes": 151114919,
-   "sha256": "3224a081e643c9a53b77d2d2fc4abe70c1cb630c2b2e1198e59e0e5305635875"
+   "bytes": 151360907,
+   "sha256": "318f270c049dfcdf9a67afc387301e9756a45e8cedd1b73c47b1f93f67efb5c8"
   },
   {
    "path": "data/fills_part004_placebo_hf_polymarket_v1.parquet",
-   "rows": 15000000,
-   "bytes": 421702112,
-   "sha256": "a784201cca10075b99d9a964ea7f492ff0e936e45ed7c37177cfa83a40dbfc2e"
+   "rows": 10296100,
+   "bytes": 290397216,
+   "sha256": "28a41a5e7a42ca4f54615fde15f83571f5ed6134671f831eeeb83e0ae3da129c"
   },
   {
    "path": "data/fills_part005_placebo_hf_polymarket_v1.parquet",
-   "rows": 15000000,
-   "bytes": 419944159,
-   "sha256": "0a7b87cd84d957820b1325820f10c40daf014a50f9a8d618a6b43f00da486147"
+   "rows": 9903290,
+   "bytes": 277971016,
+   "sha256": "c07b6027fc5c1c29153d5f8abb4b8cb43fff974f45d503f68ebac549b5cd988c"
   },
   {
    "path": "data/fills_part006_placebo_hf_polymarket_v1.parquet",
-   "rows": 260306,
-   "bytes": 7867640,
-   "sha256": "bd1fb1c62461b4e7968d9012e071234d4d6725ce88eca797c0f44b116e712af7"
+   "rows": 10060916,
+   "bytes": 284884144,
+   "sha256": "0faae727858aeca5d3b0939828cc73e4242c134d8917e74f63292902b083d353"
   },
   {
-   "path": "data/fills_part007_twin_hf_polymarket_v1.parquet",
-   "rows": 15000000,
-   "bytes": 395897073,
-   "sha256": "f57c5b86b2f46d6cca2b943dc05557a716b43f7050957fef623c3b3070c15f65"
+   "path": "data/fills_part007_placebo_data_api_v2.parquet",
+   "rows": 0,
+   "bytes": 897,
+   "sha256": "001d9ff5bac2fc75b9a62d7675f33768d79f4636d3676604202b5ae9f6a548a3"
   },
   {
    "path": "data/fills_part008_twin_hf_polymarket_v1.parquet",
-   "rows": 13135632,
-   "bytes": 345351349,
-   "sha256": "f93a4b255b4b5287199803e444c135f933ee19b42d180a2c4b8162bb982943b3"
+   "rows": 13987740,
+   "bytes": 367946851,
+   "sha256": "93a8ee9f3738a25f7d66b6cc8a175491ce6ff0425b7832361493373103407d82"
   },
   {
-   "path": "data/fills_part009_label_other_hf_polymarket_v1.parquet",
+   "path": "data/fills_part009_twin_hf_polymarket_v1.parquet",
+   "rows": 14147892,
+   "bytes": 373163789,
+   "sha256": "c66625a0a35c3f0d8e921f4004a71c7fc2cc9bfa64110c0f4b283cf8ce52b7ee"
+  },
+  {
+   "path": "data/fills_part010_twin_data_api_v2.parquet",
+   "rows": 0,
+   "bytes": 897,
+   "sha256": "001d9ff5bac2fc75b9a62d7675f33768d79f4636d3676604202b5ae9f6a548a3"
+  },
+  {
+   "path": "data/fills_part011_label_other_hf_polymarket_v1.parquet",
    "rows": 58850,
-   "bytes": 2508400,
-   "sha256": "db117e816f72621f31fbcf5a0783e8da5d622765b6fcc78cefe4264a27fb78e6"
+   "bytes": 2430989,
+   "sha256": "d8862967853721e4568eceadc27270a222605b0bec8d7a370899f3c8f85d5280"
   },
   {
-   "path": "data/fills_part010_label_other_data_api_v2.parquet",
+   "path": "data/fills_part012_label_other_data_api_v2.parquet",
    "rows": 6118,
-   "bytes": 857111,
-   "sha256": "ab61c1cd652cc2af25704fab367dac4fb144e7f89cec954d3803c8ed59b7fb46"
+   "bytes": 861613,
+   "sha256": "01340bd751b5667037e4a4886e47d61f90803e87183e38c9ca88a277cfa24eb8"
   },
   {
    "path": "data/hard_negatives.csv",
