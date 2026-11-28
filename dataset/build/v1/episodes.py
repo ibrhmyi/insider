@@ -253,7 +253,9 @@ if MODE == "winrate_matched":  # A33 self-check: the matching band equals the ba
     mism = int((chk.prior_net_long_win_rate.map(band) != chk.wr_band).sum())
     print("A33 band self-check: suspected rows", len(chk), "mismatches", mism, flush=True)
     assert mism == 0
-case_vol = c.sql("SELECT row_id, sum(usdc) case_usdc FROM el GROUP BY 1").df()
+# A43: numerator and denominator from the same source: raw Polymarket-v1 legs (weak_labels lifetime volume is Polymarket-v1 raw USDC)
+case_vol = c.sql(f"""SELECT er.row_id, sum(l.usdc) case_usdc FROM er JOIN '{LEGS_FILE}' l ON l.condition_id = er.condition_id AND l.asset_id = er.asset_id
+                     AND l.wallet = er.wallet WHERE l.source = 'hf_polymarket_v1' GROUP BY 1""").df()
 X = X.merge(case_vol, on="row_id", how="left")
 X["case_share_of_lifetime_volume"] = X["case_usdc"] / X["lifetime_usdc"]
 
@@ -280,13 +282,12 @@ for a in X.loc[X["role"] == "suspected", "wallet"].unique():
                 k = (a, x["condition_id"].lower()); red[k] = min(red.get(k, 9e18), x["timestamp"])
 X["redemption_delay_hours_post"] = [((red.get((w, cid)) - r) / 3600) if (w, cid) in red and pd.notna(r) else np.nan
                                    for w, cid, r in zip(X["wallet"], X["condition_id"], X["resolved_ts"])]
-X["hours_funding_to_first_trade"] = np.nan; X["funding_source_type"] = None; X["funder_shared_with_labelled"] = None  # phase 4 blocked
+# A43: the A8 funding fields are not built (money graph not run) and are not released
 keep = ["row_id", "role", "control_of", "case_id", "condition_id", "event_slug", "asset_id", "outcome_label", "wallet", "source_pre",
         "account_age_days_at_first_buy", "prior_markets", "prior_net_long_win_rate", "case_share_of_lifetime_volume",
         "first_price", "vwap", "max_price_paid", "n_buy_fills", "median_fill_usdc", "fill_size_cv", "taker_share", "hour_of_day_first_buy",
         "pre_buy_usdc", "pre_buy_shares", "signal_a_rebuy_1_5x", "size_price_slope", "hours_last_buy_to_tnews", "ladder_rank",
-        "is_shortest_sufficient", "share_on_this_ladder_market", "hours_first_buy_to_tnews", "hours_funding_to_first_trade",
-        "funding_source_type", "funder_shared_with_labelled", "follower_wallets_60m", "follower_buy_usdc_60m",
+        "is_shortest_sufficient", "share_on_this_ladder_market", "hours_first_buy_to_tnews", "follower_wallets_60m", "follower_buy_usdc_60m",
         "share_sold_before_resolution_post", "won_post", "pnl_post", "redemption_delay_hours_post", "relaxed_band",
         "econ_inferred_buy_usdc_pre", "raw_view_prenews_buy", "directional_shares_pre", "full_sets_pre_shares", "directional_cost_usdc_pre",
         "directional_first_buy_utc", "directional_first_buy_price", "directional_vwap_pre", "directional_hours_first_buy_to_cut"]

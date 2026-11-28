@@ -305,7 +305,7 @@ def test_control_designs():
     """A27: three control designs; suspected episodes identical across designs; age-matched controls share the episode's age band."""
     e = load("episodes", ["t_news_version", "control_design", "role", "episode_id"])
     assert set(e.control_design) == {"standard", "age_matched", "winrate_matched", "open"}
-    s = e[e.role == "suspected"].groupby(["t_news_version", "control_design"]).episode_id.apply(frozenset)
+    s = e[e.role.isin(["suspected", "labelled_other_position"])].groupby(["t_news_version", "control_design"]).episode_id.apply(frozenset)
     for v in ["day", "precise"]:
         assert s[v]["standard"] == s[v]["age_matched"] == s[v]["winrate_matched"] == s[v]["open"]
 
@@ -328,7 +328,8 @@ def test_relaxed_band_only_in_banded_designs():
 def test_t_news_reliable():
     """A29.1: per market; false only for a deadline-rule time; episodes carry their market's flag; placebo/twin rows their case market's."""
     m = load("markets", ["case_id", "condition_id", "t_news_reliable", "t_news_market_method", "t_news_deadline_rule_utc", "t_news_market_utc"])
-    assert (m.t_news_reliable == (m.t_news_market_method != "market_deadline")).all()
+    coarse = (m.t_news_market_method == "case_time") & m.t_news_precision.isin(["month", "quarter", "year", "range"]) & (m.t_news_precise_precision == "day_fallback")
+    assert (m.t_news_reliable == ((m.t_news_market_method != "market_deadline") & ~coarse)).all()  # A29.1, A29.2
     dl = m[m.t_news_market_method == "market_deadline"]
     assert (dl.t_news_deadline_rule_utc == dl.t_news_market_utc).all() and m[m.t_news_market_method != "market_deadline"].t_news_deadline_rule_utc.isna().all()
     rel = dict(zip(zip(m.case_id, m.condition_id), m.t_news_reliable))
@@ -411,5 +412,89 @@ def test_directional_entry_columns():
                               OR epoch(directional_first_buy_utc) >= t_cut_unix OR directional_vwap_price_usdc_pre NOT BETWEEN 0 AND 1))
                           OR (NOT is_directional_position AND (directional_first_buy_utc IS NOT NULL OR directional_vwap_price_usdc_pre IS NOT NULL))""").fetchall()[0][0]
     assert bad == 0
-    e = load("episodes", ["role", "directional_first_buy_utc", "directional_hours_first_buy_to_cut"])
+    e = load("episodes", ["role", "directional_first_buy_utc", "directional_hours_first_buy_to_cut"])  # every episode row is a directional position
     assert e.directional_first_buy_utc.notna().all() and (e.directional_hours_first_buy_to_cut > 0).all()
+
+
+
+def test_one_cut_per_market():
+    """A36: one news time per condition_id and version, in markets and in case positions."""
+    m = load("markets", ["condition_id", "t_news_market_utc", "t_news_market_day_utc"])
+    assert m.groupby("condition_id").t_news_market_utc.nunique().max() == 1 and m.groupby("condition_id").t_news_market_day_utc.nunique().max() == 1
+    assert duckdb.sql(f"""SELECT count(*) FROM (SELECT condition_id, t_news_version FROM read_parquet('{R}/positions.parquet') WHERE market_set = 'case'
+                          GROUP BY ALL HAVING count(DISTINCT t_cut_unix) > 1)""").fetchall()[0][0] == 0
+
+
+def test_splits_by_connected_group():
+    """A37: no condition_id or Gamma event in both train and test, nor in two leave-one-group-out folds."""
+    sp = pd.read_csv(os.path.join(PKG, "benchmarks", "splits.csv"))
+    m = load("markets", ["case_id", "condition_id", "event_id"]).merge(sp, on="case_id")
+    for k in ["condition_id", "event_id"]:
+        x = m[m[k].notna()]
+        assert x.groupby(k).split.nunique().max() == 1, k
+        assert x.groupby(k).group_id.nunique().max() == 1, k
+    c = load("cases", ["case_id", "benchmark_split", "benchmark_group_id"]).merge(sp, on="case_id")
+    assert (c.benchmark_split == c.split).all() and (c.benchmark_group_id == c.group_id).all()
+
+
+STRING_SKIP = re.compile(r"(url|_id$|^wallet$|^address|^src$|^dst$|^maker$|^taker$|^tx_hash$|^leg_id$|^fill_id$|token_ids|^asset_id|^handle$)")
+
+
+@pytest.mark.parametrize("t", list(TABLES))
+def test_no_withheld_names_in_any_string_column(t):
+    """A39: every string column of every table (categories, slugs, questions, notes; URLs, ids and addresses excluded) passes the name list."""
+    src = f"read_parquet('{R}/fills_part*.parquet')" if t == "fills" else f"read_parquet('{files_of(t)[0]}')"
+    hits = []
+    for c in TABLES[t]["cols"]:
+        if c["dtype"] != "string" or STRING_SKIP.search(c["name"]):
+            continue
+        for (v,) in duckdb.sql(f"SELECT DISTINCT {c['name']} FROM {src} WHERE {c['name']} IS NOT NULL").fetchall():
+            if any(hashlib.sha256(g.encode()).hexdigest() in NAMES for g in ngrams(v)):
+                hits.append((c["name"], v[:60]))
+    assert not hits, hits[:10]
+
+
+def test_known_answers():
+    """A40: documented figures, econ view, within 1%."""
+    if WITHHELD:
+        pytest.skip("needs all fill sources")
+    q = f"read_parquet('{R}/fills_part*_case_*.parquet')"
+    def buys(wallet, cid, cut=None):
+        w = f"AND ts_unix < {cut}" if cut else ""
+        return duckdb.sql(f"""SELECT sum(sh), sum(u) FROM (SELECT shares - coalesce(econ_excess_shares, 0) sh, econ_size_usdc u FROM {q}
+                                WHERE wallet = '{wallet}' AND condition_id = '{cid}' AND econ_side = 'BUY' AND econ_outcome_label = 'Yes' {w}
+                              UNION ALL SELECT econ_excess_shares, econ_excess_size_usdc FROM {q}
+                                WHERE wallet = '{wallet}' AND condition_id = '{cid}' AND econ_excess_shares > 0 AND econ_excess_outcome_label = 'Yes' {w})""").fetchall()[0]
+    sh, u = buys("0x31a56e9e690c621ed21de08cb559e9524cdb8ed9", "0x580adc1327de9bf7c179ef5aaffa3377bb5cb252b7d6390b027172d43fd6f993", 1767418200)
+    assert abs(sh / 436759.61 - 1) < 0.01 and abs(u / 32538.34 - 1) < 0.01, (sh, u)
+    _, u = buys("0xee50a31c3f5a7c77824b12a941a54388a2827ed6", "0xea17b1284d10617a57f910b2ea63bdef481b1724a4b899d454ff104bea67b657")
+    assert abs(u / 10650.04 - 1) < 0.01, u
+
+
+def test_alleged_positions():
+    """A35: alleged positions only on case rows of labelled wallets, on a (market, side) of claim_positions; suspected episode rows are exactly the alleged ones."""
+    cp = load("claim_positions")
+    bad = duckdb.sql(f"""SELECT count(*) FROM read_parquet('{R}/positions.parquet') p WHERE is_alleged_position AND (market_set <> 'case' OR NOT label_broad
+                          OR NOT EXISTS (SELECT 1 FROM cp WHERE cp.case_id = p.case_id AND cp.condition_id = p.condition_id AND lower(cp.side) = lower(p.outcome_label)))""").fetchall()[0][0]
+    assert bad == 0
+    e = load("episodes", ["role", "is_alleged_position"])
+    assert (e[e.role == "suspected"].is_alleged_position).all() and not e[e.role != "suspected"].is_alleged_position.any()
+
+
+def test_no_all_null_columns():
+    """A43: no released column is NULL in every row, except those marked not_built in the CODEBOOK."""
+    allowed = {("claims", "right_of_reply")}
+    bad = []
+    for t in SINGLE:
+        for c in TABLES[t]["cols"]:
+            if (t, c["name"]) in allowed:
+                continue
+            if duckdb.sql(f"SELECT count({c['name']}) FROM read_parquet('{files_of(t)[0]}')").fetchall()[0][0] == 0:
+                bad.append((t, c["name"]))
+    assert not bad, bad
+
+
+def test_lifetime_share_in_unit_interval():
+    """A43: case_share_of_lifetime_volume uses one source for numerator and denominator."""
+    e = load("episodes", ["case_share_of_lifetime_volume"]).dropna()
+    assert ((e.case_share_of_lifetime_volume >= 0) & (e.case_share_of_lifetime_volume <= 1 + 1e-9)).all()

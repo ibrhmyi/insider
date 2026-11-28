@@ -66,10 +66,37 @@ def write(name, df):
     return df
 
 
+# ---------- run-11 audit helpers
+from question_type import qtype  # A38
+from alleged import alleged_positions  # A35
+NAMES = {x.strip() for x in open(os.path.join(D, "tests", "name_hashes.txt")) if x.strip() and not x.startswith("#")}
+def has_name(v):  # A39: same n-gram hash test as the name gate
+    w = re.findall(r"[a-z]+", str(v).lower())
+    return any(hashlib.sha256(" ".join(w[i:i + n]).encode()).hexdigest() in NAMES for n in (1, 2, 3) for i in range(len(w) - n + 1))
+def scrub(df, cols):  # A39: NULL category / slug values that contain a withheld name
+    for c_ in cols:
+        if c_ in df:
+            df.loc[df[c_].map(lambda v: bool(v) and has_name(v)), c_] = ""
+    return df
+SPL = pd.read_csv(os.path.join(D, "release", "benchmarks", "splits.csv"), dtype=str).set_index("case_id")  # A37 (build/v1/splits.py)
+ALG = alleged_positions(D)
+CP = rd("data/claim_positions.csv"); CP["condition_id"] = CP.condition_id.str.lower()
 # ---------- small tables
 mk = rd("data/markets.csv"); mk["condition_id"] = mk.condition_id.str.lower()
+mk["question_type"] = mk.question.map(qtype)
+_res = mk.drop_duplicates("condition_id").set_index("condition_id")
 cl = rd("data/claims.csv"); W = rd("data/wallet_labels.csv"); cs = rd("data/cases.csv")
-cl["right_of_reply"] = ""  # A24: no reply received yet
+cl["right_of_reply"] = ""  # A24: no reply received yet (not_built, A43)
+# A42: claim timing against the claim's alleged markets; A44: duplicates
+_cpm = CP.merge(_res[["resolved_utc", "outcome"]].reset_index(), on="condition_id", how="left")
+_cpm["res"] = pd.to_datetime(_cpm.resolved_utc.replace("", None), utc=True, errors="coerce", format="mixed")
+_cpm["won"] = [None if (o == "" or pd.isna(o)) else (sd.lower() == o.lower()) for sd, o in zip(_cpm.side, _cpm.outcome)]
+_ct = _cpm.groupby("claim_id").agg(first_res=("res", "min"), n_unres=("won", lambda x: int(sum(v is None for v in x))), all_won=("won", lambda x: all(v for v in x if v is not None)))
+_cd = pd.to_datetime(cl.claim_date.where(cl.claim_date.str.len() >= 10, None), utc=True, errors="coerce", format="mixed")
+cl["claim_timing"] = [("" if k not in _ct.index or pd.isna(_ct.at[k, "first_res"]) or pd.isna(d) else ("ex_ante" if d < _ct.at[k, "first_res"] else "ex_post"))
+                      for k, d in zip(cl.claim_id, _cd)]
+cl["alleged_side_won"] = [("" if k not in _ct.index or _ct.at[k, "n_unres"] > 0 else ("true" if _ct.at[k, "all_won"] else "false")) for k in cl.claim_id]
+cl["duplicate_of"] = cl.claim_id.map({"CL0124": "CL0091"}).fillna("")
 cl["post_url"] = cl.notes.map(lambda n: (re.search(r"post_url=(\S+?)(?:;|\s|$)", n) or [None, None])[1])
 write("claims", nul(cl))
 RANK = {g: i for i, g in enumerate("E1 E2 E3 E4 E5 E6".split())}
@@ -84,8 +111,19 @@ W["hard_negative"] = [(a, k) in cw for a, k in zip(W.wallet, W.case_id)]
 W["hard_negative_rule"] = np.where(W.hard_negative, "cleared_case_wallet", "")
 W = W.drop(columns=["case_market_traded", "case_check_note"])
 wallets = write("wallets", nul(W))
-split = {r.case_id: ("test" if r.first_claim_date_earliest >= "2026-03-01" else "train") for r in cs.itertuples()}
+split = SPL.split.to_dict()  # A37: whole connected groups
 cs["benchmark_split"] = cs.case_id.map(split)
+cs["benchmark_group_id"] = cs.case_id.map(SPL.group_id)
+_tn = mk.groupby("case_id").t_news_utc.first()
+cs["event_occurred_utc"] = cs.case_id.map(_tn).fillna("")  # A44
+_dl = CP.merge(_res[["deadline_utc"]].reset_index(), on="condition_id", how="left")
+_dl["dl"] = pd.to_datetime(_dl.deadline_utc.replace("", None), utc=True, errors="coerce", format="mixed")
+cs["market_deadline_utc"] = cs.case_id.map(_dl.groupby("case_id").dl.min().dt.strftime("%Y-%m-%dT%H:%M:%SZ")).fillna("")
+_ea = cl[cl.claim_timing == "ex_ante"]
+cs["n_claims_ex_ante"] = cs.case_id.map(_ea.groupby("case_id").size()).fillna(0)
+_eaw = _ea[_ea.alleged_side_won != ""]
+cs["ex_ante_win_rate"] = cs.case_id.map(_eaw.groupby("case_id").alleged_side_won.apply(lambda x: (x == "true").mean()))
+cs = cs.drop(columns=["event_date"])
 cs["n_markets"] = cs.case_id.map(mk.groupby("case_id").size()).fillna(0)
 g = wallets.groupby("case_id")
 cs["n_wallets_suspected"] = cs.case_id.map(wallets[wallets.polarity == "suspected"].groupby("case_id").size()).fillna(0)
@@ -99,8 +137,9 @@ mk["is_placebo_market"] = "false"
 mk = mk.drop(columns=["series_id"])
 for c_ in ["question", "slug", "event_slug"]:
     mk.loc[mk.title_withheld == "true", c_] = ""
+mk = scrub(mk, ["slug", "event_slug", "category", "category_refined"])  # A39
 write("markets", nul(mk))
-pl = rd("data/placebo_markets.csv"); pl["benchmark_split"] = pl.case_id.map(split)
+pl = scrub(rd("data/placebo_markets.csv"), ["placebo_slug", "placebo_category"]); pl["benchmark_split"] = pl.case_id.map(split)
 pl.insert(0, "placebo_row_id", [f"PR{i:05d}" for i in range(1, len(pl) + 1)])
 write("placebo_markets", nul(pl))
 write("contradictions", nul(rd("data/contradictions.csv")))
@@ -109,11 +148,12 @@ blk = ed.utc.str.extract(r"^block (\d+)$")[0]
 ed["block_number"] = blk.fillna(""); ed.loc[blk.notna(), "utc"] = ""  # some sources give a block number instead of a time
 ed.insert(0, "edge_id", [f"ED{i:04d}" for i in range(1, len(ed) + 1)])
 write("edges", nul(ed))
-tw = rd("data/twin_markets.csv"); tw["benchmark_split"] = tw.case_id.map(split)  # A22
+tw = scrub(rd("data/twin_markets.csv"), ["twin_slug", "category_refined"]); tw["benchmark_split"] = tw.case_id.map(split)  # A22, A39
 tw.insert(0, "twin_row_id", [f"TR{i:05d}" for i in range(1, len(tw) + 1)])
 write("twin_markets", nul(tw))
 write("hard_negatives", nul(HN))
 write("claim_wallet_links", nul(rd("data/claim_wallet_links.csv")))
+write("claim_positions", nul(CP))  # A35
 # ---------- large tables via parquet
 c = duckdb.connect(); c.sql("SET memory_limit='4GB'; SET enable_progress_bar=false")
 # controls / episodes (both versions)
@@ -135,9 +175,13 @@ for v in ["day", "precise"]:
 epi = pd.concat(ep_ids.values(), ignore_index=True)
 LS = wallets[["wallet", "case_id", "label_strict", "label_standard", "label_broad"]]
 epi = epi.merge(LS, on=["wallet", "case_id"], how="left")
-for x in ["label_strict", "label_standard", "label_broad"]:  # A20: only suspected rows carry a label set
+for x in ["label_strict", "label_standard", "label_broad"]:  # A20: only suspected rows carry a label set (before the A35 role split below)
     epi[x] = epi[x].fillna(False).astype(bool) & (epi.role == "suspected")
 epi["t_news_reliable"] = [REL_M.get((a, b), True) for a, b in zip(epi.case_id, epi.condition_id.str.lower())]
+_alg = set(zip(ALG.wallet, ALG.case_id, ALG.condition_id, ALG.side.str.lower()))  # A35
+epi["is_alleged_position"] = [(w.lower(), k, cid.lower(), str(o).lower()) in _alg for w, k, cid, o in zip(epi.wallet, epi.case_id, epi.condition_id, epi.outcome_label)]
+epi["is_alleged_position"] = epi.is_alleged_position & (epi.role == "suspected")
+epi.loc[(epi.role == "suspected") & ~epi.is_alleged_position, "role"] = "labelled_other_position"
 write("controls", ctrl)
 write("episodes", epi.drop(columns=[x for x in epi.columns if x not in [k["name"] for k in TABLES["episodes"]["cols"]] and x not in RENAME["episodes"]]))
 # positions with label columns, assembled in DuckDB and streamed to parquet (pandas does not fit the memory limit)
@@ -150,13 +194,16 @@ hn = HN[HN.rule != "cleared_case_wallet"][["market_set", "case_id", "condition_i
 ctl = ctrl[ctrl.control_design == "standard"][["t_news_version", "case_id", "condition_id", "wallet"]].drop_duplicates()
 rel = pd.DataFrame([dict(market_set="case", case_id=a, condition_id=b, rel=v) for (a, b), v in REL_M.items()]
                    + [dict(market_set=ms, case_id=a, condition_id=b, rel=v) for (ms, a, b), v in REL_REF.items()])
-for nm, df in [("doc_df", doc), ("fr_df", fr), ("ls_df", LS), ("hn_df", hn), ("ctl_df", ctl), ("rel_df", rel)]:
+alg_df = ALG[["wallet", "case_id", "condition_id", "side"]].drop_duplicates().assign(side=lambda d: d.side.str.lower())
+for nm, df in [("doc_df", doc), ("fr_df", fr), ("ls_df", LS), ("hn_df", hn), ("ctl_df", ctl), ("rel_df", rel), ("alg_df", alg_df)]:
     c.register(nm, df)
 c.sql(f"""CREATE TEMP VIEW pos_v AS SELECT p.*, d.doc_grade AS doc_grade_d, (d.wallet IS NOT NULL) AS doc_hit,
             (f.wallet IS NOT NULL) AS coordinated_rule_fired, f.triggering_suspect, f.placebo_rate,
             coalesce(l.label_strict, false) ls_s, coalesce(l.label_standard, false) ls_t, coalesce(l.label_broad, false) ls_b,
-            h.hard_negative_rule, (h.hard_negative_rule IS NOT NULL) AS hard_negative, (k.wallet IS NOT NULL) AS ctl_hit, coalesce(r.rel, true) AS t_news_reliable
+            h.hard_negative_rule, (h.hard_negative_rule IS NOT NULL) AS hard_negative, (k.wallet IS NOT NULL) AS ctl_hit, coalesce(r.rel, true) AS t_news_reliable,
+            (p.market_set = 'case' AND ag.wallet IS NOT NULL) AS is_alleged_position
           FROM '{V1}/positions.parquet' p
+          LEFT JOIN alg_df ag ON ag.wallet = p.wallet AND ag.case_id = p.case_id AND ag.condition_id = lower(p.condition_id) AND ag.side = lower(p.outcome_label)
           LEFT JOIN rel_df r ON r.market_set = p.market_set AND r.case_id = p.case_id AND r.condition_id = lower(p.condition_id)
           LEFT JOIN doc_df d ON d.wallet = p.wallet AND d.case_id = p.case_id
           LEFT JOIN fr_df f ON p.market_set = 'case' AND f.wallet = p.wallet AND f.case_id = p.case_id AND f.condition_id = p.condition_id AND f.asset_id = p.asset_id AND f.t_news_version = p.t_news_version

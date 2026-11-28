@@ -132,13 +132,20 @@ def auc_cw(df):
 
 
 def folds_for(df, std_counts):
-    loco = sorted([c for c, n in std_counts.items() if n >= 3])
-    f = [("loco:" + c, df.case_id != c, df.case_id == c) for c in loco]
+    """A37: leave-one-group-out over connected groups (splits.csv group_id) with >= 3 label_standard wallets."""
+    grp = df.drop_duplicates("case_id").set_index("case_id").group_id
+    gc = {}
+    for c, n in std_counts.items():
+        if c in grp.index:
+            gc[grp[c]] = gc.get(grp[c], 0) + n
+    loco = sorted([g for g, n in gc.items() if n >= 3])
+    f = [("loco:" + g, df.group_id != g, df.group_id == g) for g in loco]
     f.append(("time_split", df.split == "train", df.split == "test"))
     return f
 
 
 MIN_FOLDS = 6  # A32
+ALLEGED = True  # A35: alleged positions are the positives; False = the wallet-level secondary version
 
 
 def summarise(per_fold):
@@ -207,8 +214,9 @@ def t1(data, splits, version, lset, tune, quick, size_band=False):
     p = pd.read_parquet(os.path.join(data, "positions.parquet"), filters=[("market_set", "==", "case"), ("t_news_version", "==", version), ("is_directional_position", "==", True), ("t_news_reliable", "==", True)])  # A34.2
     p = prep_t1(p).merge(splits, on="case_id")
     tr = train_set(lset)
-    p["y"] = p[lset].astype(int); p["y_tr"] = p[tr].astype(int); p["tie"] = p.buy_usdc_pre
-    p["use_ev"] = ~(p.is_documented & ~p[lset]); p["use_tr"] = ~(p.is_documented & ~p[tr])
+    al = p.is_alleged_position if ALLEGED else True  # A35: positives are alleged positions; other positions of labelled wallets are dropped
+    p["y"] = (p[lset] & al).astype(int); p["y_tr"] = (p[tr] & al).astype(int); p["tie"] = p.buy_usdc_pre
+    p["use_ev"] = ~(p.is_documented & ~(p[lset] & al)); p["use_tr"] = ~(p.is_documented & ~(p[tr] & al))
     k = ["case_id", "condition_id"]
     if size_band:
         for lab, use in [("y", "use_ev"), ("y_tr", "use_tr")]:
@@ -229,10 +237,18 @@ def t2(data, splits, version, lset, tune, quick, design="standard"):
     """T2 (standard controls), T2s (A27: age_matched), T2w (A33: winrate_matched) or T2-open (A27: open)."""
     e = pd.read_parquet(os.path.join(data, "episodes.parquet"), filters=[("t_news_version", "==", version), ("control_design", "==", design), ("t_news_reliable", "==", True)]).merge(splits, on="case_id")
     tr = train_set(lset)
+    if not ALLEGED:  # wallet-level (secondary): every position of a labelled wallet counts as suspected
+        e.loc[e.role == "labelled_other_position", "role"] = "suspected"
+    e = e[e.role != "labelled_other_position"]  # A35: positives are alleged positions only
     ep_tr = set(e[(e.role == "suspected") & e[tr]].episode_id); ep_ev = set(e[(e.role == "suspected") & e[lset]].episode_id)
     owner = np.where(e.role == "suspected", e.episode_id, e.control_of)
     e["use_tr"] = pd.Series(owner).isin(ep_tr).values; e["use_ev"] = pd.Series(owner).isin(ep_ev).values
-    e = e[e.use_tr | e.use_ev].reset_index(drop=True)
+    e = e[e.use_tr | e.use_ev]
+    # A44: a control (case, market, token, wallet) matched to several episodes counts once
+    k = ["case_id", "condition_id", "asset_id", "wallet"]; ctl = e[e.role != "suspected"]
+    fl = ctl.groupby(k)[["use_tr", "use_ev"]].transform("max")
+    ctl = ctl.assign(use_tr=fl.use_tr.values, use_ev=fl.use_ev.values).drop_duplicates(k)
+    e = pd.concat([e[e.role == "suspected"], ctl]).reset_index(drop=True)
     pos = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "gate1_score"],
                           filters=[("market_set", "==", "case"), ("t_news_version", "==", version)])
     e = e.merge(pos.drop(columns=["market_set", "t_news_version"]), on=["case_id", "condition_id", "asset_id", "wallet"], how="left")
@@ -268,14 +284,14 @@ def market_features(data, version, sets):
             price_change_24h=chg(24), price_change_6h=chg(6), price_change_1h=chg(1), abs_max_minute_move_24h=last(24).last_price_usdc.diff().abs().max(),
             taker_buy_share_24h=tb / (tb + ts_) if (tb + ts_) else np.nan))
     f = mm.groupby(k).apply(agg, include_groups=False).reset_index()
-    p = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=k + ["t_news_version", "wallet", "buy_usdc_pre", "account_age_days_at_first_buy", "gate1", "vwap_price_usdc_pre"] + sets,
+    p = pd.read_parquet(os.path.join(data, "positions.parquet"), columns=k + ["t_news_version", "wallet", "buy_usdc_pre", "account_age_days_at_first_buy", "gate1", "vwap_price_usdc_pre", "is_alleged_position"] + sets,
                         filters=[("t_news_version", "==", version), ("t_news_reliable", "==", True), ("is_directional_position", "==", True)])  # A34.2
     def pagg(g):
         tot = g.buy_usdc_pre.sum(); w = g.groupby("wallet").buy_usdc_pre.sum().sort_values(ascending=False)
         d = dict(log_n_buyers=np.log1p(g.wallet.nunique()), top10_buy_share=w.head(10).sum() / tot if tot else np.nan,
                  fresh_buyer_share=(g.account_age_days_at_first_buy <= 7).mean(), gate1_rate=g.gate1.astype(float).mean(),
                  longshot_buy_share=g.loc[g.vwap_price_usdc_pre <= 0.35, "buy_usdc_pre"].sum() / tot if tot else np.nan)
-        d.update({f"has_{s}": bool(g[s].any()) for s in sets})
+        d.update({f"has_{s}": bool((g[s] & g.is_alleged_position).any()) for s in sets})  # A35
         return pd.Series(d)
     q = p.groupby(k).apply(pagg, include_groups=False).reset_index()
     return f.merge(q, on=k, how="outer")
@@ -331,8 +347,8 @@ if __name__ == "__main__":
     ap.add_argument("--data", default=os.path.join(here, "..", "data")); ap.add_argument("--out", default=os.path.join(here, "baselines.json"))
     ap.add_argument("--quick", action="store_true", help="no gradient-boosting tuning, smaller negative samples (for the notebook)")
     a = ap.parse_args()
-    splits = pd.read_csv(os.path.join(here, "splits.csv"))[["case_id", "split"]]
-    out = dict(seed=SEED, protocol="A15, A23, A26, A27, A29, A32, A33", label_sets=SETS, training_label="label_standard (label_broad for the broad run); label_strict evaluation-only (A26)",
+    splits = pd.read_csv(os.path.join(here, "splits.csv"))[["case_id", "split", "group_id"]]
+    out = dict(seed=SEED, protocol="A15, A23, A26, A27, A29, A32, A33, A34, A35, A37, A44", positives="alleged positions (A35); wallet_level = secondary", label_sets=SETS, training_label="label_standard (label_broad for the broad run); label_strict evaluation-only (A26)",
                headline_tasks=["T1s", "T2s", "T2w", "T2open"], secondary_tasks=["T1", "T2", "T3", "T3b"], leakage=LEAKAGE, known_shortcuts=SHORTCUTS,
                features=dict(T1=T1_FEATURES, T2=T2_FEATURES, T3=T3_FEATURES), gb_grid=GRID, min_folds_for_summary=MIN_FOLDS,
                excluded_unreliable=excluded_unreliable(a.data))
@@ -346,6 +362,9 @@ if __name__ == "__main__":
                               T2open=t2(a.data, splits, v, s_, tune, a.quick, "open"), T1=t1(a.data, splits, v, s_, False, a.quick),
                               T2=t2(a.data, splits, v, s_, False, a.quick, "standard"), T3=t3(a.data, splits, v, "twin", s_, tune, cache),
                               T3b=t3(a.data, splits, v, "placebo", s_, tune, cache))
+            ALLEGED = False  # A35 secondary: wallet-level positives (any position of a labelled wallet), no gradient boosting
+            out[v][s_]["wallet_level"] = dict(T1s=t1(a.data, splits, v, s_, False, a.quick, size_band=True), T2s=t2(a.data, splits, v, s_, False, a.quick, "age_matched"))
+            ALLEGED = True
             print(v, s_, "done", flush=True)
         out[v]["all_case_markets"] = dict(T3=t3(a.data, splits, v, "twin", "all", tune, cache), T3b=t3(a.data, splits, v, "placebo", "all", tune, cache))
     json.dump(out, open(a.out, "w"), indent=1, default=lambda x: None if (isinstance(x, float) and np.isnan(x)) else (bool(x) if isinstance(x, np.bool_) else float(x)))

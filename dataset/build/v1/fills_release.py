@@ -7,6 +7,14 @@ D = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 V1, OUT = os.path.join(D, "out", "v1", "fills"), os.path.join(D, "release", "data")
 PART_ROWS = 15_000_000
 c = duckdb.connect(); c.sql(f"SET memory_limit='3GB'; SET threads=2; SET enable_progress_bar=false; SET temp_directory='{sys.argv[1]}'; SET preserve_insertion_order=true")
+import hashlib, re
+NAMES = {x.strip() for x in open(os.path.join(D, "tests", "name_hashes.txt")) if x.strip() and not x.startswith("#")}
+def has_name(v):  # A39
+    w = re.findall(r"[a-z]+", str(v).lower())
+    return any(hashlib.sha256(" ".join(w[i:i + n]).encode()).hexdigest() in NAMES for n in (1, 2, 3) for i in range(len(w) - n + 1))
+_slugs = [r[0] for r in c.sql(f"SELECT DISTINCT market_slug FROM read_parquet('{V1}/fills_*.parquet') WHERE market_slug IS NOT NULL").fetchall()]
+c.execute("CREATE TABLE NS(s VARCHAR)"); c.executemany("INSERT INTO NS VALUES (?)", [(x,) for x in _slugs if has_name(x)])
+print("A39 slugs with a withheld name:", c.sql("SELECT count(*) FROM NS").fetchall()[0][0], flush=True)
 for f in glob.glob(os.path.join(OUT, "fills_part*")):
     os.remove(f)
 n_part = total = 0
@@ -26,7 +34,7 @@ for ms in ["case", "placebo", "twin", "label_other"]:
                          (source = 'hf_polymarket_v1') role_fields_available, wallet_side,
                          CASE WHEN source = 'data_api_v2' THEN NULL ELSE aggressor_side END aggressor_side,
                          CASE WHEN source = 'data_api_v2' THEN NULL ELSE maker END maker, CASE WHEN source = 'data_api_v2' THEN NULL ELSE taker END taker,
-                         market_slug, econ_side, econ_asset_id, econ_outcome_label, econ_price_usdc::DOUBLE econ_price_usdc,
+                         CASE WHEN market_slug IN (SELECT s FROM NS) THEN NULL ELSE market_slug END market_slug, econ_side, econ_asset_id, econ_outcome_label, econ_price_usdc::DOUBLE econ_price_usdc,
                          econ_size_usdc::DOUBLE econ_size_usdc, econ_inferred, econ_partial, econ_excess_shares::DOUBLE econ_excess_shares,
                          econ_excess_asset_id, econ_excess_outcome_label, econ_excess_price_usdc::DOUBLE econ_excess_price_usdc,
                          econ_excess_size_usdc::DOUBLE econ_excess_size_usdc FROM {q} LIMIT {PART_ROWS} OFFSET {off})
