@@ -208,6 +208,18 @@ Every leg of every fill in case and placebo markets, plus every leg of labelled 
 | `maker` | string |  |  |  | meta | maker address (HF only) |
 | `taker` | string |  |  |  | meta | taker address (HF only) |
 | `market_slug` | string |  |  |  | meta | market slug; NULL for withheld markets |
+| `econ_side` | string |  | BUY, SELL |  | meta | A34 economic side: BUY for an inferred leg (SELL of a token the wallet held none of = BUY of the complement), else wallet_side |
+| `econ_asset_id` | string |  |  |  | meta | A34 economic token (the complement for an inferred leg) |
+| `econ_outcome_label` | string |  |  |  | meta | A34 label of econ_asset_id |
+| `econ_price_usdc` | float64 |  |  |  | meta | A34 economic price (1 - price_usdc for an inferred leg) |
+| `econ_size_usdc` | float64 | USDC |  |  | meta | A34 economic size: shares x econ_price_usdc for an inferred leg, else usdc |
+| `econ_inferred` | bool |  |  |  | meta | A34: leg re-read as an economic BUY of the complement (split or mint inferred); raw columns unchanged |
+| `econ_partial` | bool |  |  |  | meta | A34.1: SELL larger than the econ holding; the econ_* columns give the held SELL part, econ_excess_* the inferred BUY |
+| `econ_excess_shares` | float64 | shares |  |  | meta | A34.1: shares beyond the holding, re-read as an economic BUY of the complement |
+| `econ_excess_asset_id` | string |  |  |  | meta | A34.1: the complement token |
+| `econ_excess_outcome_label` | string |  |  |  | meta | A34.1: its label |
+| `econ_excess_price_usdc` | float64 |  |  |  | meta | A34.1: 1 - price_usdc |
+| `econ_excess_size_usdc` | float64 | USDC |  |  | meta | A34.1: econ_excess_shares x econ_excess_price_usdc |
 
 ## positions
 
@@ -236,6 +248,17 @@ All-buyer positions before the cut (C2): the full population a detector must sea
 | `sell_shares_pre` | float64 |  |  |  | pre | SELL shares before the cut |
 | `taker_share_pre` | float64 |  |  |  | pre | share of pre-cut BUY legs as taker (HF only) |
 | `source_pre` | string |  |  |  | pre | sources of pre-cut legs |
+| `econ_inferred_buy_usdc_pre` | float64 | USDC |  |  | pre | A34: part of buy_usdc_pre from inferred economic buys (econ view is the default) |
+| `raw_view_prenews_buy` | bool |  |  |  | pre | A34: the position also exists in the raw BUY-only view (a raw BUY before the cut) |
+| `full_sets_pre_shares` | float64 | shares |  |  | pre | A34.2: min(econ Yes holding, econ No holding) of this wallet in this market before the cut (full sets carry no direction) |
+| `directional_shares_pre` | float64 | shares |  |  | pre | A34.2: /econ Yes holding - econ No holding/ before the cut (wallet-market level) |
+| `directional_cost_usdc_pre` | float64 | USDC |  |  | pre | A34.2: FIFO cost of the excess shares on the directional token (0 on the other token); a FIFO accounting figure, not an entry price or time (A34.3) |
+| `directional_first_buy_utc` | timestamp |  |  |  | pre | A34.3: first econ BUY of the directional token before the cut (entry time; use for timing features) |
+| `directional_first_buy_price` | float64 |  |  |  | pre | A34.3: price of that first econ BUY |
+| `directional_vwap_pre` | float64 |  |  |  | pre | A34.3: VWAP of econ BUYs of the directional token before the cut |
+| `directional_hours_first_buy_to_cut` | float64 | hours |  |  | pre | A34.3: hours from that first econ BUY to the cut |
+| `is_directional_position` | bool |  |  |  | pre | A34.2: this token is the wallet's directional token here and directional_shares_pre > 0; the pre-news position used by label sets, benchmarks, episodes, hard negatives and the coordinated rule |
+| `is_market_maker` | bool |  |  |  | meta | A34.1 reporting flag, NOT a label: >= 20 active (market, minute) pairs with both tokens traded in > 50% of them; not used by any rule or benchmark |
 | `vwap_price_usdc_pre` | float64 |  |  |  | pre | pre-cut BUY VWAP |
 | `is_main_side` | bool |  |  |  | pre | token with the wallet's largest pre-cut BUY in this market |
 | `account_age_days_at_first_buy` | float64 | days |  |  | pre | days from first Polymarket-v1 fill to first pre-cut BUY (NULL if no v1 history) |
@@ -304,6 +327,15 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `outcome_label` | string |  |  |  | meta | token label |
 | `wallet` | string |  |  |  | meta | wallet |
 | `source_pre` | string |  |  |  | pre | source of pre-news legs |
+| `econ_inferred_buy_usdc_pre` | float64 | USDC |  |  | pre | A34: pre-news BUY USDC from inferred economic buys |
+| `raw_view_prenews_buy` | bool |  |  |  | pre | A34: the episode also exists in the raw BUY-only view |
+| `directional_shares_pre` | float64 | shares |  |  | pre | A34.2: directional shares of this wallet in this market before the cut |
+| `full_sets_pre_shares` | float64 | shares |  |  | pre | A34.2: full sets held before the cut |
+| `directional_cost_usdc_pre` | float64 | USDC |  |  | pre | A34.2: FIFO cost of the directional shares (FIFO accounting figure, not entry timing; A34.3) |
+| `directional_first_buy_utc` | timestamp |  |  |  | pre | A34.3: first econ BUY of the directional token before the cut (entry time; use for timing features) |
+| `directional_first_buy_price` | float64 |  |  |  | pre | A34.3: price of that first econ BUY |
+| `directional_vwap_pre` | float64 |  |  |  | pre | A34.3: VWAP of econ BUYs of the directional token before the cut |
+| `directional_hours_first_buy_to_cut` | float64 | hours |  |  | pre | A34.3: hours from that first econ BUY to the cut |
 | `account_age_days_at_first_buy` | float64 | days |  |  | pre | days from first Polymarket-v1 fill to first pre-news buy |
 | `n_prior_markets` | int64 |  |  |  | pre | distinct Polymarket-v1 markets before the first buy |
 | `prior_net_long_win_rate` | float64 |  |  |  | pre | win rate on earlier resolved net-long positions |
@@ -390,6 +422,7 @@ Per wallet in Polymarket-v1: ACDC reconstruction and Inca rule (A6.9, E6), and G
 | `triggering_suspect` | string |  |  |  | label | documented wallet of the earliest trigger (precise version first) |
 | `placebo_rate` | float64 |  |  |  | label | placebo-to-real ratio of that version |
 | `gate_scope` | string |  |  |  | meta | case_placebo_or_twin_markets or not_in_case_placebo_or_twin_markets |
+| `is_market_maker` | bool |  |  |  | meta | A34.1 reporting flag, NOT a label: >= 20 active (market, minute) pairs in case, twin and placebo markets with both tokens traded in > 50% of them |
 | `evidence_grade` | string |  | E6 |  | meta | E6 |
 | `data_scope` | string |  |  |  | meta | data window |
 
