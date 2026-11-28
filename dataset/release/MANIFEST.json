@@ -34,8 +34,8 @@
   {
    "path": "README.md",
    "rows": null,
-   "bytes": 15118,
-   "sha256": "578414a83df06eb346af4c68a1789663148b6936749cfe502e20fdbbbe0594cd"
+   "bytes": 21246,
+   "sha256": "3ad1866a9296af07ad08a548e6e7b9cc7ec9000d727aedf3dda9f24ed7a9f6aa"
   },
   {
    "path": "benchmarks/README.md",
@@ -46,8 +46,8 @@
   {
    "path": "benchmarks/baselines.json",
    "rows": null,
-   "bytes": 205917,
-   "sha256": "121b4ee368fc827f83f13c6e6f7c0b10fa86be343eb7a7b2b7d95103842090e7"
+   "bytes": 262801,
+   "sha256": "38025538ce40ce8abb80efc01bbc8678f8d9d8ce2afb5b2a030207741d42271c"
   },
   {
    "path": "benchmarks/pmitc_bench.py",
@@ -298,8 +298,8 @@
   {
    "path": "dataset-metadata.json",
    "rows": null,
-   "bytes": 153201,
-   "sha256": "cda830f5dec59fce1d510924d7dfdd7967dc828365285428033e72729c148ea4"
+   "bytes": 197763,
+   "sha256": "067d3e0a4fedeb0628d3e141d64dea0ac47bf3505faa95e6902f1e8602ed34a2"
   },
   {
    "path": "docs/CHANGELOG.md",
@@ -358,14 +358,14 @@
   {
    "path": "docs/README.md",
    "rows": null,
-   "bytes": 13747,
-   "sha256": "ee67f56b48cd34729ec191906b7cd22edc827262b935483daacfcef8a407a880"
+   "bytes": 19799,
+   "sha256": "a1dce4e52f5024b01ee8c9ab4e34a66eeb6a3366ab3eb0c1e9ff82b6a7b20cf3"
   },
   {
    "path": "docs/REBUILD.md",
    "rows": null,
-   "bytes": 1465,
-   "sha256": "eb4d4d38482d9ad3019a75b163b719505f602d61da4b343e3b46bdb3949caa82"
+   "bytes": 2452,
+   "sha256": "b1dabeecbcc6c33bff836cadfb9e6ac4cc76bdf20c19065e3ca31dc5304b804e"
   },
   {
    "path": "docs/blind_check_sample.csv",
@@ -376,26 +376,26 @@
   {
    "path": "docs/cases_timeline.png",
    "rows": null,
-   "bytes": 128590,
-   "sha256": "8674ba1c0d0980403d623775c3234590c3f589cf2d2cfe129a52705bffa0bcf3"
+   "bytes": 128863,
+   "sha256": "fcb401938ce1ef83a2c6535d09b40f3cbe7f09c735de61e4fe6439c7b8e99c23"
   },
   {
    "path": "notebooks/01_quickstart.ipynb",
    "rows": null,
-   "bytes": 124998,
-   "sha256": "29297ead3fde87df8885a21196a9f85ebb4d2a2980008db8822447a08e29e4c5"
+   "bytes": 125036,
+   "sha256": "e2b5acc3ddcfe1e98dc6a7ae518b292622428d2b40cb38a74e3cacb853e34aca"
   },
   {
    "path": "notebooks/02_case_study.ipynb",
    "rows": null,
-   "bytes": 107486,
-   "sha256": "bca16b7bcfdb1371596e3c531125f80760dc7be52bcf334b22a996094bb284c3"
+   "bytes": 107507,
+   "sha256": "32555c083e7e01f2485ed55a48e26ff568cccf760fe356e5d712fdaf6e3cd132"
   },
   {
    "path": "notebooks/03_benchmarks.ipynb",
    "rows": null,
-   "bytes": 37588,
-   "sha256": "eda2af4eab52539d6dff40d5369ce6ca5814095057a0867723e465a7b791bbf0"
+   "bytes": 56594,
+   "sha256": "4e6dec6106080d76214442a2d607906753e21e3028d41cba068d412945f801e5"
   },
   {
    "path": "requirements.txt",

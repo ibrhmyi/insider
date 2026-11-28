@@ -367,7 +367,8 @@ def test_few_fold_results_have_no_headline_number():
     n = 0
     for v in ["precise", "day"]:
         for s_ in B["label_sets"]:
-            for t, r in B[v][s_].items():
+            tasks = [(t, r) for t, r in B[v][s_].items() if t != "wallet_level"] + list(B[v][s_].get("wallet_level", {}).items())  # A35 secondary block
+            for t, r in tasks:
                 for m, x in r["summary"].items():
                     if x["n_loco_folds"] < B["min_folds_for_summary"]:
                         assert "loco_mean" not in x and "loco_sd" not in x and "fold_values" in x, (v, s_, t, m); n += 1

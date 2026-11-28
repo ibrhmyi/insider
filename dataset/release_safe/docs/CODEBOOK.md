@@ -71,6 +71,7 @@ One row per claim: one statement by one source at one time (PROTOCOL 2, 6). Clai
 | `notes` | string |  |  |  | meta | free notes |
 | `right_of_reply` | string |  |  |  | meta | reply received from the subject, verbatim summary and date (A24); NULL if none. not_built: no reply recorded yet (A43) |
 | `claim_timing` | string |  | ex_ante, ex_post |  | label | A42: ex_ante if claim_date is before the earliest resolution of the claim's alleged markets (claim_positions), else ex_post; NULL without a mapped market |
+| `claim_day_contains_resolution` | bool |  |  |  | label | A49: the first resolution of the claim's alleged markets falls inside the claim's UTC day (a same-day 'ex_ante' claim may describe the event after the fact); NULL where claim_timing is NULL |
 | `alleged_side_won` | bool |  |  |  | post | A42: the alleged side won in every mapped market (NULL without a mapped market or if one is unresolved) |
 | `duplicate_of` | string |  |  |  | meta | A44: claim this one repeats (same source and wallets); NULL otherwise |
 

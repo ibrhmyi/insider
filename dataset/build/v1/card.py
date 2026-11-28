@@ -47,6 +47,10 @@ nf = {s: {t: B["precise"][s][t]["summary"].get("logistic_regression", {}).get("n
 sf = sorted(set(nf["label_strict"].values()))
 STRICT_FOLDS = (f"**`label_strict` has fewer than 4 usable leave-one-group-out folds** ({', '.join(f'{t}: {nf['label_strict'][t]}' for t in HEAD)}; plus the time split): strict results are anecdotal, one fold can move the range by more than any model difference, and no strict number should be read as a detector's accuracy."
                 if max(sf) < 4 else f"`label_strict` has {', '.join(f'{t}: {nf['label_strict'][t]}' for t in HEAD)} usable leave-one-group-out folds (plus the time split); below 6 folds results are per fold only (A32).")
+few = [s_ for s_ in ["label_standard", "label_broad"] if max(nf[s_].values()) < 6]
+FEW_TXT = (f" With alleged positions as positives (A35) and whole groups as folds (A37), {' and '.join(f'`{x}`' for x in few)} also have fewer than 6 folds ({', '.join(f'{x}: {max(nf[x].values())}' for x in few)}), so **every cell is a range of fold values**." if few else "")
+ts_none = all(B["precise"][s_][t]["summary"].get("logistic_regression", {}).get("time_split") is None for s_ in nf for t in HEAD)
+TS_TXT = (" **The time split is empty for every label set:** no group first claimed on or after 2026-03-01 has an alleged position before a reliable cut, so all results are leave-one-group-out folds." if ts_none else "")
 ea = claims[claims.claim_timing == "ex_ante"]; eaw = ea[ea.alleged_side_won.notna()]
 ea_full = eaw[eaw.claim_day_contains_resolution == False]  # noqa: E712  (A49)
 TW_CM = int(tw[tw.twin_id.notna()].case_condition_id.nunique())
@@ -88,7 +92,7 @@ from datasets import load_dataset; wallets = load_dataset("<hf-user>/pmitc", "wa
 print(positions.groupby("market_set").label_strict.sum(), wallets.num_rows)
 ```
 
-Notebooks: `notebooks/01_quickstart.ipynb` (load, join, plot), `02_case_study.ipynb` (the Maduro market: price path, the wallet's buys, matched controls), `03_benchmarks.ipynb`. Requirements: `requirements.txt` (pinned); rebuilding from scratch takes about 7 hours and 30 GB of disk (`docs/REBUILD.md`).
+Notebooks: `notebooks/01_quickstart.ipynb` (load, join, plot), `02_case_study.ipynb` (the Maduro market: price path, the wallet's buys, matched controls), `03_benchmarks.ipynb`. Requirements: `requirements.txt` (pinned); rebuilding from scratch takes about 7 hours and 45 GB of disk (`docs/REBUILD.md`).
 
 ## Tables
 
@@ -118,7 +122,7 @@ Every time-dependent table exists for two cut times (`t_news_version`): `day` an
 
 ## Benchmarks (PROTOCOL A23, A26, A27, A29, A32, A33, A34; `benchmarks/`)
 
-Leave-one-group-out over connected case groups (A37: cases sharing a market or Gamma event are one group) with at least 3 `label_standard` wallets, plus a time split by group (test = groups first claimed on or after 2026-03-01). Positives are alleged positions (A35). Only `t_news_reliable = true` markets (A29) and directional pre-news positions in the economic view (A34-A34.2). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. **With fewer than 6 folds (A32) a cell gives only the range of fold values** ("folds min-max (n) / time split"); per-fold values are in `baselines.json`. This applies to every `label_strict` cell. {STRICT_FOLDS} Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
+Leave-one-group-out over connected case groups (A37: cases sharing a market or Gamma event are one group) with at least 3 `label_standard` wallets, plus a time split by group (test = groups first claimed on or after 2026-03-01). Positives are alleged positions (A35). Only `t_news_reliable = true` markets (A29) and directional pre-news positions in the economic view (A34-A34.2). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. **With fewer than 6 folds (A32) a cell gives only the range of fold values** ("folds min-max (n) / time split"); per-fold values are in `baselines.json`. This applies to every `label_strict` cell.{FEW_TXT}{TS_TXT} {STRICT_FOLDS} Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
 
 **Headline tasks control for how sources select cases (A27):** **T1s** ranks pre-news buyers only within the size band of the market's positives (size alone no longer separates them); **T2s** matches controls on account-age band as well as time, price and size; **T2w** matches on account-age and prior win-rate bands (A33); both retry with the adjacent band before dropping an episode (`relaxed_band`); **T2-open** lets Orca/Inca-flagged wallets be controls. Secondary: T1 (all buyers), T2 (standard controls), T3 (case vs same-category twin markets), T3b (case vs crypto/weather placebo markets; market-type sensitive).
 

@@ -1,20 +1,23 @@
 # PMITC v1.2.1 benchmark tasks
 
-Rules: PROTOCOL A15, A23, A26, A27, A29, A32, A33 and A34-A34.2. Run `python3 pmitc_bench.py` (writes `baselines.json`, seed 192; about an hour with gradient-boosting tuning) or `python3 pmitc_bench.py --quick`; `notebooks/03_benchmarks.ipynb` shows the results.
+Rules: PROTOCOL A15, A23, A26, A27, A29, A32, A33, A34-A34.2, A35, A37, A44 and A46. Run `python3 pmitc_bench.py` (writes `baselines.json`, seed 192; several hours with gradient-boosting tuning on 4 CPUs) or `python3 pmitc_bench.py --quick`; `notebooks/03_benchmarks.ipynb` shows the results.
 
 Labels are allegations by named sources. Positives are sparse and clustered: 74 of the 119 `label_broad` wallets come from two cases (52 Feb-28 2026 Iran strike, 22 KPMG), and 87 are cluster members linked by money flows. Every task therefore runs on three nested label sets (`label_strict` ⊆ `label_standard` ⊆ `label_broad`, A20) and every metric is reported per fold, per case and case-weighted. **Training and evaluation labels (A26):** every model is trained on `label_standard` (the main training label; `label_broad` for its own column) and scored on the label set of the column; `label_strict` is evaluation-only and is never used to fit or tune. In an evaluation on a smaller set, documented wallets outside the set are dropped from the test rows (neither positive nor negative). `label_strict` requires a buy before the market's precise news time; `wallets.strict_no_prenews` marks the wallets that meet the rest of the rule without one.
 
 **Reliable news times only (A29, A29.1):** every task drops markets whose cut came from the deadline rule (`t_news_reliable = false`, per market); `baselines.json` (`excluded_unreliable`) lists what that removes.
 
+**Positives are alleged positions (A35):** `y = label set AND is_alleged_position`: the (market, side) a wallet's own claims or its cluster's claims describe (`claim_positions`, A35.1, A48). Other positions of labelled wallets (`episodes.role = labelled_other_position`) are dropped from T2 and are neither positive nor negative in T1. The wallet-level version (any position of a labelled wallet) is the secondary result `wallet_level` in `baselines.json` (T1s, T2s; no gradient boosting).
+
 **Economic view (A34-A34.2):** T1 candidates are directional pre-news positions (`is_directional_position`): sells of tokens never held are read as buys of the other token, and full sets are netted out. Episodes and controls follow the same rule.
 
-**Few folds (A32):** a task and label set with fewer than 6 leave-one-case-out folds is summarised by its fold values with min and max only (`reporting = per_fold_only_A32`); no mean, SD or single headline number. This applies to every `label_strict` result.
+**Few folds (A32):** a task and label set with fewer than 6 leave-one-group-out folds is summarised by its fold values with min and max only (`reporting = per_fold_only_A32`); no mean, SD or single headline number. This applies to every `label_strict` result.
 
 News times are per market (A25): `positions.t_cut_ts` is the market's own cut (scheduled start, deadline or case time, `markets.t_news_market_method`).
 
 ## Folds
-- **Leave-one-case-out** over every case with at least 3 `label_standard` wallets in the task's rows: the model is trained on all other cases and tested on that case. Reported as mean, SD, minimum and maximum over folds. A fold with no positive of the label set in its test case is skipped (strict has fewer folds).
-- **Time split** (A15, `splits.csv`): train = cases first claimed before 2026-03-01, test = on or after.
+- **Leave-one-group-out (A37)** over connected case groups (`splits.csv` `group_id`: cases that share any `condition_id` or Gamma event are one group) with at least 3 `label_standard` wallets: the model is trained on all other groups and tested on that group. Reported as mean, SD, minimum and maximum over folds. A fold with no positive of the label set in its test group is skipped (strict has fewer folds). Fold names keep the `loco:` prefix and the group id (the alphabetically first case of the group).
+- **Time split** (A15, A37, `splits.csv`): whole groups; train = groups first claimed before 2026-03-01, test = on or after.
+- **Repeated controls (A44):** in T2 tasks a control (case, market, token, wallet) matched to several episodes counts once per fold.
 
 ## Baselines
 - `prevalence`: constant score (AP equals prevalence; AUC 0.5). It replaces the random baseline, whose expectation is the prevalence and whose single draws vary widely (run 9 report: random AP over 100 seeds on the old test split had mean 0.020, SD 0.044).
@@ -34,7 +37,7 @@ Sources flag large bets on fresh wallets; T1 and T2 partly reward learning that 
 ## Secondary tasks
 - **T1, within-market ranking.** Unit: (case market, wallet) on the wallet's main token, from `positions`. Rank all pre-news buyers; positives = the label set. Metric: per-market AP (and P@10, R@10, R@100), averaged within case, then over cases.
 - **T2, episode classification.** Unit: `episodes` rows of `control_design = standard`, documented episodes vs their matched controls (same side and large other-side buyers). Metric: AUC within each test case, case-weighted. Base result: matched same-side controls win about as often as documented episodes, so outcomes cannot separate them.
-- **T3, case vs twin markets** (A22): case markets where a wallet of the label set bought before the cut, vs their same-category, same-volume-decile, same-duration, same-year twins, from pre-cut flow (`market_minutes` before the cut, `positions`). Metric: AUC, case-weighted. `all_case_markets` runs every matched case market.
+- **T3, case vs twin markets** (A22, A38, A46): case markets where a wallet of the label set bought before the cut, vs their same-category, same-volume-decile, same-duration, same-year twins, from pre-cut flow (`market_minutes` before the cut, `positions`). Metric: AUC, case-weighted. `all_case_markets` runs every matched case market.
 - **T3b, case vs placebo markets** (A14): the same with crypto-price and weather placebos. **Market-type sensitive**: placebos differ from case markets in kind, so a high score partly measures market type.
 
 ## Leakage: do not use

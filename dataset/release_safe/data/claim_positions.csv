@@ -1,0 +1,179 @@
+claim_id,case_id,condition_id,side,mapping_basis,mapping_note
+CL0001,maduro-2026-01,0x18d8c59309811ce5618ea941f9bde2a96afa5d876a69c42fba2da4bcc56d3c5e,Yes,event_ladder_rungs_after_event_date,Maduro-related bets on classified operation knowledge (event 2026-01-03)
+CL0001,maduro-2026-01,0x405d8bce742fa300a306df3bede02ef29a5d45f8e788a8a4c056e17badf5a56a,Yes,event_ladder_rungs_after_event_date,Maduro-related bets on classified operation knowledge (event 2026-01-03)
+CL0001,maduro-2026-01,0x580adc1327de9bf7c179ef5aaffa3377bb5cb252b7d6390b027172d43fd6f993,Yes,event_ladder_rungs_after_event_date,Maduro-related bets on classified operation knowledge (event 2026-01-03)
+CL0001,maduro-2026-01,0xa374f4c047b99a8e2950783b7306c2a8c313fb88d98ae2c1ea0efb58231c3250,Yes,event_ladder_rungs_after_event_date,Maduro-related bets on classified operation knowledge (event 2026-01-03)
+CL0002,maduro-2026-01,0x580adc1327de9bf7c179ef5aaffa3377bb5cb252b7d6390b027172d43fd6f993,Yes,named_market,"claim names 'Maduro out by Jan 31, 2026', Yes shares"
+CL0003,maduro-2026-01,0x580adc1327de9bf7c179ef5aaffa3377bb5cb252b7d6390b027172d43fd6f993,Yes,named_market,claim names 'Maduro out by end of January'
+CL0005,maduro-2026-01,0x18d8c59309811ce5618ea941f9bde2a96afa5d876a69c42fba2da4bcc56d3c5e,Yes,event_ladder_rungs_after_event_date,three wallets on the Maduro capture
+CL0005,maduro-2026-01,0x405d8bce742fa300a306df3bede02ef29a5d45f8e788a8a4c056e17badf5a56a,Yes,event_ladder_rungs_after_event_date,three wallets on the Maduro capture
+CL0005,maduro-2026-01,0x580adc1327de9bf7c179ef5aaffa3377bb5cb252b7d6390b027172d43fd6f993,Yes,event_ladder_rungs_after_event_date,three wallets on the Maduro capture
+CL0005,maduro-2026-01,0xa374f4c047b99a8e2950783b7306c2a8c313fb88d98ae2c1ea0efb58231c3250,Yes,event_ladder_rungs_after_event_date,three wallets on the Maduro capture
+CL0085,maduro-2026-01,0x18d8c59309811ce5618ea941f9bde2a96afa5d876a69c42fba2da4bcc56d3c5e,Yes,event_ladder_rungs_after_event_date,betting on Maduro's removal hours before the arrest
+CL0085,maduro-2026-01,0x405d8bce742fa300a306df3bede02ef29a5d45f8e788a8a4c056e17badf5a56a,Yes,event_ladder_rungs_after_event_date,betting on Maduro's removal hours before the arrest
+CL0085,maduro-2026-01,0x580adc1327de9bf7c179ef5aaffa3377bb5cb252b7d6390b027172d43fd6f993,Yes,event_ladder_rungs_after_event_date,betting on Maduro's removal hours before the arrest
+CL0085,maduro-2026-01,0xa374f4c047b99a8e2950783b7306c2a8c313fb88d98ae2c1ea0efb58231c3250,Yes,event_ladder_rungs_after_event_date,betting on Maduro's removal hours before the arrest
+CL0022,us-iran-strike-2026-02-28,0x3488f31e6449f9803f99a8b5dd232c7ad883637f1c86e6953305a2ef19c77f20,Yes,named_market,"claim names 'US strikes Iran by Feb 28', bought Yes"
+CL0023,us-iran-strike-2026-02-28,0x15aa3c1259a716915e068a0d63c3885d2301d29e8982cbb1717ecb9b63d02d95,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x1a9c672954add1948931ece050d225bfbfa7650979bbe6458ac3af08d1e44742,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x3488f31e6449f9803f99a8b5dd232c7ad883637f1c86e6953305a2ef19c77f20,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x3fc804e4d893f86d49229eb42492cabf6150f5bcbf36c1b66d1e8f22bc15ec6d,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x43edd40756d4dfaa633687ddbfab445cdd21f9083a45289871e95b5292793bca,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x4b02efe53e631ada84681303fd66d79ad615f3d2b6a28b4633d43d935f89af58,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x5da48084a431e8c888b18c89e33f317207c8f5282605a052e155dcde9a4b9ac8,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x63eed4826f75272a6ff68e0d0d6d0e0e685407a75e5dc9dd78236693c4ab1741,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x6a4d97b6b54f49991f3984998fc8423668b09e9ea21de7074f27ab7dd4953ba3,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x7320a31f5b0babc0c2c99e8a14d120f577affb38793379307b6f56efdb849f49,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x78b1ffc4bfa756a54d9a4b61c2d68f1ce1d632bbaede8ba569f6cfa8ac19acc4,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x797d586ad45522306490b0cc9b2f21bdf957f3843476fae99f3bcc2cec83b74b,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x7e7e6199b1670c7f083fa22ee2bc53ff51d710a417fae70bb96b623e6f4c281c,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x824df6aa7e270678a5239d697918e918834a52cc6e59ebc25b650b2df649ac82,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x88d15da5bbd95766495c0229da4dab1382cc81e313c6be925558f86b8b628d91,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0x98c0aa27e741d5bfeb0a06e68bddd256b857fd27597c76c500250db1483c51aa,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0xacb70ddf71d1bdc0268016fb8e00099fc8f533c59ef1f13231d0af5fad0fbb34,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0xdc286ca5f101f7a88e51c89e0be838983f32e4932e941a881973df91f5878536,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0xeea3c1ef1764cffd540a50c7c85513ede593ce3d4bfe452aec6a0bce3e3b4d62,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0023,us-iran-strike-2026-02-28,0xf98a7ee2b96f9f3f95a66b62f19cac40c48421f75a976bad7cd402758a54e3d0,Yes,event_ladder_rungs_after_event_date,bet before strike news (market not named; Khamenei bets are not in this case)
+CL0024,us-iran-strike-2026-02-28,0x15aa3c1259a716915e068a0d63c3885d2301d29e8982cbb1717ecb9b63d02d95,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x1a9c672954add1948931ece050d225bfbfa7650979bbe6458ac3af08d1e44742,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x3488f31e6449f9803f99a8b5dd232c7ad883637f1c86e6953305a2ef19c77f20,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x3fc804e4d893f86d49229eb42492cabf6150f5bcbf36c1b66d1e8f22bc15ec6d,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x43edd40756d4dfaa633687ddbfab445cdd21f9083a45289871e95b5292793bca,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x4b02efe53e631ada84681303fd66d79ad615f3d2b6a28b4633d43d935f89af58,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x5da48084a431e8c888b18c89e33f317207c8f5282605a052e155dcde9a4b9ac8,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x63eed4826f75272a6ff68e0d0d6d0e0e685407a75e5dc9dd78236693c4ab1741,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x6a4d97b6b54f49991f3984998fc8423668b09e9ea21de7074f27ab7dd4953ba3,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x7320a31f5b0babc0c2c99e8a14d120f577affb38793379307b6f56efdb849f49,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x78b1ffc4bfa756a54d9a4b61c2d68f1ce1d632bbaede8ba569f6cfa8ac19acc4,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x797d586ad45522306490b0cc9b2f21bdf957f3843476fae99f3bcc2cec83b74b,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x7e7e6199b1670c7f083fa22ee2bc53ff51d710a417fae70bb96b623e6f4c281c,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x824df6aa7e270678a5239d697918e918834a52cc6e59ebc25b650b2df649ac82,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x88d15da5bbd95766495c0229da4dab1382cc81e313c6be925558f86b8b628d91,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0x98c0aa27e741d5bfeb0a06e68bddd256b857fd27597c76c500250db1483c51aa,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0xacb70ddf71d1bdc0268016fb8e00099fc8f533c59ef1f13231d0af5fad0fbb34,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0xdc286ca5f101f7a88e51c89e0be838983f32e4932e941a881973df91f5878536,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0xeea3c1ef1764cffd540a50c7c85513ede593ce3d4bfe452aec6a0bce3e3b4d62,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0024,us-iran-strike-2026-02-28,0xf98a7ee2b96f9f3f95a66b62f19cac40c48421f75a976bad7cd402758a54e3d0,Yes,event_ladder_rungs_after_event_date,netted over $2M on the Feb 28 strikes
+CL0026,us-iran-strike-2026-02-28,0x15aa3c1259a716915e068a0d63c3885d2301d29e8982cbb1717ecb9b63d02d95,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x1a9c672954add1948931ece050d225bfbfa7650979bbe6458ac3af08d1e44742,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x3488f31e6449f9803f99a8b5dd232c7ad883637f1c86e6953305a2ef19c77f20,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x3fc804e4d893f86d49229eb42492cabf6150f5bcbf36c1b66d1e8f22bc15ec6d,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x43edd40756d4dfaa633687ddbfab445cdd21f9083a45289871e95b5292793bca,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x4b02efe53e631ada84681303fd66d79ad615f3d2b6a28b4633d43d935f89af58,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x5da48084a431e8c888b18c89e33f317207c8f5282605a052e155dcde9a4b9ac8,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x63eed4826f75272a6ff68e0d0d6d0e0e685407a75e5dc9dd78236693c4ab1741,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x6a4d97b6b54f49991f3984998fc8423668b09e9ea21de7074f27ab7dd4953ba3,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x7320a31f5b0babc0c2c99e8a14d120f577affb38793379307b6f56efdb849f49,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x78b1ffc4bfa756a54d9a4b61c2d68f1ce1d632bbaede8ba569f6cfa8ac19acc4,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x797d586ad45522306490b0cc9b2f21bdf957f3843476fae99f3bcc2cec83b74b,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x7e7e6199b1670c7f083fa22ee2bc53ff51d710a417fae70bb96b623e6f4c281c,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x824df6aa7e270678a5239d697918e918834a52cc6e59ebc25b650b2df649ac82,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x88d15da5bbd95766495c0229da4dab1382cc81e313c6be925558f86b8b628d91,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0x98c0aa27e741d5bfeb0a06e68bddd256b857fd27597c76c500250db1483c51aa,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0xacb70ddf71d1bdc0268016fb8e00099fc8f533c59ef1f13231d0af5fad0fbb34,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0xdc286ca5f101f7a88e51c89e0be838983f32e4932e941a881973df91f5878536,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0xeea3c1ef1764cffd540a50c7c85513ede593ce3d4bfe452aec6a0bce3e3b4d62,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0026,us-iran-strike-2026-02-28,0xf98a7ee2b96f9f3f95a66b62f19cac40c48421f75a976bad7cd402758a54e3d0,Yes,event_ladder_rungs_after_event_date,bet the strike would come the next day
+CL0032,us-iran-ceasefire-2026-04-07,0x0de3f76fe9b60857833856bec4f30d815cdb0c283361112b46e13b759cd8ef38,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0032,us-iran-ceasefire-2026-04-07,0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0032,us-iran-ceasefire-2026-04-07,0x4ccff8c606ad71080c7611d28f1593a528a8ca6c11c1fb63bfa24a7eb2ad30d7,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0032,us-iran-ceasefire-2026-04-07,0x773abaa5fe55e5cde51a261f444b7921652a4e059ead6b3be9fe56499c2d4609,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0032,us-iran-ceasefire-2026-04-07,0x80059ff4e694f878c0498f6f3a067ee7ca62dc2fc46251a4287b58355ce47bc5,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0032,us-iran-ceasefire-2026-04-07,0x81b06cb917c9a2aabc67a7765bc3c640e88a699bbf451b29915049c0766cde04,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0032,us-iran-ceasefire-2026-04-07,0xa9937410f8aae98cc6440a7480ad832be5a1a998afcf5a6e77c6f5aa4c0f259f,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0032,us-iran-ceasefire-2026-04-07,0xd9a8b5917a3bc25caf28784fddac39bc45a9f2fe4c63fbf4e3ac8684d8b757df,Yes,event_ladder_rungs_after_event_date,Yes bets before the ceasefire post
+CL0033,us-iran-ceasefire-2026-04-07,0x0de3f76fe9b60857833856bec4f30d815cdb0c283361112b46e13b759cd8ef38,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0033,us-iran-ceasefire-2026-04-07,0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0033,us-iran-ceasefire-2026-04-07,0x4ccff8c606ad71080c7611d28f1593a528a8ca6c11c1fb63bfa24a7eb2ad30d7,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0033,us-iran-ceasefire-2026-04-07,0x773abaa5fe55e5cde51a261f444b7921652a4e059ead6b3be9fe56499c2d4609,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0033,us-iran-ceasefire-2026-04-07,0x80059ff4e694f878c0498f6f3a067ee7ca62dc2fc46251a4287b58355ce47bc5,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0033,us-iran-ceasefire-2026-04-07,0x81b06cb917c9a2aabc67a7765bc3c640e88a699bbf451b29915049c0766cde04,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0033,us-iran-ceasefire-2026-04-07,0xa9937410f8aae98cc6440a7480ad832be5a1a998afcf5a6e77c6f5aa4c0f259f,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0033,us-iran-ceasefire-2026-04-07,0xd9a8b5917a3bc25caf28784fddac39bc45a9f2fe4c63fbf4e3ac8684d8b757df,Yes,event_ladder_rungs_after_event_date,made about $611k on the ceasefire
+CL0034,us-iran-ceasefire-2026-04-07,0x0de3f76fe9b60857833856bec4f30d815cdb0c283361112b46e13b759cd8ef38,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0034,us-iran-ceasefire-2026-04-07,0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0034,us-iran-ceasefire-2026-04-07,0x4ccff8c606ad71080c7611d28f1593a528a8ca6c11c1fb63bfa24a7eb2ad30d7,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0034,us-iran-ceasefire-2026-04-07,0x773abaa5fe55e5cde51a261f444b7921652a4e059ead6b3be9fe56499c2d4609,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0034,us-iran-ceasefire-2026-04-07,0x80059ff4e694f878c0498f6f3a067ee7ca62dc2fc46251a4287b58355ce47bc5,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0034,us-iran-ceasefire-2026-04-07,0x81b06cb917c9a2aabc67a7765bc3c640e88a699bbf451b29915049c0766cde04,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0034,us-iran-ceasefire-2026-04-07,0xa9937410f8aae98cc6440a7480ad832be5a1a998afcf5a6e77c6f5aa4c0f259f,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0034,us-iran-ceasefire-2026-04-07,0xd9a8b5917a3bc25caf28784fddac39bc45a9f2fe4c63fbf4e3ac8684d8b757df,Yes,event_ladder_rungs_after_event_date,April 2026 ceasefire bet
+CL0088,us-iran-ceasefire-2026-04-07,0x0de3f76fe9b60857833856bec4f30d815cdb0c283361112b46e13b759cd8ef38,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0088,us-iran-ceasefire-2026-04-07,0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0088,us-iran-ceasefire-2026-04-07,0x4ccff8c606ad71080c7611d28f1593a528a8ca6c11c1fb63bfa24a7eb2ad30d7,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0088,us-iran-ceasefire-2026-04-07,0x773abaa5fe55e5cde51a261f444b7921652a4e059ead6b3be9fe56499c2d4609,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0088,us-iran-ceasefire-2026-04-07,0x80059ff4e694f878c0498f6f3a067ee7ca62dc2fc46251a4287b58355ce47bc5,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0088,us-iran-ceasefire-2026-04-07,0x81b06cb917c9a2aabc67a7765bc3c640e88a699bbf451b29915049c0766cde04,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0088,us-iran-ceasefire-2026-04-07,0xa9937410f8aae98cc6440a7480ad832be5a1a998afcf5a6e77c6f5aa4c0f259f,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0088,us-iran-ceasefire-2026-04-07,0xd9a8b5917a3bc25caf28784fddac39bc45a9f2fe4c63fbf4e3ac8684d8b757df,Yes,event_ladder_rungs_after_event_date,bought before the ceasefire at low odds
+CL0089,us-iran-ceasefire-2026-04-07,0x0de3f76fe9b60857833856bec4f30d815cdb0c283361112b46e13b759cd8ef38,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0089,us-iran-ceasefire-2026-04-07,0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0089,us-iran-ceasefire-2026-04-07,0x4ccff8c606ad71080c7611d28f1593a528a8ca6c11c1fb63bfa24a7eb2ad30d7,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0089,us-iran-ceasefire-2026-04-07,0x773abaa5fe55e5cde51a261f444b7921652a4e059ead6b3be9fe56499c2d4609,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0089,us-iran-ceasefire-2026-04-07,0x80059ff4e694f878c0498f6f3a067ee7ca62dc2fc46251a4287b58355ce47bc5,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0089,us-iran-ceasefire-2026-04-07,0x81b06cb917c9a2aabc67a7765bc3c640e88a699bbf451b29915049c0766cde04,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0089,us-iran-ceasefire-2026-04-07,0xa9937410f8aae98cc6440a7480ad832be5a1a998afcf5a6e77c6f5aa4c0f259f,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0089,us-iran-ceasefire-2026-04-07,0xd9a8b5917a3bc25caf28784fddac39bc45a9f2fe4c63fbf4e3ac8684d8b757df,Yes,event_ladder_rungs_after_event_date,netted about $194k on the US-Iran ceasefire
+CL0028,bubblemaps-military-cluster,0x15aa3c1259a716915e068a0d63c3885d2301d29e8982cbb1717ecb9b63d02d95,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x1a9c672954add1948931ece050d225bfbfa7650979bbe6458ac3af08d1e44742,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x3488f31e6449f9803f99a8b5dd232c7ad883637f1c86e6953305a2ef19c77f20,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x3fc804e4d893f86d49229eb42492cabf6150f5bcbf36c1b66d1e8f22bc15ec6d,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x43edd40756d4dfaa633687ddbfab445cdd21f9083a45289871e95b5292793bca,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x4b02efe53e631ada84681303fd66d79ad615f3d2b6a28b4633d43d935f89af58,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x5da48084a431e8c888b18c89e33f317207c8f5282605a052e155dcde9a4b9ac8,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x63eed4826f75272a6ff68e0d0d6d0e0e685407a75e5dc9dd78236693c4ab1741,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x6a4d97b6b54f49991f3984998fc8423668b09e9ea21de7074f27ab7dd4953ba3,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x7320a31f5b0babc0c2c99e8a14d120f577affb38793379307b6f56efdb849f49,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x78b1ffc4bfa756a54d9a4b61c2d68f1ce1d632bbaede8ba569f6cfa8ac19acc4,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x797d586ad45522306490b0cc9b2f21bdf957f3843476fae99f3bcc2cec83b74b,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x7e7e6199b1670c7f083fa22ee2bc53ff51d710a417fae70bb96b623e6f4c281c,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x824df6aa7e270678a5239d697918e918834a52cc6e59ebc25b650b2df649ac82,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x88d15da5bbd95766495c0229da4dab1382cc81e313c6be925558f86b8b628d91,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x98c0aa27e741d5bfeb0a06e68bddd256b857fd27597c76c500250db1483c51aa,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0xacb70ddf71d1bdc0268016fb8e00099fc8f533c59ef1f13231d0af5fad0fbb34,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0xdc286ca5f101f7a88e51c89e0be838983f32e4932e941a881973df91f5878536,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0xeea3c1ef1764cffd540a50c7c85513ede593ce3d4bfe452aec6a0bce3e3b4d62,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0xf98a7ee2b96f9f3f95a66b62f19cac40c48421f75a976bad7cd402758a54e3d0,Yes,event_ladder_rungs_after_event_date,bets on US military actions (strike)
+CL0028,bubblemaps-military-cluster,0x70909f0ba8256a89c301da58812ae47203df54957a07c7f8b10235e877ad63c2,Yes,named_market,bets on US military actions (Khamenei)
+CL0014,israel-rising-lion-2025-06,0x7f39808829da93cfd189807f13f6d86a0e604835e6f9482d8094fac46b3abaac,Yes,event_ladder_rungs_after_event_date,friend bet on the launch date (event 2025-06-13); daily 'strike on <date>' markets not mapped
+CL0014,israel-rising-lion-2025-06,0xd25ff3223a2233f6cd96a349455ca3237931c64358792f90c5f02d8cc39be38d,Yes,event_ladder_rungs_after_event_date,friend bet on the launch date (event 2025-06-13); daily 'strike on <date>' markets not mapped
+CL0015,israel-rising-lion-2025-06,0x7f39808829da93cfd189807f13f6d86a0e604835e6f9482d8094fac46b3abaac,Yes,event_ladder_rungs_after_event_date,bets on Israel-Iran war timing
+CL0015,israel-rising-lion-2025-06,0xd25ff3223a2233f6cd96a349455ca3237931c64358792f90c5f02d8cc39be38d,Yes,event_ladder_rungs_after_event_date,bets on Israel-Iran war timing
+CL0011,google-yis-2025,0xea17b1284d10617a57f910b2ea63bdef481b1724a4b899d454ff104bea67b657,Yes,named_market,d4vd bet at 0.2% (the #1-searched market)
+CL0046,nobel-peace-2025,0x14a3dfeba8b22a32feb0f10763db68bc4d2abeb5bff90e9ae20de53793b35a1d,Yes,named_market,Machado odds jumped before the announcement
+CL0047,nobel-peace-2025,0x14a3dfeba8b22a32feb0f10763db68bc4d2abeb5bff90e9ae20de53793b35a1d,Yes,named_market,eight accounts funded before the announcement (Machado market)
+CL0100,nobel-peace-2025,0x14a3dfeba8b22a32feb0f10763db68bc4d2abeb5bff90e9ae20de53793b35a1d,Yes,named_market,bet only on her (Machado)
+CL0040,walz-vp-2024,0x57f90c89879a5b5e69fad9c2a261fa6f44f3653001aa3a02446aed92aaff21bf,Yes,named_market,as Walz went from under 1% to 100%
+CL0056,zachxbt-axiom-2026-02,0x804bc34275d7d610dea3293c06105e925ebfcd6e454813aa27d59a882d50e86d,Yes,named_market,which company ZachXBT would expose (Axiom)
+CL0057,zachxbt-axiom-2026-02,0x804bc34275d7d610dea3293c06105e925ebfcd6e454813aa27d59a882d50e86d,Yes,named_market,traded only the Axiom market
+CL0090,zachxbt-axiom-2026-02,0x804bc34275d7d610dea3293c06105e925ebfcd6e454813aa27d59a882d50e86d,Yes,named_market,top Axiom-market winners
+CL0048,taylor-swift-engagement,0x89ac32e18929185f5bd0dc00e70337571f546e64ae5cd16dceb6026ac2679c1e,Yes,only_case_market,heavy Yes buying before the announcement
+CL0051,trump-pardon-cz-2025,0xdfbdc5331baaf33996d442f543f7c0fe3391dd067cecbb90899b8339e927d05c,Yes,named_market,bought Yes from Sept 28
+CL0018,israel-strike-2025-06-week,0x7f39808829da93cfd189807f13f6d86a0e604835e6f9482d8094fac46b3abaac,Yes,only_case_market,bet that Israel would strike Iran that week (the case's one market)
+CL0019,us-iran-strike-2025-06,0x4ec4d0c92654ccfed5b161c3ca1b4e3664608581b9d21d80939ce792a3a3b94f,Yes,event_ladder_rungs_after_event_date,won longshot bets on the June 21 strike
+CL0019,us-iran-strike-2025-06,0x6a67b9d828d53862160e470329ffea5246f338ecfffdf2cab45211ec578b0347,Yes,event_ladder_rungs_after_event_date,won longshot bets on the June 21 strike
+CL0019,us-iran-strike-2025-06,0x6c6cff89b135f5684f5a25a98fd0335814d1bc411d08bfcf0be400db76ce511a,Yes,event_ladder_rungs_after_event_date,won longshot bets on the June 21 strike
+CL0020,us-iran-strike-2025-06,0x4ec4d0c92654ccfed5b161c3ca1b4e3664608581b9d21d80939ce792a3a3b94f,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0020,us-iran-strike-2025-06,0x6a67b9d828d53862160e470329ffea5246f338ecfffdf2cab45211ec578b0347,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0020,us-iran-strike-2025-06,0x6c6cff89b135f5684f5a25a98fd0335814d1bc411d08bfcf0be400db76ce511a,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0020,us-iran-strike-2025-06,0xb2f2bdc4427cfe0b7ae878355610478ad2384e387705e42cf8c8f596193488c6,Yes,event_ladder_rungs_after_event_date,timing a June 2025 strike (month-level event date: rungs from June 1)
+CL0030,khamenei-removal-2026,0x70909f0ba8256a89c301da58812ae47203df54957a07c7f8b10235e877ad63c2,Yes,named_market,bet that Khamenei would be out by end of March
+CL0031,us-iran-ceasefire-2026-03,0x3c6bcb7da14ea576e5af25547dbd96f2bb24ac34e748e76aecff2ee9195dd1ac,Yes,named_market,bet on a ceasefire by March 31
+CL0035,us-iran-ceasefire-2026-04-07,0x0de3f76fe9b60857833856bec4f30d815cdb0c283361112b46e13b759cd8ef38,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x4c5701bcde0b8fb7d7f48c8e9d20245a6caa58c61a77f981fad98f2bfa0b1bc7,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x4ccff8c606ad71080c7611d28f1593a528a8ca6c11c1fb63bfa24a7eb2ad30d7,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x773abaa5fe55e5cde51a261f444b7921652a4e059ead6b3be9fe56499c2d4609,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x80059ff4e694f878c0498f6f3a067ee7ca62dc2fc46251a4287b58355ce47bc5,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0x81b06cb917c9a2aabc67a7765bc3c640e88a699bbf451b29915049c0766cde04,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0xa9937410f8aae98cc6440a7480ad832be5a1a998afcf5a6e77c6f5aa4c0f259f,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0035,us-iran-ceasefire-2026-04-07,0xd9a8b5917a3bc25caf28784fddac39bc45a9f2fe4c63fbf4e3ac8684d8b757df,Yes,event_ladder_rungs_after_event_date,five-figure ceasefire bets in April
+CL0036,trump-zelensky-meeting-2025-12,0x702dcbe5b0f73dae060f2ed0fde1ce7aa8c9c01a8068dcc7ad375d85364eca8d,Yes,named_market,claim names 'Trump meets Zelenskyy by Dec 31'
+CL0054,openai-browser-2025-10,0xc25e15f39f776813870ee363ed483451add1c55dad163b18bdb2df653be2c90c,Yes,named_market,bet that OpenAI would launch a browser that month (October 2025)
+CL0118,nvidia-ceo-return-2026-11,0x27748e74503ff93d998d1e857980c43eca77c38efd61f642dd43d41a18525250,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0118,nvidia-ceo-return-2026-11,0x6368d1c0daed920fb7cb4444636b605e8b02d700dfdf70bba2758a7c0c4054cb,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0118,nvidia-ceo-return-2026-11,0x79a7b7c58effc4f2753011fb78f44ff59d1912eddc62f4a4ad16f7adda09eb81,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0118,nvidia-ceo-return-2026-11,0xf29406bd9f45effb17a902125a7480b9e15fdc7c24f1a897f543ed3799876be6,Yes,event_ladder_rungs_after_event_date,bet on the CEO's return before the announcement
+CL0119,nvidia-ceo-return-2026-11,0x27748e74503ff93d998d1e857980c43eca77c38efd61f642dd43d41a18525250,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
+CL0119,nvidia-ceo-return-2026-11,0x6368d1c0daed920fb7cb4444636b605e8b02d700dfdf70bba2758a7c0c4054cb,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
+CL0119,nvidia-ceo-return-2026-11,0x79a7b7c58effc4f2753011fb78f44ff59d1912eddc62f4a4ad16f7adda09eb81,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
+CL0119,nvidia-ceo-return-2026-11,0xf29406bd9f45effb17a902125a7480b9e15fdc7c24f1a897f543ed3799876be6,Yes,event_ladder_rungs_after_event_date,bets on the CEO's return (the no-successor market is not in this case)
