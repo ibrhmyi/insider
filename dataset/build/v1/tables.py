@@ -141,7 +141,7 @@ epi["t_news_reliable"] = [REL_M.get((a, b), True) for a, b in zip(epi.case_id, e
 write("controls", ctrl)
 write("episodes", epi.drop(columns=[x for x in epi.columns if x not in [k["name"] for k in TABLES["episodes"]["cols"]] and x not in RENAME["episodes"]]))
 # positions with label columns, assembled in DuckDB and streamed to parquet (pandas does not fit the memory limit)
-DT = {"string": "VARCHAR", "int64": "BIGINT", "float64": "DOUBLE", "bool": "BOOLEAN"}
+DT = {"string": "VARCHAR", "int64": "BIGINT", "float64": "DOUBLE", "bool": "BOOLEAN", "timestamp": "TIMESTAMPTZ"}
 doc = wallets[wallets.is_documented][["wallet", "case_id", "doc_grade"]].assign(is_documented=True)
 fr = CC.sort_values("trigger_utc").drop_duplicates(["candidate_wallet", "case_id", "condition_id", "asset_id", "t_news_version"])
 fr = fr.rename(columns={"candidate_wallet": "wallet", "trigger_wallet": "triggering_suspect"})[["wallet", "case_id", "condition_id", "asset_id", "t_news_version", "triggering_suspect"]]
@@ -169,6 +169,12 @@ expr = dict(is_documented="(market_set = 'case' AND doc_hit)", doc_grade="CASE W
 inv = {v: k for k, v in RENAME["positions"].items()}
 sel = ", ".join(f"CAST({expr.get(col['name'], inv.get(col['name'], col['name']))} AS {DT[col['dtype']]}) AS {col['name']}" for col in TABLES["positions"]["cols"])
 c.sql(f"COPY (SELECT {sel} FROM pos_v ORDER BY market_set, case_id, condition_id, t_news_version, wallet, asset_id) TO '{OUT}/positions.parquet' (FORMAT parquet, COMPRESSION zstd)")
+if any(col["dtype"] == "timestamp" for col in TABLES["positions"]["cols"]):  # DuckDB writes TIMESTAMPTZ in microseconds; cast to the schema (seconds, UTC)
+    _src = os.path.join(OUT, "positions.parquet"); _tmp = _src + ".cast_tmp"; _sch = schema_of("positions")
+    with pq.ParquetWriter(_tmp, _sch, compression="zstd") as _w:
+        for _b in pq.ParquetFile(_src).iter_batches(batch_size=500_000):
+            _w.write_table(pa.Table.from_batches([_b]).cast(_sch))
+    os.replace(_tmp, _src)
 print("positions", c.sql(f"SELECT count(*) FROM '{OUT}/positions.parquet'").fetchall(), flush=True)
 # weak labels + gate counts
 gc = c.sql(f"""SELECT wallet, t_news_version, sum(gate1::INT) gate1, sum(gate2a::INT) gate2a, sum(gate2b::INT) gate2b
