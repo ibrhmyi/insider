@@ -20,9 +20,10 @@ One row per case (underlying event). Derived from claims (build/build_cases.py) 
 | `case_grade` | string |  | E1, E2, E3, E4, E5, E6 |  | label | strongest evidence grade among the case's claims |
 | `grades_present` | string |  |  |  | meta | all grades present, ';'-joined |
 | `investigation_outcome` | string |  | sanctioned, charged, cleared_official, cleared_analyst, disputed, under_investigation, unresolved |  | label | PROTOCOL A9.2 |
-| `event_date` | string |  |  |  | meta | earliest event_date as written (partial dates allowed, A6.3) |
-| `event_date_earliest` | date |  |  |  | meta | earliest possible day of event_date |
-| `event_date_precision` | string |  | day, month, quarter, year, range |  | meta | precision of event_date |
+| `event_occurred_utc` | timestamp |  |  |  | label | A44: earliest documented occurrence of the event (= the case-level t_news_utc) |
+| `market_deadline_utc` | timestamp |  |  |  | meta | A44: deadline of the case's alleged market (claim_positions), the earliest if several; NULL without a mapped market |
+| `event_date_earliest` | date |  |  |  | meta | earliest possible day of the event date as written |
+| `event_date_precision` | string |  | day, month, quarter, year, range |  | meta | precision of the event date as written |
 | `first_claim_date` | string |  |  |  | meta | earliest claim_date as written |
 | `first_claim_date_earliest` | date |  |  |  | meta | earliest possible day of the first claim (used for the A15 time split) |
 | `first_claim_date_precision` | string |  | day, month, quarter, year, range |  | meta | precision of first_claim_date |
@@ -34,7 +35,10 @@ One row per case (underlying event). Derived from claims (build/build_cases.py) 
 | `n_wallets_coordinated_rule` | int64 |  |  |  | label | distinct wallets for which the A13 rule fired in this case (rule output, not an allegation; A17) |
 | `max_amount_claimed_usd` | float64 | USD |  |  | meta | largest amount any claim states |
 | `amounts_disagree` | bool |  |  |  | meta | claims state different amounts |
-| `benchmark_split` | string |  | train, test |  | meta | PROTOCOL A15 split |
+| `benchmark_split` | string |  | train, test |  | meta | PROTOCOL A15/A37 split (by connected group) |
+| `benchmark_group_id` | string |  |  |  | meta | A37: connected group of cases sharing a market or Gamma event (splits and folds assign whole groups) |
+| `n_claims_ex_ante` | int64 |  |  |  | label | A42: claims made before their alleged market resolved |
+| `ex_ante_win_rate` | float64 |  |  |  | post | A42: share of ex-ante claims whose alleged side won (NULL without ex-ante claims) |
 | `status_note` | string |  |  |  | meta | free note |
 
 ## claims
@@ -65,7 +69,10 @@ One row per claim: one statement by one source at one time (PROTOCOL 2, 6). Clai
 | `accessed_date` | date |  |  |  | meta | date accessed |
 | `extractor` | string |  |  |  | meta | who extracted the row |
 | `notes` | string |  |  |  | meta | free notes |
-| `right_of_reply` | string |  |  |  | meta | reply received from the subject, verbatim summary and date (A24); NULL if none |
+| `right_of_reply` | string |  |  |  | meta | reply received from the subject, verbatim summary and date (A24); NULL if none. not_built: no reply recorded yet (A43) |
+| `claim_timing` | string |  | ex_ante, ex_post |  | label | A42: ex_ante if claim_date is before the earliest resolution of the claim's alleged markets (claim_positions), else ex_post; NULL without a mapped market |
+| `alleged_side_won` | bool |  |  |  | post | A42: the alleged side won in every mapped market (NULL without a mapped market or if one is unresolved) |
+| `duplicate_of` | string |  |  |  | meta | A44: claim this one repeats (same source and wallets); NULL otherwise |
 
 ## wallets
 
@@ -138,7 +145,8 @@ One row per (case, market). Ladders are full Gamma events (A6.5). Titles withhel
 | `t_news_market_day_utc` | timestamp |  |  |  | label | A25: per-market day-level cut (day version) |
 | `t_news_market_method` | string |  | scheduled_start, market_deadline, case_time |  | meta | A25 method (A30: a scheduled start is used only if before the market's close) |
 | `is_placebo_market` | bool |  |  |  | meta | always false here |
-| `t_news_reliable` | bool |  |  |  | label | A29: false for every market of a month- or year-dated case without a sourced exact time; excluded from default analyses and benchmarks |
+| `t_news_reliable` | bool |  |  |  | label | A29.1/A29.2: false for deadline-rule cuts and for case-date fallbacks of month/quarter/year/range-dated cases; excluded from default analyses and benchmarks |
+| `question_type` | string |  | weather, crypto_price, sports, legal_action, appointment, election, award, military_action, corporate_release, crypto_project, other |  | meta | A38 keyword type of the question |
 | `t_news_deadline_rule_utc` | timestamp |  |  |  | label | A29: the A25 rule-2 deadline time where it set the cut; NULL otherwise |
 | `ff_tier` | string |  |  |  | meta | ForesightFlow tier if listed |
 | `ff_tier2_tnews` | timestamp |  |  |  | meta | ForesightFlow tier-2 proxy (stored, not used) |
@@ -296,6 +304,7 @@ All-buyer positions before the cut (C2): the full population a detector must sea
 | `is_placebo_market` | bool |  |  |  | label | market_set = placebo |
 | `is_twin_market` | bool |  |  |  | label | market_set = twin (A22) |
 | `t_news_reliable` | bool |  |  |  | label | A29: the (matched) case's news time is reliable; default analyses and benchmarks use true only |
+| `is_alleged_position` | bool |  |  |  | label | A35: a labelled wallet's position on a (market, side) its claims describe (claim_positions); benchmark positives |
 | `buy_usdc_post` | float64 | USDC |  |  | post | BUY USDC at or after the cut |
 | `buy_shares_post` | float64 |  |  |  | post | BUY shares at or after the cut |
 | `sell_usdc_post` | float64 | USDC |  |  | post | SELL USDC at or after the cut |
@@ -315,7 +324,8 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `control_design` | string (PK) |  | standard, age_matched, winrate_matched, open |  | meta | A27/A33: standard (A6.10), age_matched (plus account-age band; T2s), winrate_matched (plus prior win-rate band; T2w) or open (Orca/Inca wallets allowed; T2-open) |
 | `t_news_reliable` | bool |  |  |  | label | A29: the case's news time is reliable (default analyses use true only) |
 | `relaxed_band` | bool |  |  |  | label | A33: control chosen after the adjacent age / win-rate band was allowed; false on suspected rows and exact-band controls |
-| `role` | string |  |  |  | label | suspected, control_same_side, control_other_side_large_buyer |
+| `role` | string |  | suspected, labelled_other_position, control_same_side, control_other_side_large_buyer |  | label | A35: suspected (an alleged position of a labelled wallet), labelled_other_position (another position of a labelled wallet), control_same_side, control_other_side_large_buyer |
+| `is_alleged_position` | bool |  |  |  | label | A35: this (market, side) is one the wallet's claims describe (claim_positions) |
 | `label_strict` | bool |  |  |  | label | suspected row of a label_strict wallet (A20); false on control rows |
 | `label_standard` | bool |  |  |  | label | label_standard (A20) |
 | `label_broad` | bool |  |  |  | label | label_broad (A20) |
@@ -339,7 +349,7 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `account_age_days_at_first_buy` | float64 | days |  |  | pre | days from first Polymarket-v1 fill to first pre-news buy |
 | `n_prior_markets` | int64 |  |  |  | pre | distinct Polymarket-v1 markets before the first buy |
 | `prior_net_long_win_rate` | float64 |  |  |  | pre | win rate on earlier resolved net-long positions |
-| `case_share_of_lifetime_volume` | float64 |  |  |  | post | case volume / lifetime Polymarket-v1 volume (uses lifetime: ex-post denominator) |
+| `case_share_of_lifetime_volume` | float64 |  |  |  | post | this market-token's raw Polymarket-v1 USDC / the wallet's lifetime raw Polymarket-v1 USDC (A43: same source, in [0, 1]; lifetime denominator is ex post) |
 | `first_price_usdc` | float64 |  |  |  | pre | first pre-news buy price |
 | `vwap_price_usdc` | float64 |  |  |  | pre | pre-news buy VWAP |
 | `max_price_paid_usdc` | float64 |  |  |  | pre | max pre-news price |
@@ -357,9 +367,6 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `is_shortest_sufficient` | bool |  |  |  | post | market is the event's shortest deadline that resolved Yes |
 | `share_on_this_ladder_market` | float64 |  |  |  | label | share of event buys on this market. LEAKY for suspected-vs-control tasks: controls are matched one market at a time, so it is 1 for every control |
 | `hours_first_buy_to_tnews` | float64 | hours |  |  | pre | hours from first buy to t_news |
-| `hours_funding_to_first_trade` | float64 |  |  |  | pre | empty: money graph not run (A12.2) |
-| `funding_source_type` | string |  |  |  | pre | empty (A12.2) |
-| `funder_shared_with_labelled` | bool |  |  |  | pre | empty (A12.2) |
 | `n_follower_wallets_60m` | int64 |  |  |  | post | other wallets buying the token within 60 min after a pre-news buy (may extend past t_news) |
 | `follower_buy_usdc_60m` | float64 | USDC |  |  | post | their buy USDC (may extend past t_news) |
 | `share_sold_before_resolution_post` | float64 |  |  |  | post | share of shares sold before resolution |
@@ -428,7 +435,7 @@ Per wallet in Polymarket-v1: ACDC reconstruction and Inca rule (A6.9, E6), and G
 
 ## market_minutes
 
-One row per market, version and UTC minute with fills, cut - 48 h to + 24 h, Yes token (A9.3, A10.2, A14).
+One row per market, version and UTC minute with fills, cut - 48 h to + 24 h (A9.3, A10.2, A14). Prices (vwap, last_price) are of the Yes token, or of the first listed outcome where there is no Yes (A44); volumes cover both tokens; raw fills.
 
 | column | type | unit | allowed values | source | leakage | description |
 |---|---|---|---|---|---|---|
@@ -490,7 +497,7 @@ Money links between addresses from the seed sources (funding, Relay handoff, Saf
 
 ## twin_markets
 
-One row per twin market (A22): a resolved market of the same category, volume decile, duration band and year as a case market, in no claim; unmatched case-market rows have NULL twin fields.
+One row per twin market (A22, A38): a resolved market of the same category and question type, volume decile, duration band and year as a case market, never a placebo category or the same subject, in no claim; unmatched case-market rows have NULL twin fields.
 
 | column | type | unit | allowed values | source | leakage | description |
 |---|---|---|---|---|---|---|
@@ -499,8 +506,9 @@ One row per twin market (A22): a resolved market of the same category, volume de
 | `case_id` | string |  |  |  | meta | matched case (FK cases) |
 | `case_condition_id` | string |  |  |  | meta | matched case market (FK markets) |
 | `twin_condition_id` | string |  |  |  | meta | twin market condition id (unique) |
-| `category_refined` | string |  |  |  | meta | Polymarket-v1 category shared by case market and twin |
-| `twin_slug` | string |  |  |  | meta | twin market slug |
+| `category_refined` | string |  |  |  | meta | Polymarket-v1 category shared by case market and twin (NULL if it names a withheld person, A39) |
+| `question_type` | string |  | sports, legal_action, appointment, election, award, military_action, corporate_release, crypto_project, other |  | meta | A38: question type shared by case market and twin |
+| `twin_slug` | string |  |  |  | meta | twin market slug (NULL if it names a withheld person, A39) |
 | `twin_token_ids` | string |  |  |  | meta | token ids |
 | `twin_outcomes` | string |  |  |  | meta | outcome labels |
 | `twin_outcome` | string |  |  |  | post | winning outcome |
@@ -539,6 +547,19 @@ One row per hard negative (A21): a position or wallet that matches the suspect p
 | `profile_created_utc` | timestamp |  |  |  | pre | Gamma profile createdAt |
 | `first_buy_utc` | timestamp |  |  |  | pre | first pre-cut BUY on the token |
 | `won_post` | bool |  |  |  | post | token won |
+
+## claim_positions
+
+A35: one row per (claim, market, side) a claim describes, mapped by hand from claim text and market questions without looking at outcomes.
+
+| column | type | unit | allowed values | source | leakage | description |
+|---|---|---|---|---|---|---|
+| `claim_id` | string (PK) |  |  |  | meta | claim (FK claims) |
+| `case_id` | string |  |  |  | meta | case |
+| `condition_id` | string (PK) |  |  |  | meta | market (FK markets) |
+| `side` | string (PK) |  |  |  | meta | outcome label the claim says was bought |
+| `mapping_basis` | string |  | named_market, event_ladder_rungs_after_event_date, only_case_market |  | meta | how the market was picked |
+| `mapping_note` | string |  |  |  | meta | what in the claim text picks it |
 
 ## claim_wallet_links
 
