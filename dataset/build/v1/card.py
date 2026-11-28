@@ -50,7 +50,24 @@ STRICT_FOLDS = (f"**`label_strict` has fewer than 4 usable leave-one-group-out f
 few = [s_ for s_ in ["label_standard", "label_broad"] if max(nf[s_].values()) < 6]
 FEW_TXT = (f" With alleged positions as positives (A35) and whole groups as folds (A37), {' and '.join(f'`{x}`' for x in few)} also have fewer than 6 folds ({', '.join(f'{x}: {max(nf[x].values())}' for x in few)}), so **every cell is a range of fold values**." if few else "")
 ts_none = all(B["precise"][s_][t]["summary"].get("logistic_regression", {}).get("time_split") is None for s_ in nf for t in HEAD)
-TS_TXT = (" **The time split is empty for every label set:** no group first claimed on or after 2026-03-01 has an alleged position before a reliable cut, so all results are leave-one-group-out folds." if ts_none else "")
+TS_TXT = ""  # v1.2.2: written after the concentration values below
+# v1.2.2 docs: target note, strict n+ per fold, group concentration, empty time split, T2 coverage
+_ep = rp("episodes"); _lo = _ep[_ep.role == "labelled_other_position"]
+_lo_ps = _lo[(_lo.t_news_version == "precise") & (_lo.control_design == "standard")]
+LO_STD_ALL, LO_STD_PS = int(_lo.label_standard.sum()), int(_lo_ps.label_standard.sum())
+_lost = _lo_ps[_lo_ps.won_post == False]  # noqa: E712
+LOST_N, LOST_STD, LOST_BROAD, LOST_STRICT = len(_lost), int(_lost.label_standard.sum()), int(_lost.label_broad.sum()), int(_lost.label_strict.sum())
+MIN_EVAL = 5  # docs-only marking; A51 pre-registers it as a rule for v1.3
+def _npos(s_, t):
+    return {f: v["n_test_positives"] for f, v in B["precise"][s_][t]["folds"].items() if f.startswith("loco:")}
+STRICT_NPOS = "\n".join(f"- {t}: " + "; ".join(f"`{f}` n+={n}" + ("" if n >= MIN_EVAL else " (**not evaluable**)") for f, n in _npos("label_strict", t).items())
+                        + f" ({sum(n >= MIN_EVAL for n in _npos('label_strict', t).values())} evaluable)" for t in ["T1s", "T2s", "T2w", "T2open", "T1", "T2", "T3", "T3b"])
+N_EVAL_STRICT = sorted({sum(n >= MIN_EVAL for n in _npos("label_strict", t).values()) for t in HEAD})
+_SPL = pd.read_csv(os.path.join(REL, "benchmarks", "splits.csv"))
+_std_npos = _npos("label_standard", "T2s"); BIG_G = max(_std_npos, key=_std_npos.get); BIG_N = _std_npos[BIG_G]; BIG_G = BIG_G[5:]
+STD_POS = B["precise"]["label_standard"]["T2s"]["n_pos_eval"]
+BIG_CASES = sorted(_SPL[_SPL.group_id == BIG_G].case_id); BIG_DATE = _SPL[_SPL.group_id == BIG_G].group_first_claim_date.iloc[0]
+COV = {t: B["precise"]["label_standard"][t]["coverage"] for t in ["T2s", "T2w"]}
 ea = claims[claims.claim_timing == "ex_ante"]; eaw = ea[ea.alleged_side_won.notna()]
 ea_full = eaw[eaw.claim_day_contains_resolution == False]  # noqa: E712  (A49)
 TW_CM = int(tw[tw.twin_id.notna()].case_condition_id.nunique())
@@ -76,7 +93,7 @@ configs:
 {chr(10).join(yaml_cfg)}
 ---
 
-# PMITC v1.2.1: Prediction-Market Informed-Trading Casebook
+# PMITC v1.2.2: Prediction-Market Informed-Trading Casebook
 
 PMITC is a source-traced register of **publicly documented, suspected** informed trading on prediction markets (Polymarket and Kalshi): {len(cases)} cases and {len(claims)} claims from courts, regulators, platforms, researchers, journalists and on-chain analysts, each graded E1 (adjudicated) to E6 (rule-based screen), joined to the trades. For every case market it ships every fill, every buyer before the news, matched controls, hard negatives, same-category "twin" markets and placebo markets where nobody can know the outcome early, so that detection methods can be trained and tested honestly. **Every label is an allegation by a named source ("flagged by <source>"), not a finding.** No table contains a personal name.
 
@@ -112,7 +129,7 @@ Every column has a type, unit, allowed values, source and leakage note in `docs/
 
 **`label_standard` is the main training label; `label_strict` is evaluation-only** (models are trained on `label_standard` and scored on strict positives, A26). `label_strict` also needs a buy before the market's precise news time; {int(wallets.strict_no_prenews.sum())} wallet(s) meet the rest of the rule without one (`strict_no_prenews`). Other label columns are kept separate and never merged: `hard_negative` (A21: {len(hn):,} rows; look-alike losers, look-alike winners in placebo markets, cleared cases), `coordinated_rule_fired` (rule output; about 1/3 expected by chance; may include copy-traders; not an allegation), `gate1`/`gate2a`/`gate2b` (frozen screens), `acdc_class` (reconstruction, not a label), `inca_flag` (published rule only; broader than Inca's list), `is_control`, `is_placebo_market`, `is_twin_market`.
 
-**Positives are alleged positions (A35).** A wallet's alleged positions are the (market, side) pairs its own claims, or its cluster's claims, describe (`claim_positions`, mapped from claim text and market questions only; A35.1, A48). Of {A35['suspected_side_positions']} pre-news positions of labelled wallets in their own cases (precise cut), {A35['alleged_positions']} are alleged; the other {A35['labelled_other_positions']} are `role = labelled_other_position` in `episodes` and are not positives. All {A35['losing_positions']} losing suspected-side positions are labelled-other positions; no alleged position lost. On alleged positions: `label_strict` {a35l['label_strict']['alleged_positions']} positions from {a35l['label_strict']['wallets_with_alleged_position']} wallets in {a35l['label_strict']['cases_with_alleged_position']} cases, `label_standard` {a35l['label_standard']['alleged_positions']} from {a35l['label_standard']['wallets_with_alleged_position']} wallets in {a35l['label_standard']['cases_with_alleged_position']} cases, `label_broad` {a35l['label_broad']['alleged_positions']} from {a35l['label_broad']['wallets_with_alleged_position']} wallets in {a35l['label_broad']['cases_with_alleged_position']} cases. {A35['dropouts']['wallets']} labelled wallets drop out ({A35['dropouts']['by_reason'].get('no_linked_or_cluster_claim_names_market_or_side', 0)} because no claim names a market or side, e.g. all of `kpmg-earnings-2025-26` and `world-cup-2026-06`; {A35['dropouts']['by_reason'].get('alleged_market_or_side_not_held_before_cut', 0)} because they held no alleged market and side before the cut; `logs/a35_dropouts.csv`). The wallet-level version (any position of a labelled wallet) is reported as secondary (`baselines.json`, `wallet_level`).
+**Positives are alleged positions (A35).** A wallet's alleged positions are the (market, side) pairs its own claims, or its cluster's claims, describe (`claim_positions`, mapped from claim text and market questions only; A35.1, A48). Of {A35['suspected_side_positions']} pre-news positions of labelled wallets in their own cases (precise cut), {A35['alleged_positions']} are alleged; the other {A35['labelled_other_positions']} are `role = labelled_other_position` in `episodes` and are not positives. All {A35['losing_positions']} losing suspected-side positions are labelled-other positions; no alleged position lost. On alleged positions: `label_strict` {a35l['label_strict']['alleged_positions']} positions from {a35l['label_strict']['wallets_with_alleged_position']} wallets in {a35l['label_strict']['cases_with_alleged_position']} cases, `label_standard` {a35l['label_standard']['alleged_positions']} from {a35l['label_standard']['wallets_with_alleged_position']} wallets in {a35l['label_standard']['cases_with_alleged_position']} cases, `label_broad` {a35l['label_broad']['alleged_positions']} from {a35l['label_broad']['wallets_with_alleged_position']} wallets in {a35l['label_broad']['cases_with_alleged_position']} cases. {A35['dropouts']['wallets']} labelled wallets drop out ({A35['dropouts']['by_reason'].get('no_linked_or_cluster_claim_names_market_or_side', 0)} because no claim names a market or side, e.g. all of `kpmg-earnings-2025-26` and `world-cup-2026-06`; {A35['dropouts']['by_reason'].get('alleged_market_or_side_not_held_before_cut', 0)} because they held no alleged market and side before the cut; `logs/a35_dropouts.csv`). The wallet-level version (any position of a labelled wallet) is reported as secondary (`baselines.json`, `wallet_level`). **The benchmark target is `label_<set> & is_alleged_position`, not `label_<set>` alone:** the `label_*` columns are also true on `role = labelled_other_position` rows ({LO_STD_ALL:,} rows for `label_standard` in `episodes` over both news-time versions and the four control designs; {LO_STD_PS} in the precise, standard-design rows, including {LOST_STD} of the {LOST_N} losing positions; all {LOST_N} are `label_broad`).
 
 ## News times
 
@@ -122,7 +139,7 @@ Every time-dependent table exists for two cut times (`t_news_version`): `day` an
 
 ## Benchmarks (PROTOCOL A23, A26, A27, A29, A32, A33, A34; `benchmarks/`)
 
-Leave-one-group-out over connected case groups (A37: cases sharing a market or Gamma event are one group) with at least 3 `label_standard` wallets, plus a time split by group (test = groups first claimed on or after 2026-03-01). Positives are alleged positions (A35). Only `t_news_reliable = true` markets (A29) and directional pre-news positions in the economic view (A34-A34.2). Cells: case-weighted leave-one-case-out mean ± SD (number of folds) / time split; precise news times; seed 192. **With fewer than 6 folds (A32) a cell gives only the range of fold values** ("folds min-max (n) / time split"); per-fold values are in `baselines.json`. This applies to every `label_strict` cell.{FEW_TXT}{TS_TXT} {STRICT_FOLDS} Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
+Leave-one-group-out over connected case groups (A37: cases sharing a market or Gamma event are one group) with at least 3 `label_standard` wallets, plus a time split by group (test = groups first claimed on or after 2026-03-01). Positives are alleged positions (A35). Only `t_news_reliable = true` markets (A29) and directional pre-news positions in the economic view (A34-A34.2). Cells: the range of leave-one-group-out fold values, "folds min-max (number of folds) / time split" (A32: below 6 folds there is no mean, SD or single number); precise news times; seed 192; per-fold values are in `baselines.json`.{FEW_TXT}{TS_TXT} {STRICT_FOLDS} Models train on `label_standard` (`label_broad` for its own column); the `label_strict` column scores the same models on strict positives.
 
 **Headline tasks control for how sources select cases (A27):** **T1s** ranks pre-news buyers only within the size band of the market's positives (size alone no longer separates them); **T2s** matches controls on account-age band as well as time, price and size; **T2w** matches on account-age and prior win-rate bands (A33); both retry with the adjacent band before dropping an episode (`relaxed_band`); **T2-open** lets Orca/Inca-flagged wallets be controls. Secondary: T1 (all buyers), T2 (standard controls), T3 (case vs same-category twin markets), T3b (case vs crypto/weather placebo markets; market-type sensitive).
 
@@ -130,7 +147,12 @@ Leave-one-group-out over connected case groups (A37: cases sharing a market or G
 |---|---|---|---|---|---|
 {chr(10).join(bench_rows)}
 
-Base result for T2: matched same-side controls win about as often as documented episodes, so outcomes cannot separate them. Full per-fold results, leakage lists and the known shortcuts are in `benchmarks/README.md` and `benchmarks/baselines.json`.
+**Concentration and the time split.** {BIG_N} of the {STD_POS} `label_standard` alleged positives are in one group, `{BIG_G}` ({", ".join(f"`{c}`" for c in BIG_CASES)}: the Iran strike plus the ceasefire cases). A37 dates a whole group by its first claim ({BIG_DATE}, before the 2026-03-01 cut), so that group and every other group with an alleged positive fall in `train`, and **the time split has no test positive for any label set. The time split is retired for the alleged-position tasks** (the "/ n/a" in every cell; pre-registered as A54 for v1.3). It is kept for the wallet-level secondary results, where it still has test positives.
+
+**Strict folds (n+ = alleged strict positives in the test group; a fold with fewer than {MIN_EVAL} is marked not evaluable).** `label_strict` has **{" or ".join(map(str, N_EVAL_STRICT))} evaluable folds** in the headline tasks; the ranges in the strict column above still include the not-evaluable folds (A51 pre-registers excluding them for v1.3).
+{STRICT_NPOS}
+
+**T2 controls.** Only {COV['T2s']['n_episodes_with_same_side']} of {COV['T2s']['n_episodes']} alleged episodes have a same-side control in T2s ({COV['T2w']['n_episodes_with_same_side']} of {COV['T2w']['n_episodes']} in T2w); the rest are compared only with large buyers of the other token. Alleged episodes and same-side controls all won, and other-side controls all lost, so **T2s and T2w mostly compare alleged winners with other-side losers**, and price features separate them partly by construction (A52 pre-registers a headline T2 restricted to episodes with a same-side control for v1.3). Full per-fold results, leakage lists and the known shortcuts are in `benchmarks/README.md` and `benchmarks/baselines.json`.
 
 ## Coverage
 
@@ -163,7 +185,7 @@ CC-BY-4.0 for PMITC tables and docs; MIT for code. Polymarket-v1 (TimeSeventeen,
 
 ## How to cite
 
-> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.2.1 [dataset]. Protocol v1.0 with amendments A1 to A49. https://github.com/ibrhmyi/insider
+> Yildiz, I. (2026). *Prediction-Market Informed-Trading Casebook (PMITC)*, version 1.2.2 [dataset]. Protocol v1.0 with amendments A1 to A49 (A50-A54 pre-registered for v1.3). https://github.com/ibrhmyi/insider
 
 See `docs/CITATION.cff`. Please also cite Polymarket-v1 for the fills.
 """

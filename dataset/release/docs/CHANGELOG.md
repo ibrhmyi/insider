@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.2 (2026-11-28): docs only
+No data table, benchmark result or rule changed; tables, fills and `baselines.json` are byte-identical to v1.2.1 (their SHA-256 in `MANIFEST.json` are unchanged).
+- Dataset card: the benchmark target is `label_<set> & is_alleged_position`; `label_*` is also true on `labelled_other_position` rows. The leftover "mean ± SD" wording is gone (every cell is a range of fold values). n+ per strict fold, with folds under 5 positives marked not evaluable (strict has 2 evaluable folds in the headline tasks). 114 of 140 `label_standard` alleged positives sit in one group, which is why the time split is empty; the time split is retired for the alleged-position tasks. Only 44 of 140 alleged episodes have a same-side control in T2s.
+- CODEBOOK: the same target note on `label_strict`, `label_standard` and `label_broad` in `episodes` and `positions`.
+- EXTRACTION: extractor model filled in (Claude via Claude Code, `claude-opus-5-5`, for the session that finished run 11). CITATION: `cff-version` corrected to 1.2.0 (the CFF schema version), `version` 1.2.2.
+- PROTOCOL: A50-A54 pre-registered for v1.3 (not used in this release) and the CL0079 open question.
+- Unchanged: the notebooks and `benchmarks/pmitc_bench.py` still say v1.2.1, the version whose results they show.
+
 ## v1.2.1 (2026-11-28, run 11): last fixes
 Amendments A29-A49 (the run-11 request numbered them A28-A32; A28 was already taken by the run-10 multi-account family).
 - A29, A29.1: `t_news_reliable` per market in `markets`, `positions`, `episodes` and `market_minutes`: false only where the cut came from the A25 deadline rule (285 markets in 9 cases, range-dated tweet-count markets included); sourced exact times and checked scheduled starts are reliable (World Cup and KPMG stay in). `markets.t_news_deadline_rule_utc` keeps the deadline time. Default analyses and every benchmark use reliable rows only. (A29 as first applied, by case, flagged all 90 checked scheduled starts; A29.1 corrected the scope before any release table used it.)

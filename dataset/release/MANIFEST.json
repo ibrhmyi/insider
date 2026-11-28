@@ -1,6 +1,6 @@
 {
  "name": "PMITC",
- "version": "1.2.1",
+ "version": "1.2.2",
  "package": "release",
  "withheld_sources": [],
  "wallets_confirmed_only_by_withheld_sources": [],
@@ -34,14 +34,14 @@
   {
    "path": "README.md",
    "rows": null,
-   "bytes": 21246,
-   "sha256": "3ad1866a9296af07ad08a548e6e7b9cc7ec9000d727aedf3dda9f24ed7a9f6aa"
+   "bytes": 23980,
+   "sha256": "04c23abe52ca74ff253b6a869ef1688b0f18532ef0bccd504253a404b5c9e668"
   },
   {
    "path": "benchmarks/README.md",
    "rows": null,
-   "bytes": 9537,
-   "sha256": "937350df9251756e6dbc60038461b4b641b30c2c1e0825bb05a8393db9f986a7"
+   "bytes": 9569,
+   "sha256": "7ee3a72cef17c927aad2a7958440f86abbc1ab2ddb3f5d09ce53e38ed933810c"
   },
   {
    "path": "benchmarks/baselines.json",
@@ -298,32 +298,32 @@
   {
    "path": "dataset-metadata.json",
    "rows": null,
-   "bytes": 197763,
-   "sha256": "067d3e0a4fedeb0628d3e141d64dea0ac47bf3505faa95e6902f1e8602ed34a2"
+   "bytes": 202126,
+   "sha256": "46f71c6b58719c7933c1e7aff78c20befe1ea1b54170111260b1f278a119c989"
   },
   {
    "path": "docs/CHANGELOG.md",
    "rows": null,
-   "bytes": 12028,
-   "sha256": "f65c7ff17ddf151ac9f68d5084905cbba3ab42a0e6237ae80fd9613c6aa94eff"
+   "bytes": 13334,
+   "sha256": "80cce5e7133ead723f6b9afc02e1f127178d046cd1b48823228eebe086880f59"
   },
   {
    "path": "docs/CITATION.cff",
    "rows": null,
    "bytes": 1237,
-   "sha256": "f44c47497a7022b84d0d7fe83f29572584491562c8c2730c4ea0bf656990324a"
+   "sha256": "f4ff0b4b3078c48b46a35a053596dc7f63543ee845e61b35484c0e712f996f7d"
   },
   {
    "path": "docs/CODEBOOK.md",
    "rows": null,
-   "bytes": 46932,
-   "sha256": "adfef5664f5478d7d6f23be1411468d6a0b4b497c9199c9ac4ed4a615dcec85f"
+   "bytes": 48225,
+   "sha256": "ff7ffbeb7387684a0032f83b0a0a208aef552d74b4ea00dc80f54a3dad7e278a"
   },
   {
    "path": "docs/DATASHEET.md",
    "rows": null,
    "bytes": 5296,
-   "sha256": "c0e80d5cff3e9e9b607ff08b15d7b60ef7f3d95b8edf97465abb410799c6a12d"
+   "sha256": "b3a0635ceb267cc8b88fa746953547aa96ed5baf8e2af2d5e24c4b749a4a911f"
   },
   {
    "path": "docs/DATA_PROTECTION.md",
@@ -334,8 +334,8 @@
   {
    "path": "docs/EXTRACTION.md",
    "rows": null,
-   "bytes": 3266,
-   "sha256": "45c324cc42289f205f5f67e46c1c9e0813b9161fd99938b49edfd9b194ce1696"
+   "bytes": 3485,
+   "sha256": "d2f174518c57db96ee35a33bb0ef3bb73fec86fe13f8a7650ae7f7bf7b3cdf3b"
   },
   {
    "path": "docs/LICENSE.md",
@@ -352,14 +352,14 @@
   {
    "path": "docs/PROTOCOL.md",
    "rows": null,
-   "bytes": 74844,
-   "sha256": "cdd8eff38138a48a6475acfe1bfc49aa0996fbe251c63fdfc0c52f8b6c0d2813"
+   "bytes": 79361,
+   "sha256": "2aff3087f68f9f3871778da59687589efc3ff84adb2d49aab0b09f010d323b3d"
   },
   {
    "path": "docs/README.md",
    "rows": null,
-   "bytes": 19799,
-   "sha256": "a1dce4e52f5024b01ee8c9ab4e34a66eeb6a3366ab3eb0c1e9ff82b6a7b20cf3"
+   "bytes": 22533,
+   "sha256": "97793dcb1c603a7293d6e61c915394b612f7c80182779513920abe9a736232bd"
   },
   {
    "path": "docs/REBUILD.md",
@@ -376,8 +376,8 @@
   {
    "path": "docs/cases_timeline.png",
    "rows": null,
-   "bytes": 128863,
-   "sha256": "fcb401938ce1ef83a2c6535d09b40f3cbe7f09c735de61e4fe6439c7b8e99c23"
+   "bytes": 128812,
+   "sha256": "06e531125cd573d8605132c561a6e5b68d2a3350cdc749a6bb05d79ab5d591a5"
   },
   {
    "path": "notebooks/01_quickstart.ipynb",

@@ -294,9 +294,9 @@ All-buyer positions before the cut (C2): the full population a detector must sea
 | `gate2b` | bool |  |  |  | post | Signal B: largest pre-cut BUY in the event is on the shortest Yes deadline, Yes token (uses resolution: label only) |
 | `is_documented` | bool |  |  |  | label | wallet is documented for this case |
 | `doc_grade` | string |  | E1, E2, E3, E4, E5, E6 |  | label | wallet's doc_grade |
-| `label_strict` | bool |  |  |  | label | wallet in label_strict for this case (A20) |
-| `label_standard` | bool |  |  |  | label | label_standard (A20) |
-| `label_broad` | bool |  |  |  | label | label_broad (A20) |
+| `label_strict` | bool |  |  |  | label | wallet in label_strict for this case (A20); NOT the benchmark target: also true on non-alleged positions of the wallet; the A35 target is label_<set> AND is_alleged_position |
+| `label_standard` | bool |  |  |  | label | label_standard (A20); NOT the benchmark target: also true on non-alleged positions of the wallet; the A35 target is label_<set> AND is_alleged_position |
+| `label_broad` | bool |  |  |  | label | label_broad (A20); NOT the benchmark target: also true on non-alleged positions of the wallet; the A35 target is label_<set> AND is_alleged_position |
 | `hard_negative` | bool |  |  |  | label | A21: position matches the suspect profile but is a negative (loser, cleared case, or placebo winner) |
 | `hard_negative_rule` | string |  | lookalike_loser, cleared_case_lookalike, placebo_lookalike_winner |  | label | A21 rule |
 | `coordinated_rule_fired` | bool |  |  |  | label | A13 rule fired for this wallet, token, market, case and version. Rule output; about 1/3 expected by chance; may include copy-traders; not an allegation (A17) |
@@ -328,9 +328,9 @@ Per (wallet, market, token) episode of documented wallets and their matched cont
 | `relaxed_band` | bool |  |  |  | label | A33: control chosen after the adjacent age / win-rate band was allowed; false on suspected rows and exact-band controls |
 | `role` | string |  | suspected, labelled_other_position, control_same_side, control_other_side_large_buyer |  | label | A35: suspected (an alleged position of a labelled wallet), labelled_other_position (another position of a labelled wallet), control_same_side, control_other_side_large_buyer |
 | `is_alleged_position` | bool |  |  |  | label | A35: this (market, side) is one the wallet's claims describe (claim_positions) |
-| `label_strict` | bool |  |  |  | label | suspected row of a label_strict wallet (A20); false on control rows |
-| `label_standard` | bool |  |  |  | label | label_standard (A20) |
-| `label_broad` | bool |  |  |  | label | label_broad (A20) |
+| `label_strict` | bool |  |  |  | label | suspected-side row (suspected or labelled_other_position) of a label_strict wallet (A20); false on control rows; NOT the benchmark target: also true on role = labelled_other_position rows (2,648 such rows for label_standard over both versions and four designs; 365 in precise/standard, including 35 of the 39 losing positions); the A35 target is label_<set> AND is_alleged_position |
+| `label_standard` | bool |  |  |  | label | label_standard (A20); false on control rows; NOT the benchmark target: also true on role = labelled_other_position rows (2,648 such rows for label_standard over both versions and four designs; 365 in precise/standard, including 35 of the 39 losing positions); the A35 target is label_<set> AND is_alleged_position |
+| `label_broad` | bool |  |  |  | label | label_broad (A20); false on control rows; NOT the benchmark target: also true on role = labelled_other_position rows (2,648 such rows for label_standard over both versions and four designs; 365 in precise/standard, including 35 of the 39 losing positions); the A35 target is label_<set> AND is_alleged_position |
 | `control_of` | string |  |  |  | meta | row_id... of the episode this control is matched to (its episode_id via controls) |
 | `case_id` | string |  |  |  | meta | case |
 | `condition_id` | string |  |  |  | meta | market |

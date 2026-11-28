@@ -1,4 +1,4 @@
-# PMITC v1.2.1 benchmark tasks
+# PMITC v1.2.2 benchmark tasks (results unchanged from v1.2.1)
 
 Rules: PROTOCOL A15, A23, A26, A27, A29, A32, A33, A34-A34.2, A35, A37, A44 and A46. Run `python3 pmitc_bench.py` (writes `baselines.json`, seed 192; several hours with gradient-boosting tuning on 4 CPUs) or `python3 pmitc_bench.py --quick`; `notebooks/03_benchmarks.ipynb` shows the results.
 

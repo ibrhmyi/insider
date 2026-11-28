@@ -1,7 +1,7 @@
 # How the claims were extracted
 
 ## Extractor
-- The claims, cases, wallet labels, event times and protocol amendments were extracted and written by an **AI model (Anthropic Claude)** working under `PROTOCOL.md`, run by the dataset owner. Model and version: `<to be filled in by the owner from the session records>`. The `extractor` column of `claims` records the extractor per row.
+- The claims, cases, wallet labels, event times and protocol amendments were extracted and written by an **AI model (Anthropic Claude)** working under `PROTOCOL.md`, run by the dataset owner. Model and version: Claude (Anthropic) via Claude Code, `claude-opus-5-5` (the model that served the session that finished run 11 and wrote v1.2.2, as reported by the session itself; the session records of earlier runs are not visible from that session, so their model ids are not confirmed here). The `extractor` column of `claims` records the extractor per row.
 - No human has yet re-extracted any claim. The blind check (PROTOCOL A4) is **pending**: `blind_check_sample.csv` section 1 (18 claims, 20% of the first 92, seed 192) is blank, waiting for a second extractor who did not see the first pass. Section 2 (run 11, A35) is a seed-192 20% sample of `claim_positions` rows (36 of 178 rows, 13 claims) with the claim text only: the second extractor maps each claim to the market(s) and side it describes, without seeing the mapping, and the answers are compared by `cp_row`.
 
 | Blind check (A4) | Result |
