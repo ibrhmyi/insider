@@ -399,3 +399,5 @@ Minutes with no fills are left out. The table covers the outcome token of each m
 **A34.3 (2026-11-27, run 11, columns only, before episodes or positions are rebuilt; no rule, population or label changes).**
 - `positions` and `episodes` gain, per directional position (A34.2), from the econ BUYs of the directional token before the cut: `directional_first_buy_utc`, `directional_first_buy_price` (price of that first econ BUY), `directional_vwap_pre` (econ BUY USDC / econ BUY shares on the directional token) and `directional_hours_first_buy_to_cut`. NULL where the row is not a directional position.
 - `directional_cost_usdc_pre` is a **FIFO accounting figure** (the cost of the newest remaining lots after sells and full-set pairing); it is not an entry time or entry price. Entry-timing and entry-price features should use the four columns above.
+
+*Note to A34.3 (2026-11-28, run 11; naming only).* `directional_vwap_pre` is released as `directional_vwap_price_usdc_pre` in `positions` and `episodes`, because A24 requires a unit in every numeric column name (the existing `vwap_pre` is released as `vwap_price_usdc_pre`). The other A34.3 columns keep their names.

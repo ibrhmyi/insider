@@ -19,10 +19,14 @@ ADDR = re.compile(r"^0x[0-9a-f]{40}$")
 SINGLE = [t for t in TABLES if t != "fills"]
 
 
-def load(t, cols=None):
+def load(t, cols=None, filters=None):
     if t == "fills":
         return duckdb.sql(f"SELECT {', '.join(cols) if cols else '*'} FROM read_parquet('{R}/fills_part*.parquet')")
-    return pd.read_parquet(os.path.join(R, f"{t}.parquet"), columns=cols)
+    return pd.read_parquet(os.path.join(R, f"{t}.parquet"), columns=cols, filters=filters)
+
+
+def distinct(t, cols, where="true"):
+    return duckdb.sql(f"SELECT DISTINCT {', '.join(cols)} FROM read_parquet('{R}/{t}.parquet') WHERE {where}").df()
 
 
 def files_of(t):
@@ -44,15 +48,18 @@ def test_schema_dtypes_and_columns(t):
 
 @pytest.mark.parametrize("t", SINGLE)
 def test_allowed_values_and_no_empty_strings(t):
-    df = load(t)
+    """Checked column by column in DuckDB (positions has ~18 M rows; pandas would not fit the memory limit)."""
+    src = f"read_parquet('{files_of(t)[0]}')"
     for c in TABLES[t]["cols"]:
-        s = df[c["name"]]
-        if c["dtype"] == "string":
-            assert not (s == "").any(), (t, c["name"], "empty string instead of NULL")
-        if c["allowed"] and c["dtype"] == "string" and c["name"] not in ("platform", "family"):
-            vals = {tok for v in s.dropna() for tok in (v.split(";") if c["name"] == "label_family" else [v])}
+        if c["dtype"] != "string":
+            continue
+        n = c["name"]
+        assert duckdb.sql(f"SELECT count(*) FROM {src} WHERE {n} = ''").fetchall()[0][0] == 0, (t, n, "empty string instead of NULL")
+        if c["allowed"] and n not in ("platform", "family"):
+            vals = [r[0] for r in duckdb.sql(f"SELECT DISTINCT {n} FROM {src} WHERE {n} IS NOT NULL").fetchall()]
+            vals = {tok for v in vals for tok in (v.split(";") if n == "label_family" else [v])}
             bad = vals - set(c["allowed"].split(";"))
-            assert not bad, (t, c["name"], bad)
+            assert not bad, (t, n, bad)
 
 
 @pytest.mark.parametrize("t", list(TABLES))
@@ -64,7 +71,8 @@ def test_primary_keys_unique(t):
         n, u = duckdb.sql(f"SELECT count(*), count(DISTINCT leg_id) FROM read_parquet('{R}/fills_part*.parquet')").fetchall()[0]
         assert n == u
     else:
-        assert not load(t).duplicated(pk).any()
+        k = ", ".join(pk)
+        assert duckdb.sql(f"SELECT count(*) FROM (SELECT {k} FROM read_parquet('{files_of(t)[0]}') GROUP BY ALL HAVING count(*) > 1)").fetchall()[0][0] == 0
 
 
 def test_foreign_keys():
@@ -74,7 +82,7 @@ def test_foreign_keys():
     mk = load("markets"); mkeys = set(zip(mk.case_id, mk.condition_id))
     ep = load("episodes"); assert set(zip(ep.case_id, ep.condition_id)) <= mkeys
     ct = load("controls"); assert set(ct.episode_id) <= set(ep.episode_id.dropna())
-    pos = load("positions", ["market_set", "case_id", "condition_id"]).drop_duplicates()
+    pos = distinct("positions", ["market_set", "case_id", "condition_id"])
     assert set(map(tuple, pos[pos.market_set == "case"][["case_id", "condition_id"]].values)) <= mkeys
     pl = load("placebo_markets"); assert set(pos[pos.market_set == "placebo"].condition_id) <= set(pl.placebo_condition_id.dropna())
     tw = load("twin_markets"); assert set(pos[pos.market_set == "twin"].condition_id) <= set(tw.twin_condition_id.dropna())
@@ -90,7 +98,7 @@ def test_every_wallet_in_fills_or_flagged():
     w = load("wallets")
     seen = {r[0] for r in duckdb.sql(f"SELECT DISTINCT wallet FROM read_parquet('{R}/fills_part*.parquet')").fetchall()}
     if WITHHELD:  # wallets whose only fills are in withheld files still appear in positions (derived aggregates)
-        seen |= set(load("positions", ["wallet"]).wallet) | set(MAN.get("wallets_confirmed_only_by_withheld_sources", []))
+        seen |= set(distinct("positions", ["wallet"]).wallet) | set(MAN.get("wallets_confirmed_only_by_withheld_sources", []))
     missing = w[~w.wallet.isin(seen)]
     assert (missing.trade_confirmed == False).all(), missing[["wallet", "case_id"]]  # noqa: E712
 
@@ -155,15 +163,18 @@ def test_no_pre_news_feature_uses_post_news_fill(v):
     e = load("episodes"); e = e[e.t_news_version == v]
     assert (e.hours_first_buy_to_tnews.dropna() > 0).all() and (e.hours_last_buy_to_tnews.dropna() > 0).all()
     # recompute buy_usdc_pre for documented positions from fills with ts < cut
-    pp = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "t_cut_unix", "buy_usdc_pre", "is_documented"])
-    pp = pp[(pp.t_news_version == v) & pp.is_documented]
+    pp = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "t_cut_unix", "buy_usdc_pre", "is_documented"],
+              filters=[("t_news_version", "==", v), ("is_documented", "==", True)])
     if WITHHELD:  # only positions whose pre-cut legs are all in shipped files can be recomputed
-        src = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "source_pre"])
+        src = load("positions", ["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version", "source_pre"], filters=[("is_documented", "==", True)])
         pp = pp.merge(src, on=["market_set", "case_id", "condition_id", "asset_id", "wallet", "t_news_version"])
         pp = pp[pp.source_pre == "hf_polymarket_v1"].drop(columns="source_pre")
     con = duckdb.connect(); con.register("pp", pp)
-    d = con.sql(f"""SELECT pp.buy_usdc_pre, sum(f.econ_size_usdc) re FROM pp JOIN read_parquet('{R}/fills_part*_case_*.parquet') f
-                    ON f.condition_id = pp.condition_id AND f.econ_asset_id = pp.asset_id AND f.wallet = pp.wallet AND f.econ_side = 'BUY' AND f.ts_unix < pp.t_cut_unix
+    d = con.sql(f"""WITH f AS (SELECT condition_id, wallet, ts_unix, econ_asset_id a, econ_size_usdc u FROM read_parquet('{R}/fills_part*_case_*.parquet') WHERE econ_side = 'BUY'
+                               UNION ALL  -- A34.1: the inferred BUY part of a partial sell
+                               SELECT condition_id, wallet, ts_unix, econ_excess_asset_id, econ_excess_size_usdc FROM read_parquet('{R}/fills_part*_case_*.parquet') WHERE econ_excess_shares > 0)
+                    SELECT pp.buy_usdc_pre, sum(f.u) re FROM pp JOIN f
+                    ON f.condition_id = pp.condition_id AND f.a = pp.asset_id AND f.wallet = pp.wallet AND f.ts_unix < pp.t_cut_unix
                     GROUP BY pp.case_id, pp.condition_id, pp.asset_id, pp.wallet, pp.buy_usdc_pre""").df()
     assert len(d) == len(pp) and ((d.buy_usdc_pre - d.re).abs() < 1e-6 * (1 + d.re)).all()
 
@@ -277,8 +288,7 @@ def test_market_cut_not_after_sourced_case_time():
 def test_positions_use_market_cut():
     """A25: positions' cut is the market's own cut in both versions."""
     m = load("markets", ["case_id", "condition_id", "t_news_market_utc", "t_news_market_day_utc"])
-    p = load("positions", ["market_set", "case_id", "condition_id", "t_news_version", "t_cut_unix"])
-    p = p[p.market_set == "case"].drop_duplicates(["case_id", "condition_id", "t_news_version"]).merge(m, on=["case_id", "condition_id"])
+    p = distinct("positions", ["market_set", "case_id", "condition_id", "t_news_version", "t_cut_unix"], "market_set = 'case'").drop_duplicates(["case_id", "condition_id", "t_news_version"]).merge(m, on=["case_id", "condition_id"])
     exp = p.t_news_market_utc.where(p.t_news_version == "precise", p.t_news_market_day_utc)
     assert len(p) and (exp.map(lambda x: int(x.timestamp())).values == p.t_cut_unix.values).all()
 
@@ -287,8 +297,7 @@ def test_strict_requires_prenews_buy():
     """A26: every label_strict wallet bought before a case market's precise cut; strict_no_prenews is disjoint from strict and within standard."""
     w = load("wallets", ["wallet", "label_strict", "label_standard", "strict_no_prenews"])
     assert not (w.label_strict & w.strict_no_prenews).any() and (~w.strict_no_prenews | w.label_standard).all()
-    p = load("positions", ["market_set", "wallet", "t_news_version", "is_directional_position"])
-    pre = set(p[(p.market_set == "case") & (p.t_news_version == "precise") & p.is_directional_position].wallet)  # A34.2
+    pre = set(distinct("positions", ["wallet"], "market_set = 'case' AND t_news_version = 'precise' AND is_directional_position").wallet)  # A34.2
     assert set(w[w.label_strict].wallet) <= pre
 
 
@@ -390,7 +399,8 @@ def test_market_maker_flag_consistent():
     """A34.1: is_market_maker is the same reporting flag in positions and weak_labels."""
     w = duckdb.sql(f"SELECT wallet, is_market_maker FROM read_parquet('{R}/weak_labels.parquet') WHERE is_market_maker").df()
     p = duckdb.sql(f"SELECT DISTINCT wallet, is_market_maker FROM read_parquet('{R}/positions.parquet')").df()
-    assert duckdb.sql("SELECT count(*) FROM p WHERE is_market_maker AND wallet NOT IN (SELECT wallet FROM w)").fetchall()[0][0] == 0
+    allw = duckdb.sql(f"SELECT wallet FROM read_parquet('{R}/weak_labels.parquet')").df()  # weak_labels covers Polymarket-v1 wallets only
+    assert duckdb.sql("SELECT count(*) FROM p WHERE is_market_maker AND wallet IN (SELECT wallet FROM allw) AND wallet NOT IN (SELECT wallet FROM w)").fetchall()[0][0] == 0
     assert p.groupby("wallet").is_market_maker.nunique().max() == 1
 
 
@@ -398,8 +408,8 @@ def test_directional_entry_columns():
     """A34.3: entry columns only on directional positions, and always before the cut."""
     q = f"read_parquet('{R}/positions.parquet')"
     bad = duckdb.sql(f"""SELECT count(*) FROM {q} WHERE (is_directional_position AND (directional_first_buy_utc IS NULL OR NOT directional_hours_first_buy_to_cut > 0
-                              OR epoch(directional_first_buy_utc) >= t_cut_unix OR directional_vwap_pre NOT BETWEEN 0 AND 1))
-                          OR (NOT is_directional_position AND (directional_first_buy_utc IS NOT NULL OR directional_vwap_pre IS NOT NULL))""").fetchall()[0][0]
+                              OR epoch(directional_first_buy_utc) >= t_cut_unix OR directional_vwap_price_usdc_pre NOT BETWEEN 0 AND 1))
+                          OR (NOT is_directional_position AND (directional_first_buy_utc IS NOT NULL OR directional_vwap_price_usdc_pre IS NOT NULL))""").fetchall()[0][0]
     assert bad == 0
     e = load("episodes", ["role", "directional_first_buy_utc", "directional_hours_first_buy_to_cut"])
     assert e.directional_first_buy_utc.notna().all() and (e.directional_hours_first_buy_to_cut > 0).all()
