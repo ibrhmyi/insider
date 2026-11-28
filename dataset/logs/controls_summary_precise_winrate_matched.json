@@ -2,7 +2,7 @@
  "seed": 192,
  "n_episodes": 523,
  "n_controls": 4973,
- "n_pre_rows": 1498542,
+ "n_pre_rows": 1498543,
  "n_excluded_addresses": 12512,
  "episodes_with_same_side_controls": 397,
  "relaxation_counts": {
@@ -33,9 +33,9 @@
   "biden-pardons": 9,
   "walz-vp-2024": 5,
   "israel-rising-lion-2025-06": 2,
-  "draftkings-pm-launch": 1,
   "fed-chair-nomination-2026": 1,
+  "trump-pardon-cz-2025": 1,
   "taylor-swift-engagement": 1,
-  "trump-pardon-cz-2025": 1
+  "draftkings-pm-launch": 1
  }
 }
