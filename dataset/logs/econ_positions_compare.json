@@ -12,26 +12,26 @@
    "directional_econ_only_share": 0.3536
   },
   "non_market_maker": {
-   "raw_positions": 1584116,
-   "econ_positions": 2230909,
+   "raw_positions": 1584382,
+   "econ_positions": 2231272,
    "econ_only_share": 0.2899,
    "growth": 0.4083,
-   "raw_buy_usdc": 1913839664,
-   "econ_buy_usdc": 3187839687,
-   "buy_usdc_growth": 0.6657,
-   "directional_positions": 1389901,
+   "raw_buy_usdc": 1914416582,
+   "econ_buy_usdc": 3188290736,
+   "buy_usdc_growth": 0.6654,
+   "directional_positions": 1390439,
    "directional_econ_only_share": 0.3546
   },
   "market_maker": {
-   "raw_positions": 10510,
-   "econ_positions": 12465,
-   "econ_only_share": 0.1568,
-   "growth": 0.186,
-   "raw_buy_usdc": 29728373,
-   "econ_buy_usdc": 67575143,
-   "buy_usdc_growth": 1.2731,
-   "directional_positions": 8257,
-   "directional_econ_only_share": 0.1941
+   "raw_positions": 10244,
+   "econ_positions": 12102,
+   "econ_only_share": 0.1535,
+   "growth": 0.1814,
+   "raw_buy_usdc": 29151455,
+   "econ_buy_usdc": 67124094,
+   "buy_usdc_growth": 1.3026,
+   "directional_positions": 7719,
+   "directional_econ_only_share": 0.1845
   }
  },
  "case/precise": {
@@ -43,30 +43,30 @@
    "raw_buy_usdc": 2097521893,
    "econ_buy_usdc": 3440868231,
    "buy_usdc_growth": 0.6404,
-   "directional_positions": 1498542,
+   "directional_positions": 1498543,
    "directional_econ_only_share": 0.3429
   },
   "non_market_maker": {
-   "raw_positions": 1689551,
-   "econ_positions": 2359064,
+   "raw_positions": 1689913,
+   "econ_positions": 2359516,
    "econ_only_share": 0.2838,
-   "growth": 0.3963,
-   "raw_buy_usdc": 2065772257,
-   "econ_buy_usdc": 3370120113,
-   "buy_usdc_growth": 0.6314,
-   "directional_positions": 1489732,
-   "directional_econ_only_share": 0.3439
+   "growth": 0.3962,
+   "raw_buy_usdc": 2066341584,
+   "econ_buy_usdc": 3370665346,
+   "buy_usdc_growth": 0.6312,
+   "directional_positions": 1490380,
+   "directional_econ_only_share": 0.3438
   },
   "market_maker": {
-   "raw_positions": 11291,
-   "econ_positions": 13318,
-   "econ_only_share": 0.1522,
-   "growth": 0.1795,
-   "raw_buy_usdc": 31749636,
-   "econ_buy_usdc": 70748118,
-   "buy_usdc_growth": 1.2283,
-   "directional_positions": 8810,
-   "directional_econ_only_share": 0.1884
+   "raw_positions": 10929,
+   "econ_positions": 12866,
+   "econ_only_share": 0.1506,
+   "growth": 0.1772,
+   "raw_buy_usdc": 31180310,
+   "econ_buy_usdc": 70202885,
+   "buy_usdc_growth": 1.2515,
+   "directional_positions": 8163,
+   "directional_econ_only_share": 0.1806
   }
  },
  "placebo/day": {
@@ -82,26 +82,26 @@
    "directional_econ_only_share": 0.513
   },
   "non_market_maker": {
-   "raw_positions": 1964804,
-   "econ_positions": 3444836,
-   "econ_only_share": 0.4296,
-   "growth": 0.7533,
-   "raw_buy_usdc": 735026959,
-   "econ_buy_usdc": 1082132186,
-   "buy_usdc_growth": 0.4722,
-   "directional_positions": 2577898,
+   "raw_positions": 1964071,
+   "econ_positions": 3443829,
+   "econ_only_share": 0.4297,
+   "growth": 0.7534,
+   "raw_buy_usdc": 734885882,
+   "econ_buy_usdc": 1081853197,
+   "buy_usdc_growth": 0.4721,
+   "directional_positions": 2577627,
    "directional_econ_only_share": 0.5175
   },
   "market_maker": {
-   "raw_positions": 49644,
-   "econ_positions": 55748,
-   "econ_only_share": 0.1095,
-   "growth": 0.123,
-   "raw_buy_usdc": 23721479,
-   "econ_buy_usdc": 40273325,
-   "buy_usdc_growth": 0.6978,
-   "directional_positions": 30524,
-   "directional_econ_only_share": 0.1349
+   "raw_positions": 50377,
+   "econ_positions": 56755,
+   "econ_only_share": 0.1124,
+   "growth": 0.1266,
+   "raw_buy_usdc": 23862556,
+   "econ_buy_usdc": 40552313,
+   "buy_usdc_growth": 0.6994,
+   "directional_positions": 30795,
+   "directional_econ_only_share": 0.1374
   }
  },
  "placebo/precise": {
@@ -113,100 +113,100 @@
    "raw_buy_usdc": 786433939,
    "econ_buy_usdc": 1166444199,
    "buy_usdc_growth": 0.4832,
-   "directional_positions": 2702590,
+   "directional_positions": 2702589,
    "directional_econ_only_share": 0.5122
   },
   "non_market_maker": {
-   "raw_positions": 2027504,
-   "econ_positions": 3555988,
-   "econ_only_share": 0.4298,
-   "growth": 0.7539,
-   "raw_buy_usdc": 762227470,
-   "econ_buy_usdc": 1125381824,
+   "raw_positions": 2026696,
+   "econ_positions": 3554896,
+   "econ_only_share": 0.4299,
+   "growth": 0.754,
+   "raw_buy_usdc": 762108108,
+   "econ_buy_usdc": 1125149832,
    "buy_usdc_growth": 0.4764,
-   "directional_positions": 2671115,
-   "directional_econ_only_share": 0.5166
+   "directional_positions": 2670853,
+   "directional_econ_only_share": 0.5167
   },
   "market_maker": {
-   "raw_positions": 51184,
-   "econ_positions": 57472,
-   "econ_only_share": 0.1094,
-   "growth": 0.1229,
-   "raw_buy_usdc": 24206468,
-   "econ_buy_usdc": 41062375,
-   "buy_usdc_growth": 0.6963,
-   "directional_positions": 31475,
-   "directional_econ_only_share": 0.1355
+   "raw_positions": 51992,
+   "econ_positions": 58564,
+   "econ_only_share": 0.1122,
+   "growth": 0.1264,
+   "raw_buy_usdc": 24325831,
+   "econ_buy_usdc": 41294368,
+   "buy_usdc_growth": 0.6976,
+   "directional_positions": 31736,
+   "directional_econ_only_share": 0.138
   }
  },
  "twin/day": {
   "all": {
-   "raw_positions": 622250,
-   "econ_positions": 878744,
-   "econ_only_share": 0.2919,
-   "growth": 0.4122,
-   "raw_buy_usdc": 337185815,
-   "econ_buy_usdc": 526110752,
-   "buy_usdc_growth": 0.5603,
-   "directional_positions": 489503,
-   "directional_econ_only_share": 0.4003
+   "raw_positions": 1126137,
+   "econ_positions": 1596769,
+   "econ_only_share": 0.2947,
+   "growth": 0.4179,
+   "raw_buy_usdc": 638786967,
+   "econ_buy_usdc": 967138285,
+   "buy_usdc_growth": 0.514,
+   "directional_positions": 912424,
+   "directional_econ_only_share": 0.4039
   },
   "non_market_maker": {
-   "raw_positions": 619618,
-   "econ_positions": 875749,
-   "econ_only_share": 0.2925,
-   "growth": 0.4134,
-   "raw_buy_usdc": 333423958,
-   "econ_buy_usdc": 518974494,
-   "buy_usdc_growth": 0.5565,
-   "directional_positions": 487582,
-   "directional_econ_only_share": 0.4012
+   "raw_positions": 1120724,
+   "econ_positions": 1590596,
+   "econ_only_share": 0.2954,
+   "growth": 0.4193,
+   "raw_buy_usdc": 627165887,
+   "econ_buy_usdc": 949014995,
+   "buy_usdc_growth": 0.5132,
+   "directional_positions": 908923,
+   "directional_econ_only_share": 0.4049
   },
   "market_maker": {
-   "raw_positions": 2632,
-   "econ_positions": 2995,
-   "econ_only_share": 0.1212,
-   "growth": 0.1379,
-   "raw_buy_usdc": 3761856,
-   "econ_buy_usdc": 7136258,
-   "buy_usdc_growth": 0.897,
-   "directional_positions": 1921,
-   "directional_econ_only_share": 0.1661
+   "raw_positions": 5413,
+   "econ_positions": 6173,
+   "econ_only_share": 0.1231,
+   "growth": 0.1404,
+   "raw_buy_usdc": 11621080,
+   "econ_buy_usdc": 18123290,
+   "buy_usdc_growth": 0.5595,
+   "directional_positions": 3501,
+   "directional_econ_only_share": 0.1697
   }
  },
  "twin/precise": {
   "all": {
-   "raw_positions": 648643,
-   "econ_positions": 918581,
-   "econ_only_share": 0.2939,
-   "growth": 0.4162,
-   "raw_buy_usdc": 343657338,
-   "econ_buy_usdc": 535135271,
-   "buy_usdc_growth": 0.5572,
-   "directional_positions": 517501,
-   "directional_econ_only_share": 0.402
+   "raw_positions": 1163603,
+   "econ_positions": 1654609,
+   "econ_only_share": 0.2968,
+   "growth": 0.422,
+   "raw_buy_usdc": 656838796,
+   "econ_buy_usdc": 991815496,
+   "buy_usdc_growth": 0.51,
+   "directional_positions": 955027,
+   "directional_econ_only_share": 0.4053
   },
   "non_market_maker": {
-   "raw_positions": 645914,
-   "econ_positions": 915477,
-   "econ_only_share": 0.2945,
-   "growth": 0.4173,
-   "raw_buy_usdc": 339785940,
-   "econ_buy_usdc": 527866621,
-   "buy_usdc_growth": 0.5535,
-   "directional_positions": 515504,
-   "directional_econ_only_share": 0.4029
+   "raw_positions": 1158035,
+   "econ_positions": 1648242,
+   "econ_only_share": 0.2974,
+   "growth": 0.4233,
+   "raw_buy_usdc": 644907435,
+   "econ_buy_usdc": 973271782,
+   "buy_usdc_growth": 0.5092,
+   "directional_positions": 951393,
+   "directional_econ_only_share": 0.4062
   },
   "market_maker": {
-   "raw_positions": 2729,
-   "econ_positions": 3104,
-   "econ_only_share": 0.1208,
-   "growth": 0.1374,
-   "raw_buy_usdc": 3871398,
-   "econ_buy_usdc": 7268650,
-   "buy_usdc_growth": 0.8775,
-   "directional_positions": 1997,
-   "directional_econ_only_share": 0.1657
+   "raw_positions": 5568,
+   "econ_positions": 6367,
+   "econ_only_share": 0.1255,
+   "growth": 0.1435,
+   "raw_buy_usdc": 11931361,
+   "econ_buy_usdc": 18543713,
+   "buy_usdc_growth": 0.5542,
+   "directional_positions": 3634,
+   "directional_econ_only_share": 0.1734
   }
  }
 }
